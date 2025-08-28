@@ -1,0 +1,97 @@
+hrms-frontend/
+│
+├── eslint.config.mjs
+├── jsconfig.json
+├── next.config.mjs
+├── package.json
+├── postcss.config.mjs
+├── README.md
+│
+├── public/
+│   ├── icons/ (add this folder)
+│   │   ├── dashboard.svg
+│   │   ├── employees.svg
+│   │   ├── attendance.svg
+│   │   └── ...other icons
+│   └── ...existing SVGs
+│
+├── src/
+│   ├── app/
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.js
+│   │   ├── page.js
+│   │   ├── (auth)/
+│   │   │   ├── layout.js
+│   │   │   ├── login/
+│   │   │   │   └── page.js
+│   │   │   └── register/
+│   │   │       └── page.js
+│   │   └── (dashboard)/
+│   │       ├── layout.js
+│   │       ├── employee/
+│   │       │   ├── dashboard/
+│   │       │   │   └── page.js
+│   │       │   ├── leave/
+│   │       │   │   └── page.js
+│   │       │   ├── profile/
+│   │       │   │   └── page.js
+│   │       │   ├── attendance/
+│   │       │   │   └── page.js
+│   │       │   ├── payslips/
+│   │       │   │   └── page.js
+│   │       │   └── documents/
+│   │       │       └── page.js
+│   │       └── hr/
+│   │           ├── dashboard/
+│   │           │   └── page.js
+│   │           ├── employees/
+│   │           │   └── page.js
+│   │           ├── leave-requests/
+│   │           │   └── page.js
+│   │           ├── attendance/
+│   │           │   └── page.js
+│   │           ├── payroll/
+│   │           │   └── page.js
+│   │           ├── recruitment/
+│   │           │   └── page.js
+│   │           ├── performance/
+│   │           │   └── page.js
+│   │           └── reports/
+│   │               └── page.js
+│   │
+│   ├── components/
+│   │   ├── layout/
+│   │   │   ├── AppHeader.js
+│   │   │   ├── AppSidebar.js
+│   │   │   └── RoleBasedAccess.js
+│   │   ├── ui/
+│   │   │   ├── Button.js
+│   │   │   ├── Card.js
+│   │   │   ├── Table.js
+│   │   │   ├── Modal.js
+│   │   │   └── FormElements.js
+│   │   ├── dashboard/
+│   │   │   ├── StatsCard.js
+│   │   │   ├── CalendarView.js
+│   │   │   └── RecentActivity.js
+│   │   └── hr/
+│   │       ├── EmployeeForm.js
+│   │       ├── LeaveRequestTable.js
+│   │       └── PayrollCalculator.js
+│   │
+│   ├── lib/
+│   │   ├── auth.js
+│   │   ├── api.js
+│   │   └── utils.js
+│   │
+│   ├── contexts/
+│   │   └── AuthContext.js
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.js
+│   │   └── useLocalStorage.js
+│   │
+│   └── constants/
+│       ├── roles.js
+│       └── routes.js

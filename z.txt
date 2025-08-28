@@ -1,0 +1,206 @@
+https://nextjs-demo.tailadmin.com/
+
+
+
+src/
+└── app/
+    ├── (auth)/
+    │   ├── login/
+    │   │   └── page.js              # Login page (simple layout)
+    │   └── register/
+    │       └── page.js              # Registration page
+    │   └── layout.js                # Layout for auth: No sidebar, just a simple centered form.
+    ├── (dashboard)/
+    │   ├── employee/
+    │   │   ├── dashboard/
+    │   │   │   └── page.js          # Employee's main page
+    │   │   ├── leave/
+    │   │   │   └── page.js          # Employee applies for leave here
+    │   │   └── profile/
+    │   │       └── page.js          # Employee views their profile
+    │   ├── hr/
+    │   │   ├── dashboard/
+    │   │   │   └── page.js          # HR's main page
+    │   │   ├── employees/
+    │   │   │   └── page.js          # HR manages employees here
+    │   │   └── leave-requests/
+    │   │       └── page.js          # HR approves/denies leave here
+    │   └── layout.js                # MAIN DASHBOARD LAYOUT: Contains the <Sidebar> & <Header> for ALL dashboard pages
+    ├── globals.css                  # Tailwind is here + your template's main CSS
+    ├── layout.js                    # Root layout (html, body)
+    └── page.js                      # Your website's homepage (maybe a landing page)
+
+    The Flow of a User
+User arrives at the site (/). maybe a public landing page.
+
+They click Login, going to /login.
+
+The (auth)/layout.js provides a clean, simple page.
+
+They log in.
+
+Your login logic checks their role from the future backend API.
+
+They are redirected:
+
+If role === 'employee' → redirect to /employee/dashboard
+
+If role === 'hr' → redirect to /hr/dashboard
+
+They see their dashboard:
+
+The (dashboard)/layout.js file wraps the page. This layout contains the <Sidebar /> and <Header /> components you created from the template.
+
+The URL defines which page's content (page.js) is shown inside the layout.
+
+The Sidebar component can hide/show menu items based on the user's role.
+
+What to Do Right Now:
+Create the /src/app/(auth) and /src/app/(dashboard) folder groups.
+
+Build the (dashboard)/layout.js file. This is your most important task. Put your downloaded template's sidebar and header code in here.
+
+Create simple placeholder page.js files for /login, /employee/dashboard, and /hr/dashboard to test the routing and layout.
+
+Style it. Make sure your template's CSS is loaded in globals.css and that the sidebar and header look correct.
+
+This structure is scalable and perfectly handles multiple roles within a single, clean codebase.
+
+--------------------------------------------------
+mkdir -p src/components/auth
+touch src/components/auth/SignInForm.js
+
+
+
+
+
+
+
+above page is of my downloaded template file so that project is using Next.js , Typescript, and extension is .tsx
+and I am creating a Next.js project from scratch and I am not using typescript so can you please convert above code for my project as of I am not using typescript and extension is .js
+
+
+============================================================================
+I am creating HRMS software for my company
+below is my Next.js project folder structure. I am not using typescript and for css I am using tailwind.
+hrms-frontend/
+│
+├── public/
+│   ├── file.svg
+│   ├── globe.svg
+│   ├── next.svg
+│   ├── vercel.svg
+│   ├── window.svg
+│   └── images/
+│       ├── logo/
+│       │   └── auth-logo.svg
+│       └── shape/
+│           └── grid-01.svg
+│
+├── src/
+│   ├── app/
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.js
+│   │   ├── page.js
+│   │   ├── (auth)/
+│   │   │   ├── layout.js
+│   │   │   └── signin/
+│   │   │       └── page.js
+│   │   └── (dashboard)/
+│   │       ├── layout.js
+│   │       ├── employee/
+│   │       │   ├── attendance/page.js
+│   │       │   ├── dashboard/page.js
+│   │       │   ├── leave/page.js
+│   │       │   ├── payslips/page.js
+│   │       │   └── profile/page.js
+│   │       └── hr/
+│   │           ├── attendance/page.js
+│   │           ├── dashboard/
+│   │           │   ├── page.js
+│   │           │   └── components/
+│   │           │       └── MonthlyTarget.js
+│   │           ├── employees/
+│   │           │   ├── page.js
+│   │           │   ├── [id]/page.js
+│   │           │   ├── [id]/edit/page.js
+│   │           │   └── new/page.js
+│   │           ├── leave/page.js
+│   │           ├── payroll/page.js
+│   │           ├── recruitment/page.js
+│   │           └── report/page.js
+│   │
+│   ├── components/
+│   │   ├── auth/SignInForm.js
+│   │   ├── common/
+│   │   │   ├── GridShape.js
+│   │   │   ├── ThemeToggleButton.js
+│   │   │   └── ThemeTogglerTwo.js
+│   │   ├── form/
+│   │   │   ├── Label.js
+│   │   │   └── input/
+│   │   │       ├── Checkbox.js
+│   │   │       └── InputField.js
+│   │   ├── header/
+│   │   │   ├── NotificationDropdown.js
+│   │   │   └── UserDropdown.js
+│   │   ├── layout/
+│   │   │   ├── AppHeader.js
+│   │   │   ├── AppSidebar.js
+│   │   │   └── Backdrop.js
+│   │   └── ui/
+│   │       ├── button/Button.js
+│   │       └── dropdown/
+│   │           ├── Dropdown.js
+│   │           └── DropdownItem.js
+│   │
+│   ├── context/
+│   │   ├── SidebarContext.js
+│   │   └── ThemeContext.js
+│   │
+│   └── icons/
+│       └── index.js
+│
+├── .gitignore
+├── eslint.config.mjs
+├── jsconfig.json
+├── next.config.mjs
+├── package.json
+├── postcss.config.mjs
+├── README.md
+├── z.txt
+└── zzdetails.txt
+
+and my package.json below 
+{
+  "name": "hrms-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.12",
+    "apexcharts": "^5.3.4",
+    "lucide-react": "^0.541.0",
+    "next": "15.5.0",
+    "react": "19.1.0",
+    "react-apexcharts": "^1.7.0",
+    "react-dom": "19.1.0",
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.0"
+  }
+}
+
+so create component for if you think its necessary and please make UI better you have full freedom to do that.
+let me give you code which you can take reference and convert to next.js
