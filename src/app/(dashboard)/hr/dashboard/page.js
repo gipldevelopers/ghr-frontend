@@ -1,5 +1,5 @@
 import React from "react";
-import MonthlyTarget from "@/app/(dashboard)/hr/dashboard/components/MonthlyTarget";
+// import MonthlyTarget from "@/app/(dashboard)/hr/dashboard/components/MonthlyTarget";
 import WelcomeWrap from "./components/WelcomeWrap";
 import StatsCard from "./components/StatsCard";
 import EmployeeDepartmentChart from "./components/EmployeeDepartmentChart";
@@ -7,6 +7,8 @@ import JobApplicants from "./components/JobApplicants";
 import Schedules from "./components/Schedules";
 import AttendanceOverview from "./components/AttendanceOverview";
 import Birthdays from "./components/Birthdays";
+import ClockInOut from "./components/ClockInOut";
+import EmployeesTable from "./components/EmployeesTable";
 
 export const metadata = {
   title: "HR Dashboard | HRMS Portal",
@@ -244,42 +246,40 @@ export default function HrDashboard() {
       </div>
 
       {/* New Row for Additional Components */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6"> */}
+      <div className="flex flex-wrap gap-4 md:gap-6">
         {/* Job Applicants Component */}
-        <div className="lg:col-span-1">
+        {/* <div className="lg:col-span-1"> */}
+        <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
           <JobApplicants />
         </div>
 
         {/* Schedules Component */}
-        <div className="lg:col-span-1">
+        <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
           <Schedules />
         </div>
         {/* Attendance Overview Component */}
-        <div className="lg:col-span-1">
+        <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
           <AttendanceOverview />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+      <div className="flex flex-wrap gap-4 md:gap-6">
         {/* Birthdays Component */}
-        <div className="lg:col-span-1">
+        <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
           <Birthdays />
         </div>
 
-        {/* Add your other two components here */}
-        <div className="lg:col-span-1">
-          {/* Replace with your first additional component */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 p-5 h-full flex items-center justify-center">
-            <p className="text-gray-500 dark:text-gray-400">Component 1</p>
-          </div>
+         {/* ClockInOut Component */}
+        <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <ClockInOut />
         </div>
 
-        <div className="lg:col-span-1">
-          {/* Replace with your second additional component */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 p-5 h-full flex items-center justify-center">
-            <p className="text-gray-500 dark:text-gray-400">Component 2</p>
-          </div>
+        {/* Employees Table Component */}
+        <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <EmployeesTable />
         </div>
+
       </div>
     </div>
   );

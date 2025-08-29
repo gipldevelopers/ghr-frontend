@@ -84,41 +84,55 @@ const AttendanceOverview = () => {
         </h5>
 
         {/* Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            className="flex items-center px-3 py-1 text-sm font-medium border rounded-lg bg-white dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          >
-            <span className="mr-2">{selectedPeriod}</span>
-            <svg
-              className={`h-4 w-4 transform transition-transform ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-          {isDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-36 bg-white dark:bg-gray-700 rounded-md shadow-lg border border-gray-200 dark:border-gray-600 z-20">
-              {periodOptions.map((period) => (
-                <button
-                  key={period}
-                  className={`block w-full text-left px-4 py-2 text-sm ${
-                    selectedPeriod === period
-                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                      : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  }`}
-                  onClick={() => handlePeriodSelect(period)}
-                >
-                  {period}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+<div className="dropdown relative" ref={dropdownRef}>
+  <button
+    className="btn btn-white border border-gray-200 dark:border-gray-600 text-xs py-1 px-2 rounded-lg inline-flex items-center bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+  >
+    <svg
+      className="h-3 w-3 mr-1"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+      />
+    </svg>
+    {selectedPeriod}
+    <svg 
+      className="h-3 w-3 ml-1 transition-transform" 
+      style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'rotate(0)' }}
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+  
+  {/* Dropdown menu */}
+  {isDropdownOpen && (
+    <div className="absolute right-0 mt-1 w-32 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-lg z-10">
+      {periodOptions.map((period) => (
+        <button
+          key={period}
+          className={`block w-full text-left px-4 py-2 text-xs ${
+            selectedPeriod === period 
+              ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" 
+              : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
+          }`}
+          onClick={() => handlePeriodSelect(period)}
+        >
+          {period}
+        </button>
+      ))}
+    </div>
+  )}
+</div>
       </div>
 
       {/* Body */}

@@ -200,7 +200,7 @@ const JobApplicants = () => {
                     </div>
                   </div>
                   <span
-                    className={`text-[10px] py-[2px] px-2 rounded-sm ${applicant.badgeColor} text-white`}
+                    className={`text-[10px] px-2 py-1 rounded-sm ${applicant.badgeColor} text-white`}
                   >
                     {applicant.position}
                   </span>

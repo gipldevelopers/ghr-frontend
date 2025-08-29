@@ -7,6 +7,7 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import Checkbox from "@/components/form/input/Checkbox";
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { useAuth } from "@/context/AuthContext"; // Import the auth context
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,12 +17,22 @@ export default function SignInForm() {
     password: ""
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { login } = useAuth(); // Get the login function from auth context
 
-  // Static credentials for HR login
-  const hrCredentials = {
-    email: "hr@gipl.com",
-    password: "hr123"
+  // Static credentials for different roles
+  const credentials = {
+    hr: {
+      email: "hr@ghr.com",
+      password: "hr123",
+      role: "HR Admin"
+    },
+    employee: {
+      email: "employee@gipl.com",
+      password: "emp123",
+      role: "Employee"
+    }
   };
 
   const handleChange = (e) => {
@@ -34,16 +45,50 @@ export default function SignInForm() {
     if (error) setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     
-    // Check if credentials match the static HR credentials
-    if (formData.email === hrCredentials.email && formData.password === hrCredentials.password) {
-      console.log("HR login successful");
-      // Redirect to HR dashboard
-      router.push("/hr/dashboard");
-    } else {
-      setError("Invalid email or password. Use hr@gipl.com / hr123");
+    try {
+      // Check if credentials match any of the static credentials
+      let userData = null;
+      
+      if (formData.email === credentials.hr.email && formData.password === credentials.hr.password) {
+        userData = {
+          email: credentials.hr.email,
+          role: credentials.hr.role,
+          name: "HR Administrator",
+          id: "hr-001"
+        };
+      } else if (formData.email === credentials.employee.email && formData.password === credentials.employee.password) {
+        userData = {
+          email: credentials.employee.email,
+          role: credentials.employee.role,
+          name: "John Employee",
+          id: "emp-001"
+        };
+      } else {
+        setError("Invalid email or password. Try hr@ghr.com/hr123 or employee@gipl.com/emp123");
+        setLoading(false);
+        return;
+      }
+      
+      // Login using the auth context
+      login(userData);
+      
+      // Redirect based on role
+      if (userData.role === 'HR Admin') {
+        router.push("/hr/dashboard");
+      } else {
+        router.push("/employee/dashboard");
+      }
+      
+    } catch (error) {
+      setError("An error occurred during login");
+      console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -130,12 +175,28 @@ export default function SignInForm() {
               </div>
               
               <div>
-                <Button type="submit" className="w-full" size="sm">
-                  Sign In
+                <Button 
+                  type="submit" 
+                  className="w-full" 
+                  size="sm"
+                  disabled={loading}
+                >
+                  {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
               </div>
             </div>
           </form>
+
+          {/* Demo credentials hint */}
+          <div className="p-4 mt-6 text-sm bg-blue-50 rounded-lg dark:bg-blue-900/20">
+            <p className="font-medium text-blue-800 dark:text-blue-300">Demo Credentials:</p>
+            <p className="mt-1 text-blue-700 dark:text-blue-200">
+              HR: hr@ghr.com / hr123
+            </p>
+            <p className="text-blue-700 dark:text-blue-200">
+              Employee: employee@gipl.com / emp123
+            </p>
+          </div>
 
            <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start flex justify-between">

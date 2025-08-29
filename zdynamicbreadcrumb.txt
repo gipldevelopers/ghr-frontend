@@ -1,0 +1,55 @@
+5. Handle Special Cases
+For pages that need custom breadcrumb labels (like employee names), you can pass props or use context. Here's an example for the employee detail page:
+
+In src/app/(dashboard)/hr/employees/[id]/page.js:
+
+jsx
+import Breadcrumb from '@/components/common/Breadcrumb';
+import CustomBreadcrumb from './components/CustomBreadcrumb';
+
+export default async function EmployeeDetail({ params }) {
+  // Fetch employee data
+  const employee = await getEmployee(params.id);
+  
+  return (
+    <div>
+      <CustomBreadcrumb employeeName={employee.name} />
+      {/* Page content */}
+    </div>
+  );
+}
+Create src/app/(dashboard)/hr/employees/[id]/components/CustomBreadcrumb.js:
+
+jsx
+'use client';
+
+import { usePathname } from 'next/navigation';
+import Breadcrumb from '@/components/common/Breadcrumb';
+
+const CustomBreadcrumb = ({ employeeName }) => {
+  const pathname = usePathname();
+  
+  // Override the default breadcrumb label for the current path
+  const customLabels = {
+    [pathname]: employeeName
+  };
+  
+  return <Breadcrumb customLabels={customLabels} />;
+};
+
+export default CustomBreadcrumb;
+Why This Approach is Best
+No Additional Dependencies: Uses Next.js capabilities without adding new libraries
+
+Customizable: You can easily customize the appearance and behavior
+
+Dynamic Routing Support: Handles dynamic routes like [id] effectively
+
+Performance: Lightweight solution with minimal overhead
+
+Maintainable: Centralized configuration for route mappings
+
+Styling with Tailwind
+The component uses Tailwind CSS classes, but you can customize them to match your design system. You might want to add responsive behavior or different styles based on your theme.
+
+This implementation gives you a flexible, maintainable breadcrumb system that works with your existing project structure.
