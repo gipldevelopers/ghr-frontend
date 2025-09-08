@@ -11,7 +11,7 @@ import {
   Calendar,
   Users,
   Clock,
-  DollarSign,
+  IndianRupee,
   CheckCircle,
   XCircle
 } from 'lucide-react';

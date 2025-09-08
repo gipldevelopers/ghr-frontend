@@ -1,5 +1,5 @@
 "use client";
-import { Briefcase, Calendar, User, DollarSign, Clock, Building, Users, FileText } from 'lucide-react';
+import { Briefcase, Calendar, User, IndianRupee, Clock, Building, Users, FileText } from 'lucide-react';
 import InputField from '@/components/form/input/InputField';
 import SelectField from './SelectField';
 import Label from '@/components/form/Label';
@@ -233,7 +233,7 @@ export default function ProfessionalInfoForm({ formData, errors, onChange }) {
               onChange={(e) => onChange('salary', e.target.value)}
               placeholder="Enter salary"
               error={errors.salary}
-              icon={<DollarSign className="w-4 h-4" />}
+              icon={<IndianRupee className="w-4 h-4" />}
             />
           </div>
 

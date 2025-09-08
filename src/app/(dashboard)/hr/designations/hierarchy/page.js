@@ -1,7 +1,7 @@
 // src/app/(dashboard)/hr/designations/hierarchy/page.js
 "use client";
 import Breadcrumb from '@/components/common/Breadcrumb';
-import { Network, TrendingUp, DollarSign, Clock } from 'lucide-react';
+import { Network, TrendingUp, IndianRupee, Clock } from 'lucide-react';
 
 export default function DesignationHierarchyPage() {
   // Mock data for designation hierarchy
@@ -68,7 +68,7 @@ export default function DesignationHierarchyPage() {
               <span className="text-gray-600 dark:text-gray-300">Career progression path</span>
             </div>
             {/* <div className="flex items-center">
-              <DollarSign size={16} className="text-green-500 mr-2" />
+              <IndianRupee size={16} className="text-green-500 mr-2" />
               <span className="text-gray-600 dark:text-gray-300">Salary range</span>
             </div> */}
             <div className="flex items-center">
@@ -101,7 +101,7 @@ export default function DesignationHierarchyPage() {
                     </h4>
                     <div className="space-y-2 text-sm">
                       {/* <div className="flex items-center text-green-600 dark:text-green-400">
-                        <DollarSign size={14} className="mr-1" />
+                        <IndianRupee size={14} className="mr-1" />
                         <span>${designation.minSalary.toLocaleString()} - ${designation.maxSalary.toLocaleString()}</span>
                       </div> */}
                       <div className="flex items-center text-purple-600 dark:text-purple-400">

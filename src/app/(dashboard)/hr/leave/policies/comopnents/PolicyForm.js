@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { ArrowLeft, X, Calendar, Users, Clock, DollarSign, FileText, CheckCircle } from 'lucide-react';
+import { ArrowLeft, X, Calendar, Users, Clock, IndianRupee, FileText, CheckCircle } from 'lucide-react';
 
 const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
   const [formData, setFormData] = useState({

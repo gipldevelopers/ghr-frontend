@@ -17,7 +17,8 @@ import {
   ChevronDown,
   MoreHorizontal,
   Briefcase,
-  Presentation
+  Presentation,
+  CreditCard
 } from "lucide-react";
 
 const hrNavItems = [
@@ -85,9 +86,16 @@ const hrNavItems = [
     ],
   },
   {
-    icon: <FileText size={20} />,
-    name: "Payroll",
-    path: "/hr/payroll",
+    icon: <CreditCard size={20} />, // You'll need to import CreditCard from lucide-react
+    name: "Payroll Management",
+    subItems: [
+      { name: "Payroll Dashboard", path: "/hr/payroll" },
+      { name: "Salary Structure", path: "/hr/payroll/salary-structure" },
+      { name: "Process Payroll", path: "/hr/payroll/process" },
+      { name: "Payslips", path: "/hr/payroll/payslips" },
+      { name: "Payroll Reports", path: "/hr/payroll/reports" },
+      { name: "Tax Settings", path: "/hr/payroll/tax-settings" },
+    ],
   },
   {
     icon: <Settings size={20} />,

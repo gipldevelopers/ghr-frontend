@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { PlusCircle, Calendar, Coins, FileText, DollarSign, Clock, Trash2, Edit } from 'lucide-react';
+import { PlusCircle, Calendar, Coins, FileText, IndianRupee, Clock, Trash2, Edit } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
 
@@ -192,7 +192,7 @@ export default function LeaveTypes() {
               
               {leaveType.isEncashable && (
                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <DollarSign className="w-4 h-4 mr-2" />
+                  <IndianRupee className="w-4 h-4 mr-2" />
                   <span>Encashment available</span>
                 </div>
               )}
