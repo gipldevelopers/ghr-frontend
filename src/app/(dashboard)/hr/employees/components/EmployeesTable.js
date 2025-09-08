@@ -261,36 +261,6 @@ export default function EmployeeTable() {
     []
   );
 
-  // Apply filters automatically when any filter changes
-  // useEffect(() => {
-  //   let result = [...defaultData];
-    
-  //   // Apply global search filter
-  //   if (globalFilter) {
-  //     const searchTerm = globalFilter.toLowerCase();
-  //     result = result.filter(employee => 
-  //       employee.name.toLowerCase().includes(searchTerm) ||
-  //       employee.email.toLowerCase().includes(searchTerm) ||
-  //       employee.phone.toLowerCase().includes(searchTerm) ||
-  //       employee.designation.toLowerCase().includes(searchTerm) ||
-  //       employee.id.toLowerCase().includes(searchTerm)
-  //     );
-  //   }
-    
-  //   // Apply status filter
-  //   if (statusFilter !== 'all') {
-  //     result = result.filter(employee => employee.status === statusFilter);
-  //   }
-    
-  //   // Apply designation filter
-  //   if (designationFilter !== 'all') {
-  //     result = result.filter(employee => employee.designation === designationFilter);
-  //   }
-    
-  //   setFilteredData(result);
-  //   setPagination(prev => ({ ...prev, pageIndex: 0 })); // Reset to first page when filters change
-  // }, [globalFilter, statusFilter, designationFilter]);
-
     // Apply all filters and return filtered data
   const filteredData = useMemo(() => {
     let result = [...data];

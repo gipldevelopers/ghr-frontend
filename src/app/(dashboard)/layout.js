@@ -1,7 +1,6 @@
 // src/app/(dashboard)/layout.js
 "use client"; // This must be a client component because it uses context and state
 
-import Breadcrumb from "@/components/common/Breadcrumb";
 import { useAuth } from "@/context/AuthContext";
 import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
@@ -57,7 +56,6 @@ export default function DashboardLayout({ children }) {
         
         {/* Page Content */}
         <div className="p-4 mx-auto max-w-screen-2xl md:p-5">
-          <Breadcrumb />
           {children}
         </div>
       </div>

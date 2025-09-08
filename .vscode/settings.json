@@ -1,0 +1,7 @@
+{
+    "blackbox.mcp.mode": "off",
+    "blackbox.mcpMarketplace.enabled": false,
+    "bladeFormatter.format.enabled": false,
+    "css.format.enable": true,
+    "css.format.newlineBetweenRules": true
+}
