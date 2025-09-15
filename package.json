@@ -13,6 +13,7 @@
     "@tailwindcss/vite": "^4.1.12",
     "@tanstack/react-table": "^8.21.3",
     "apexcharts": "^5.3.4",
+    "axios": "^1.11.0",
     "chart.js": "^4.5.0",
     "flatpickr": "^4.6.13",
     "lucide-react": "^0.541.0",
@@ -24,6 +25,7 @@
     "react-dom": "19.1.0",
     "react-flatpickr": "^4.0.11",
     "recharts": "^3.1.2",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.12"
   },

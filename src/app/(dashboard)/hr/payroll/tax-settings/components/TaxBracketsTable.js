@@ -177,7 +177,7 @@ const TaxBracketsTable = () => {
                 <td className="px-4 py-4 whitespace-nowrap text-sm">
                   <div className="flex items-center gap-2">
                      <Link
-                        href={`/hr/payroll/tax-settings/${bracket.id}`}
+                        href={`/hr/payroll/tax-settings/edit/${bracket.id}`}
                         className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
                         title="Edit bracket"
                         >

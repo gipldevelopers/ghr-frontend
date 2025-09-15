@@ -1,3 +1,4 @@
+import AuthGuard from "@/components/auth/AuthGuard";
 import SignInForm from "@/components/auth/SignInForm";
 
 export const metadata = {
@@ -6,5 +7,9 @@ export const metadata = {
 };
 
 export default function SignIn() {
-  return <SignInForm />;
+  return (
+    <AuthGuard requireAuth={false}>  {/* Don't require auth for signin page */}
+      <SignInForm />
+    </AuthGuard>
+  )
 }

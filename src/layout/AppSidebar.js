@@ -18,8 +18,44 @@ import {
   MoreHorizontal,
   Briefcase,
   Presentation,
-  CreditCard
+  CreditCard,
+  Package,
+  Shield,
+  UserStar
 } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+
+const superAdminNavItems = [
+  {
+    icon: <Grid size={20} />,
+    name: "Dashboard",
+    path: "/super-admin/dashboard",
+  },
+  {
+    icon: <Shield size={20} />,
+    name: "Roles & Permissions",
+    subItems: [
+      { name: "Role Management", path: "/super-admin/roles-permissions" },
+      { name: "Add New Role", path: "/super-admin/roles-permissions/add" },
+    ],
+  },
+  {
+    icon: <Users size={20} />,
+    name: "User Management",
+    subItems: [
+      { name: "All Users", path: "/super-admin/users" },
+      { name: "Admin Users", path: "/super-admin/users/admins" },
+    ],
+  },
+  {
+    icon: <Settings size={20} />,
+    name: "System Settings",
+    subItems: [
+      { name: "General Settings", path: "/super-admin/settings/general" },
+      { name: "Audit Logs", path: "/super-admin/settings/audit" },
+    ],
+  },
+];
 
 const hrNavItems = [
   {
@@ -61,7 +97,6 @@ const hrNavItems = [
       { name: "Dashboard", path: "/hr/attendance" },
     ],
   },
-  // In your hrNavItems array, add:
   {
     icon: <PieChart size={20} />,
     name: "Reports & Analytics",
@@ -97,15 +132,44 @@ const hrNavItems = [
       { name: "Tax Settings", path: "/hr/payroll/tax-settings" },
     ],
   },
+  // {
+  //   icon: <Settings size={20} />,
+  //   name: "Settings",
+  //   subItems: [
+  //     { name: "Company Information", path: "/hr/settings/company" },
+  //     { name: "System Settings", path: "/hr/settings/system" },
+  //     { name: "User Management", path: "/hr/settings/users" },
+  //     { name: "Leave Policies", path: "/hr/settings/leave-policies" },
+  //     { name: "Holiday Calendar", path: "/hr/settings/holidays" },
+  //   ],
+  // },
   {
-    icon: <Settings size={20} />,
-    name: "Settings",
+    icon: <Package size={20} />, // Import Package from lucide-react
+    name: "Asset Management",
     subItems: [
-      { name: "Company Information", path: "/hr/settings/company" },
-      { name: "System Settings", path: "/hr/settings/system" },
-      { name: "User Management", path: "/hr/settings/users" },
-      { name: "Leave Policies", path: "/hr/settings/leave-policies" },
-      { name: "Holiday Calendar", path: "/hr/settings/holidays" },
+      { name: "Asset Inventory", path: "/hr/assets" },
+      { name: "Add Asset", path: "/hr/assets/add" },
+      { name: "Asset Categories", path: "/hr/assets/categories" },
+      { name: "Asset Assignments", path: "/hr/assets/assignments" },
+      { name: "Maintenance History", path: "/hr/assets/maintenance" },
+      { name: "Asset Reports", path: "/hr/assets/reports" },
+    ],
+  },
+   {
+    icon: <Settings size={20} />,
+    name: "System Settings",
+    subItems: [
+      { name: "Role Management", path: "/hr/settings/roles" },
+      { name: "Permission Management", path: "/hr/settings/permissions" },
+      { name: "User Access Control", path: "/hr/settings/user-access" },
+    ],
+  },
+    {
+    icon: <UserStar size={20} />,
+    name: "Roles & Permissions",
+    subItems: [
+      { name: "Role Management", path: "/super-admin/roles-permissions" },
+      { name: "Add New Role", path: "/super-admin/roles-permissions/add" },
     ],
   },
 ];
@@ -139,9 +203,18 @@ const employeeNavItems = [
     name: "Payslips",
     path: "/employee/payslips",
   },
+  {
+    icon: <Package size={20} />,
+    name: "My Assets",
+    path: "/employee/assets",
+  },
 ];
 
-const AppSidebar = ({ userRole = "HR Admin" }) => {
+const AppSidebar = () => {
+  const { user } = useAuth(); // Get user from auth context
+  // const userRole = user?.role; // Extract role
+  const userRole = user?.role?.name || user?.role || 'EMPLOYEE';
+
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
 
@@ -153,7 +226,14 @@ const AppSidebar = ({ userRole = "HR Admin" }) => {
 
   // Get appropriate navigation items based on user role
   const getNavItems = () => {
-    return userRole === "HR Admin" ? hrNavItems : employeeNavItems;
+    switch(userRole) {
+      case "SUPER_ADMIN":  // Changed from "Super Admin"
+        return superAdminNavItems;
+      case "HR_ADMIN":     // Changed from "HR Admin"
+        return hrNavItems;
+      default:
+        return employeeNavItems;
+    }
   };
 
   useEffect(() => {
@@ -299,7 +379,11 @@ const AppSidebar = ({ userRole = "HR Admin" }) => {
       {/* My Profile - Always visible for all users */}
       <li>
         <Link
-          href={userRole === "HR Admin" ? "/hr/profile" : "/employee/profile"}
+          href={
+            userRole === "SUPER_ADMIN" ? "/super-admin/profile" :
+            userRole === "HR_ADMIN" ? "/hr/profile" : 
+            "/employee/profile"
+          }
           className={`menu-item group w-full ${
             pathname.includes("profile") ? "menu-item-active" : "menu-item-inactive"
           }`}
@@ -382,11 +466,13 @@ const AppSidebar = ({ userRole = "HR Admin" }) => {
                     : "justify-start"
                 }`}
               >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  userRole === "HR Admin" ? "HR Management" : "Employee Portal"
-                ) : (
-                  <MoreHorizontal size={16} />
-                )}
+                 {isExpanded || isHovered || isMobileOpen ? (
+                    userRole === "SUPER_ADMIN" ? "Super Admin Portal" :
+                    userRole === "HR_ADMIN" ? "HR Management" : 
+                    "Employee Portal"
+                  ) : (
+                    <MoreHorizontal size={16} />
+                  )}
               </h2>
               {renderMenuItems(getNavItems())}
             </div>

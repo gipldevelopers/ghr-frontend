@@ -7,7 +7,7 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import Checkbox from "@/components/form/input/Checkbox";
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import { useAuth } from "@/context/AuthContext"; // Import the auth context
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignInForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,21 +19,7 @@ export default function SignInForm() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const { login } = useAuth(); // Get the login function from auth context
-
-  // Static credentials for different roles
-  const credentials = {
-    hr: {
-      email: "hr@ghr.com",
-      password: "hr123",
-      role: "HR Admin"
-    },
-    employee: {
-      email: "employee@gipl.com",
-      password: "emp123",
-      role: "Employee"
-    }
-  };
+  const { login } = useAuth();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +27,6 @@ export default function SignInForm() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (error) setError("");
   };
 
@@ -51,41 +36,16 @@ export default function SignInForm() {
     setError("");
     
     try {
-      // Check if credentials match any of the static credentials
-      let userData = null;
+      const result = await login(formData);
       
-      if (formData.email === credentials.hr.email && formData.password === credentials.hr.password) {
-        userData = {
-          email: credentials.hr.email,
-          role: credentials.hr.role,
-          name: "HR Administrator",
-          id: "hr-001"
-        };
-      } else if (formData.email === credentials.employee.email && formData.password === credentials.employee.password) {
-        userData = {
-          email: credentials.employee.email,
-          role: credentials.employee.role,
-          name: "John Employee",
-          id: "emp-001"
-        };
+      if (result.success) {
+        // Use the redirect path from the login response
+        router.push(result.redirect || "/employee/dashboard");
       } else {
-        setError("Invalid email or password. Try hr@ghr.com/hr123 or employee@gipl.com/emp123");
-        setLoading(false);
-        return;
+        setError(result.message || 'Login failed');
       }
-      
-      // Login using the auth context
-      login(userData);
-      
-      // Redirect based on role
-      if (userData.role === 'HR Admin') {
-        router.push("/hr/dashboard");
-      } else {
-        router.push("/employee/dashboard");
-      }
-      
     } catch (error) {
-      setError("An error occurred during login");
+      setError("An unexpected error occurred");
       console.error("Login error:", error);
     } finally {
       setLoading(false);
@@ -128,6 +88,7 @@ export default function SignInForm() {
                     onChange={handleChange}
                     className="pl-10"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -147,6 +108,7 @@ export default function SignInForm() {
                     onChange={handleChange}
                     className="pl-10 pr-10"
                     required
+                    disabled={loading}
                   />
                   <span
                     onClick={() => setShowPassword(!showPassword)}
@@ -166,11 +128,12 @@ export default function SignInForm() {
                   <Checkbox 
                     id="remember"
                     checked={isChecked} 
-                    onChange={setIsChecked} 
+                    onChange={setIsChecked}
+                    disabled={loading}
                   />
-                   <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
-                      Keep me logged in
-                    </span>
+                  <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
+                    Keep me logged in
+                  </span>
                 </div>
               </div>
               
@@ -180,6 +143,7 @@ export default function SignInForm() {
                   className="w-full" 
                   size="sm"
                   disabled={loading}
+                  loading={loading}
                 >
                   {loading ? 'Signing in...' : 'Sign In'}
                 </Button>
@@ -196,19 +160,22 @@ export default function SignInForm() {
             <p className="text-blue-700 dark:text-blue-200">
               Employee: employee@gipl.com / emp123
             </p>
+            <p className="text-blue-700 dark:text-blue-200">
+              Super Admin: admin@hrms.com / admin123
+            </p>
           </div>
 
-           <div className="mt-5">
-              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start flex justify-between">
-                Can&apos;t remember password?{""}
-                <Link
-                  href="/forgot-password"
-                  className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
-                >
-                  Forgot Password?
-                </Link>
-              </p>
-            </div>
+          <div className="mt-5">
+            <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start flex justify-between">
+              Can&apos;t remember password?{""}
+              <Link
+                href="/forgot-password"
+                className="text-brand-500 hover:text-brand-600 dark:text-brand-400"
+              >
+                Forgot Password?
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
