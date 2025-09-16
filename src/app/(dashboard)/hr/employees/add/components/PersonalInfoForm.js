@@ -4,6 +4,7 @@ import { useState, useRef } from 'react';
 import InputField from '@/components/form/input/InputField';
 import SelectField from './SelectField';
 import Label from '@/components/form/Label';
+import { toast } from 'sonner';
 
 export default function PersonalInfoForm({ formData, errors, onChange }) {
   const [profilePreview, setProfilePreview] = useState(null);
@@ -42,7 +43,7 @@ export default function PersonalInfoForm({ formData, errors, onChange }) {
   const handleProfilePhotoUpload = (file) => {
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('File size should be less than 5MB');
+        toast.error('File size should be less than 5MB');
         return;
       }
 

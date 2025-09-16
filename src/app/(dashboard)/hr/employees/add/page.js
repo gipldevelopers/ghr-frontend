@@ -1,6 +1,7 @@
+// src/app/(dashboard)/hr/employees/add/page.js
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import PersonalInfoForm from './components/PersonalInfoForm';
 import Breadcrumb from '@/components/common/Breadcrumb';
@@ -10,6 +11,10 @@ import ProfessionalInfoForm from './components/ProfessionalInfoForm';
 import BankingInfoForm from './components/BankingInfoForm';
 import DocumentsForm from './components/DocumentsForm';
 import FormNavigation from './components/FormNavigation';
+import FormRecoveryModal from '@/components/form/FormRecoveryModal';
+import { toast } from 'sonner';
+import employeeService from '@/services/employeeService';
+import { validateEmployeeForm } from '@/utils/validation';
 
 const STEPS = [
   { id: 1, title: 'Personal Information', component: 'personal' },
@@ -19,73 +24,163 @@ const STEPS = [
   { id: 5, title: 'Documents', component: 'documents' }
 ];
 
+const STORAGE_KEY = 'hrms_employee_form_data';
+
+// Default form data structure
+const defaultFormData = {
+  // Personal Information
+  profilePhoto: null,
+  firstName: '',
+  lastName: '',
+  middleName: '',
+  dateOfBirth: '',
+  gender: '',
+  maritalStatus: '',
+  bloodGroup: '',
+  nationality: '',
+  religion: '',
+  
+  // Contact Information
+  email: '',
+  phone: '',
+  alternatePhone: '',
+  permanentAddress: '',
+  currentAddress: '',
+  city: '',
+  state: '',
+  pincode: '',
+  country: 'India',
+  
+  // Emergency Contact
+  emergencyContactName: '',
+  emergencyContactRelation: '',
+  emergencyContactPhone: '',
+  
+  // Professional Information
+  employeeId: '',
+  department: '',
+  designation: '',
+  reportingManager: '',
+  joiningDate: '',
+  employmentType: '',
+  workLocation: '',
+  salary: '',
+  probationPeriod: '',
+  workShift: '',
+  
+  // Banking Information
+  bankName: '',
+  accountNumber: '',
+  ifscCode: '',
+  accountHolderName: '',
+  branchName: '',
+  
+  // Documents
+  aadhaarNumber: '',
+  panNumber: '',
+  passportNumber: '',
+  drivingLicense: '',
+  voterIdNumber: '',
+  aadhaarDocument: null,
+  panDocument: null,
+  photo: null,
+  resume: null,
+  educationCertificates: []
+};
+
 export default function AddEmployeePage() {
+   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [showRecoveryModal, setShowRecoveryModal] = useState(false);
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    // Personal Information
-    firstName: '',
-    lastName: '',
-    middleName: '',
-    dateOfBirth: '',
-    gender: '',
-    maritalStatus: '',
-    bloodGroup: '',
-    nationality: '',
-    religion: '',
-    
-    // Contact Information
-    email: '',
-    phone: '',
-    alternatePhone: '',
-    permanentAddress: '',
-    currentAddress: '',
-    city: '',
-    state: '',
-    pincode: '',
-    country: 'India',
-    
-    // Emergency Contact
-    emergencyContactName: '',
-    emergencyContactRelation: '',
-    emergencyContactPhone: '',
-    
-    // Professional Information
-    employeeId: '',
-    department: '',
-    designation: '',
-    reportingManager: '',
-    joiningDate: '',
-    employmentType: '',
-    workLocation: '',
-    salary: '',
-    probationPeriod: '',
-    workShift: '',
-    
-    // Banking Information
-    bankName: '',
-    accountNumber: '',
-    ifscCode: '',
-    accountHolderName: '',
-    branchName: '',
-    
-    // Documents
-    aadhaarNumber: '',
-    panNumber: '',
-    passportNumber: '',
-    drivingLicense: '',
-    voterIdNumber: '',
-    aadhaarDocument: null,
-    panDocument: null,
-    photo: null,
-    resume: null,
-    educationCertificates: []
-  });
-
+  const [isSaved, setIsSaved] = useState(false);
+  const [lastSaved, setLastSaved] = useState(null);
+  const [formData, setFormData] = useState(defaultFormData);
   const [errors, setErrors] = useState({});
 
-  const handleInputChange = (name, value) => {
+  // Load saved data on component mount
+  // useEffect(() => {
+  //   const loadSavedData = () => {
+  //     try {
+  //       const saved = localStorage.getItem(STORAGE_KEY);
+  //       if (saved) {
+  //         setShowRecoveryModal(true);
+  //         const parsedData = JSON.parse(saved);
+  //         setFormData(parsedData.formData || defaultFormData);
+  //         setCurrentStep(parsedData.currentStep || 1);
+          
+  //         // Show recovery message
+  //         toast.success('Previous form data recovered');
+  //       }
+  //     } catch (error) {
+  //       console.error('Error loading saved form data:', error);
+  //       clearFormData(); // Clear corrupted data
+  //     }
+  //   };
+
+  //   loadSavedData();
+  // }, []);
+
+   useEffect(() => {
+    const loadSavedData = () => {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsedData = JSON.parse(saved);
+          setFormData(parsedData.formData || defaultFormData);
+          setCurrentStep(parsedData.currentStep || 1);
+          setIsDataLoaded(true); // Mark data as loaded
+          setShowRecoveryModal(true);
+        } else {
+          setIsDataLoaded(true); // No saved data, but still mark as loaded
+        }
+      } catch (error) {
+        console.error('Error loading saved form data:', error);
+        clearFormData();
+        setIsDataLoaded(true);
+      }
+    };
+
+    loadSavedData();
+  }, []);
+
+  // Auto-save with debouncing
+  useEffect(() => {
+    const saveData = () => {
+      try {
+        const dataToSave = {
+          formData,
+          currentStep,
+          timestamp: new Date().toISOString()
+        };
+        
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+        setLastSaved(new Date());
+        setIsSaved(true);
+        
+        // Auto-hide saved indicator after 2 seconds
+        setTimeout(() => setIsSaved(false), 2000);
+      } catch (error) {
+        console.error('Error saving form data:', error);
+      }
+    };
+
+    // Debounce the save operation
+    const timeoutId = setTimeout(saveData, 1000); // Save after 1 second of inactivity
+    return () => clearTimeout(timeoutId);
+  }, [formData, currentStep]);
+
+  // Clear form data from storage
+  const clearFormData = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setFormData(defaultFormData);
+    setCurrentStep(1);
+    setErrors({});
+  }, []);
+
+  // Handle input changes
+  const handleInputChange = useCallback((name, value) => {
     setFormData(prev => ({
       ...prev,
       [name]: value
@@ -98,89 +193,106 @@ export default function AddEmployeePage() {
         [name]: ''
       }));
     }
-  };
+  }, [errors]);
 
-//   const validateStep = (step) => {
-//     const newErrors = {};
-    
-//     switch(step) {
-//       case 1:
-//         if (!formData.firstName.trim())   newErrors.firstName = 'First name is required';
-//         if (!formData.lastName.trim())   newErrors.lastName = 'Last name is required';
-//         if (!formData.dateOfBirth)   newErrors.dateOfBirth = 'Date of birth is required';
-//         if (!formData.gender)   newErrors.gender = 'Gender is required';
-//         break;
-        
-//       case 2:
-//         if (!formData.email.trim())   newErrors.email = 'Email is required';
-//         if (!formData.phone.trim())   newErrors.phone = 'Phone number is required';
-//         if (!formData.permanentAddress.trim())   newErrors.permanentAddress = 'Address is required';
-//         if (!formData.emergencyContactName.trim())   newErrors.emergencyContactName = 'Emergency contact name is required';
-//         if (!formData.emergencyContactPhone.trim())   newErrors.emergencyContactPhone = 'Emergency contact phone is required';
-//         break;
-        
-//       case 3:
-//         if (!formData.employeeId.trim())   newErrors.employeeId = 'Employee ID is required';
-//         if (!formData.department)   newErrors.department = 'Department is required';
-//         if (!formData.designation.trim())   newErrors.designation = 'Designation is required';
-//         if (!formData.joiningDate)   newErrors.joiningDate = 'Joining date is required';
-//         if (!formData.employmentType)   newErrors.employmentType = 'Employment type is required';
-//         break;
-        
-//       case 4:
-//         if (!formData.bankName.trim())   newErrors.bankName = 'Bank name is required';
-//         if (!formData.accountNumber.trim())   newErrors.accountNumber = 'Account number is required';
-//         if (!formData.ifscCode.trim())   newErrors.ifscCode = 'IFSC code is required';
-//         break;
-        
-//       case 5:
-//         if (!formData.aadhaarNumber.trim())   newErrors.aadhaarNumber = 'Aadhaar number is required';
-//         if (!formData.panNumber.trim())   newErrors.panNumber = 'PAN number is required';
-//         break;
-//     }
-    
-//     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
-//   };
+  // Navigation handlers
+  const handleNext = useCallback(() => {
+    // Validate current step before proceeding
+    const stepErrors = validateEmployeeForm(formData, currentStep);
 
-  const handleNext = () => {
-    // if (validateStep(currentStep)) {
-      if (currentStep < STEPS.length) {
-        setCurrentStep(currentStep + 1);
-    //   }
+    console.log('Current step:', currentStep);
+    console.log('Form data:', formData);
+    console.log('Validation errors:', stepErrors);
+    console.log('Error count:', Object.keys(stepErrors).length);
+
+     if (Object.keys(stepErrors).length > 0) {
+      setErrors(stepErrors);
+      toast.error('Please fix the errors before proceeding');
+      return;
     }
-  };
 
-  const handlePrevious = () => {
+    if (currentStep < STEPS.length) {
+      setCurrentStep(currentStep + 1);
+    }
+  }, [currentStep, formData]);
+
+  const handlePrevious = useCallback(() => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
-  };
+  }, [currentStep]);
 
+  // Form submission
   const handleSubmit = async () => {
-    // if (!validateStep(currentStep)) return;
-    
     setIsSubmitting(true);
     
     try {
-      // Here you would typically send the data to your backend
-      console.log('Employee data to submit:', formData);
+      // Prepare data for API
+      const submitData = {
+        ...formData,
+        // Convert string numbers to actual numbers
+        salary: formData.salary ? parseFloat(formData.salary) : null,
+        // Convert dates to ISO format
+        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : null,
+        joiningDate: formData.joiningDate ? new Date(formData.joiningDate).toISOString() : null,
+        // Ensure createUser is boolean
+        createUser: Boolean(formData.createUser)
+      };
+
+      // Call the API
+      const response = await employeeService.createEmployee(submitData);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Clear saved data on successful submission
+      clearFormData();
       
-      // Redirect to employees list or show success message
-      router.push('/hr/employees?success=Employee added successfully');
+      // Show success message and redirect
+      toast.success('Employee created successfully!');
+      router.push('/hr/employees');
       
     } catch (error) {
       console.error('Error submitting form:', error);
-      // Handle error - show toast notification etc.
+      
+      // Handle validation errors from backend
+      if (error.response?.data?.errors) {
+        const validationErrors = {};
+        error.response.data.errors.forEach(err => {
+          validationErrors[err.field] = err.message;
+        });
+        setErrors(validationErrors);
+        toast.error('Please fix the validation errors');
+      } else {
+        toast.error(error.message || 'Failed to create employee. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const renderStepContent = () => {
+  // Manual save function (optional)
+  const handleManualSave = useCallback(() => {
+    const dataToSave = {
+      formData,
+      currentStep,
+      timestamp: new Date().toISOString()
+    };
+    
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
+    setLastSaved(new Date());
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2000);
+    toast.success('Form progress saved');
+  }, [formData, currentStep]);
+  
+
+  // Render step content
+  const renderStepContent = useCallback(() => {
+     if (!isDataLoaded) {
+      return (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      );
+    }
     switch(currentStep) {
       case 1:
         return (
@@ -225,15 +337,66 @@ export default function AddEmployeePage() {
       default:
         return null;
     }
+  }, [currentStep, formData, errors, handleInputChange, isDataLoaded]);
+
+  const handleRecover = () => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        const parsedData = JSON.parse(saved);
+        setFormData(parsedData.formData || defaultFormData);
+        setCurrentStep(parsedData.currentStep || 1);
+        toast.success('Form data recovered successfully');
+      }
+    } catch (error) {
+      console.error('Error recovering form data:', error);
+      toast.error('Failed to recover form data');
+    } finally {
+      setShowRecoveryModal(false);
+    }
+  };
+
+  const handleDiscard = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setShowRecoveryModal(false);
+    toast.info('Previous form data discarded');
   };
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <Breadcrumb rightContent={null} />
 
-    <Breadcrumb rightContent={null} />
+      {/* Save Status Indicator */}
+      <div className="px-6 pt-6">
+        <div className="max-w-4xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+            {isSaved && (
+              <span className="text-green-600 dark:text-green-400">✓ Saved</span>
+            )}
+            {lastSaved && (
+              <span>Last saved: {new Date(lastSaved).toLocaleTimeString()}</span>
+            )}
+          </div>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={handleManualSave}
+              className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+            >
+              Save Progress
+            </button>
+            <button
+              onClick={clearFormData}
+              className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+            >
+              Clear Form
+            </button>
+          </div>
+        </div>
+      </div>
 
       {/* Progress Indicator */}
-      <div className="px-6 my-8">
+      <div className="px-6 my-6">
         <ProgressIndicator 
           steps={STEPS}
           currentStep={currentStep}
@@ -264,6 +427,14 @@ export default function AddEmployeePage() {
           </div>
         </div>
       </div>
+
+      {/* Recovery Modal */}
+      <FormRecoveryModal
+        isOpen={showRecoveryModal}
+        onRecover={handleRecover}
+        onDiscard={handleDiscard}
+      />
+
     </div>
   );
 }
