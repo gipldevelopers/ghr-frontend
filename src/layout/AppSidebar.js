@@ -434,6 +434,8 @@ const AppSidebar = () => {
                 alt="Logo"
                 width={150}
                 height={40}
+                style={{ width: 'auto', height: 'auto' }} // Maintain aspect ratio
+                priority
               />
               <Image
                 className="hidden dark:block"
@@ -441,6 +443,7 @@ const AppSidebar = () => {
                 alt="Logo"
                 width={150}
                 height={40}
+                style={{ width: 'auto', height: 'auto' }} // Maintain aspect ratio
               />
             </>
           ) : (
@@ -449,6 +452,7 @@ const AppSidebar = () => {
               alt="Logo"
               width={50}
               height={50}
+              style={{ width: 'auto', height: 'auto' }}
             />
           )}
         </Link>

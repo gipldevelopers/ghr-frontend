@@ -1,5 +1,5 @@
 "use client";
-import { CreditCard, Building, User, Scan, Branch, Banknote, CheckCircle } from 'lucide-react';
+import { CreditCard, Building, User, Scan, Banknote, CheckCircle, MapPin } from 'lucide-react';
 import InputField from '@/components/form/input/InputField';
 import SelectField from './SelectField';
 import Label from '@/components/form/Label';
@@ -195,7 +195,7 @@ export default function BankingInfoForm({ formData, errors, onChange }) {
               onChange={(e) => onChange('branchName', e.target.value)}
               placeholder="Enter branch name"
               error={errors.branchName}
-              icon={<Branch className="w-4 h-4" />}
+              icon={<MapPin className="w-4 h-4" />}
             />
           </div>
 
