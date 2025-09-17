@@ -264,6 +264,7 @@ const AppHeader = () => {
               className="dark:hidden"
               src="/images/logo/GHR.PNG"
               alt="Logo"
+              priority 
             />
             <Image
               width={154}

@@ -11,6 +11,10 @@ export default function PersonalInfoForm({ formData, errors, onChange }) {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef(null);
 
+    // In PersonalInfoForm.js
+console.log('Form data received:', formData);
+console.log('FirstName value:', formData.firstName);
+
   const genderOptions = [
     { value: '', label: 'Select Gender' },
     { value: 'male', label: 'Male' },

@@ -326,12 +326,12 @@ export default function PayslipTable() {
       </div>
 
       {/* Results Count */}
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+      {/* <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
         Showing {filteredData.length} of {defaultData.length} payslips
         {(statusFilter !== 'all' || periodFilter !== 'all' || globalFilter) && (
           <span> (filtered)</span>
         )}
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">

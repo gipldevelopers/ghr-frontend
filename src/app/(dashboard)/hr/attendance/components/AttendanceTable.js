@@ -516,12 +516,12 @@ export default function AttendanceTable() {
       </div>
 
       {/* Results Count */}
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
+      {/* <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
         Showing {filteredData.length} of {defaultData.length} attendance records
         {(statusFilter !== 'all' || departmentFilter !== 'all' || globalFilter) && (
           <span> (filtered)</span>
         )}
-      </div>
+      </div> */}
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
