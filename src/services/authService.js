@@ -6,9 +6,26 @@ export const authService = {
   login: async (credentials) => {
     try {
       const response = await apiClient.post('/auth/login', credentials);
+
+         // Store company ID and subdomain for future requests
+      if (response.data.success) {
+        localStorage.setItem('company_id', response.data.data.user.company.id);
+        localStorage.setItem('company_subdomain', response.data.data.user.company.subdomain);
+      }
+
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Login failed');
+    }
+  },
+
+    // Get company by subdomain (NEW)
+  getCompanyBySubdomain: async (subdomain) => {
+    try {
+      const response = await apiClient.get(`/auth/company/${subdomain}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Company not found');
     }
   },
 
@@ -39,6 +56,16 @@ export const authService = {
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || 'Logout failed');
+    }
+  },
+
+   // Verify company by subdomain
+    verifyCompany: async (subdomain) => {
+    try {
+      const response = await apiClient.get(`/auth/company/${subdomain}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Company verification failed');
     }
   }
 };

@@ -1,5 +1,5 @@
 "use client";
-import { Mail, Phone, MapPin, User, PhoneCall } from 'lucide-react';
+import { Mail, Phone, MapPin, PhoneCall } from 'lucide-react';
 import InputField from '@/components/form/input/InputField';
 import SelectField from './SelectField';
 import Label from '@/components/form/Label';
@@ -7,27 +7,27 @@ import Label from '@/components/form/Label';
 export default function ContactInfoForm({ formData, errors, onChange }) {
   const countryOptions = [
     { value: '', label: 'Select Country' },
-    { value: 'india', label: 'India' },
-    { value: 'usa', label: 'United States' },
-    { value: 'uk', label: 'United Kingdom' },
-    { value: 'canada', label: 'Canada' },
-    { value: 'australia', label: 'Australia' },
-    { value: 'germany', label: 'Germany' },
-    { value: 'france', label: 'France' },
-    { value: 'japan', label: 'Japan' },
-    { value: 'china', label: 'China' },
-    { value: 'brazil', label: 'Brazil' }
+    { value: 'India', label: 'India' },
+    { value: 'United States', label: 'United States' },
+    { value: 'United Kingdom', label: 'United Kingdom' },
+    { value: 'Canada', label: 'Canada' },
+    { value: 'Australia', label: 'Australia' },
+    { value: 'Germany', label: 'Germany' },
+    { value: 'France', label: 'France' },
+    { value: 'Japan', label: 'Japan' },
+    { value: 'China', label: 'China' },
+    { value: 'Brazil', label: 'Brazil' }
   ];
 
   const relationOptions = [
     { value: '', label: 'Select Relationship' },
-    { value: 'spouse', label: 'Spouse' },
-    { value: 'parent', label: 'Parent' },
-    { value: 'sibling', label: 'Sibling' },
-    { value: 'child', label: 'Child' },
-    { value: 'friend', label: 'Friend' },
-    { value: 'relative', label: 'Relative' },
-    { value: 'other', label: 'Other' }
+    { value: 'SPOUSE', label: 'Spouse' },
+    { value: 'PARENT', label: 'Parent' },
+    { value: 'SIBLING', label: 'Sibling' },
+    { value: 'CHILD', label: 'Child' },
+    { value: 'FRIEND', label: 'Friend' },
+    { value: 'RELATIVE', label: 'Relative' },
+    { value: 'OTHER', label: 'Other' }
   ];
 
   return (
@@ -60,22 +60,7 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="email" required>
-              Email Address
-            </Label>
-            <InputField
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => onChange('email', e.target.value)}
-              placeholder="Enter email address"
-              error={errors.email}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="phone" required>
+            <Label htmlFor="phone">
               Phone Number
             </Label>
             <InputField
@@ -90,17 +75,17 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="alternatePhone">
-              Alternate Phone Number
+            <Label htmlFor="personalEmail">
+              Personal Email
             </Label>
             <InputField
-              id="alternatePhone"
-              name="alternatePhone"
-              type="tel"
-              value={formData.alternatePhone}
-              onChange={(e) => onChange('alternatePhone', e.target.value)}
-              placeholder="Enter alternate phone"
-              error={errors.alternatePhone}
+              id="personalEmail"
+              name="personalEmail"
+              type="email"
+              value={formData.personalEmail}
+              onChange={(e) => onChange('personalEmail', e.target.value)}
+              placeholder="personal@email.com"
+              error={errors.personalEmail}
             />
           </div>
         </div>
@@ -117,7 +102,7 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
         
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="permanentAddress" required>
+            <Label htmlFor="permanentAddress">
               Permanent Address
             </Label>
             <InputField
@@ -235,7 +220,7 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="emergencyContactName" required>
+            <Label htmlFor="emergencyContactName">
               Contact Name
             </Label>
             <InputField
@@ -249,7 +234,7 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="emergencyContactRelation" required>
+            <Label htmlFor="emergencyContactRelation">
               Relationship
             </Label>
             <SelectField
@@ -263,7 +248,7 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="emergencyContactPhone" required>
+            <Label htmlFor="emergencyContactPhone">
               Phone Number
             </Label>
             <InputField

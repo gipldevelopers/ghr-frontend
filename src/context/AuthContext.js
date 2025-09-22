@@ -15,8 +15,9 @@ export function AuthProvider({ children }) {
       try {
         const savedToken = localStorage.getItem('token');
         const savedUser = localStorage.getItem('hrms_user');
+        const savedCompanyId = localStorage.getItem('company_id');
 
-        if (savedToken && savedUser) {
+        if (savedToken && savedUser && savedCompanyId) {
           setToken(savedToken);
           setUser(JSON.parse(savedUser));
           
@@ -30,9 +31,18 @@ export function AuthProvider({ children }) {
         }
       } catch (error) {
         console.error('Auth check failed:', error);
+        
         // Don't logout here - just clear invalid data
+        // localStorage.removeItem('token');
+        // localStorage.removeItem('hrms_user');
+        // setUser(null);
+        // setToken(null);
+
+         // Clear all auth data
         localStorage.removeItem('token');
         localStorage.removeItem('hrms_user');
+        localStorage.removeItem('company_id');
+        localStorage.removeItem('company_subdomain');
         setUser(null);
         setToken(null);
       } finally {
@@ -51,14 +61,19 @@ export function AuthProvider({ children }) {
         const { user: userData, token: userToken
           // , requiresPasswordChange 
         } = response.data;
+
+         // Use systemRole instead of role (FIX for backend)
+        const userRole = userData.systemRole;
         // Store auth data
         setUser(userData);
         setToken(userToken);
         localStorage.setItem('token', userToken);
         localStorage.setItem('hrms_user', JSON.stringify(userData));
 
-          // Set role in cookie for middleware
-      document.cookie = `userRole=${userData.role}; path=/; max-age=86400; secure; samesite=lax`;
+      // Set role in cookie for middleware
+      // const userRole = userData.systemRole || userData.role;
+      // document.cookie = `userRole=${userData.role}; path=/; max-age=86400; secure; samesite=lax`;
+       document.cookie = `userRole=${userRole}; path=/; max-age=86400; secure; samesite=lax`;
 
          // Check if password change is required FIRST
       // if (requiresPasswordChange) {
@@ -69,14 +84,14 @@ export function AuthProvider({ children }) {
       //   };
       // }
 
-        // Redirect based on role - FIXED!
+        // Redirect based on systemRole
         let redirectPath = '/employee/dashboard';
-        if (userData.role === 'HR_ADMIN') {
+        if (userRole === 'HR_ADMIN') {
           redirectPath = '/hr/dashboard';
-        } else if (userData.role === 'SUPER_ADMIN') {
-          redirectPath = '/super-admin/dashboard';  // ← Super Admin goes to super admin dashboard
+        } else if (userRole === 'SUPER_ADMIN') {
+          redirectPath = '/super-admin/dashboard';
         }
-       console.log('Redirecting to:', redirectPath);
+          console.log('Redirecting to:', redirectPath, 'for role:', userRole);
         
         return {
           success: true,
@@ -102,8 +117,12 @@ export function AuthProvider({ children }) {
       setToken(null);
       localStorage.removeItem('token');
       localStorage.removeItem('hrms_user');
+      localStorage.removeItem('company_id');
+      localStorage.removeItem('company_subdomain');
 
        // Clear role cookie
+      // document.cookie = 'userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+        // Clear role cookie
       document.cookie = 'userRole=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
       
       // Redirect to login page
@@ -143,9 +162,9 @@ export function AuthProvider({ children }) {
     changePassword,
     refreshUser,
     isAuthenticated: !!user && !!token,
-    isHR: user?.role === 'HR_ADMIN',
-    isSuperAdmin: user?.role === 'SUPER_ADMIN',
-    isEmployee: user?.role === 'EMPLOYEE'
+    isHR: user?.systemRole === 'HR_ADMIN', // Use systemRole
+    isSuperAdmin: user?.systemRole === 'SUPER_ADMIN', // Use systemRole
+    isEmployee: user?.systemRole === 'EMPLOYEE' // Use systemRole
   };
 
   return (

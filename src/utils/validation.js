@@ -38,6 +38,10 @@
 export const validateEmployeeForm = (formData, currentStep) => {
   const errors = {};
 
+  console.log("============validation debug");
+  console.log("step", currentStep);
+  console.log("form data", formData);
+
   // Step 1: Personal Information
   if (currentStep === 1) {
     if (!formData.firstName?.trim()) errors.firstName = 'First name is required';
@@ -86,11 +90,11 @@ export const validateEmployeeForm = (formData, currentStep) => {
     }
   }
 
-  // Step 3: Professional Information
+  // Step 3: Professional Information - FIXED FIELD NAMES
   if (currentStep === 3) {
     if (!formData.employeeId?.trim()) errors.employeeId = 'Employee ID is required';
-    if (!formData.department) errors.department = 'Department is required';
-    if (!formData.designation) errors.designation = 'Designation is required';
+    if (!formData.departmentId) errors.departmentId = 'Department is required'; // FIXED: department → departmentId
+    if (!formData.designationId) errors.designationId = 'Designation is required'; // FIXED: designation → designationId
     if (!formData.joiningDate) errors.joiningDate = 'Joining date is required';
     if (!formData.employmentType) errors.employmentType = 'Employment type is required';
     

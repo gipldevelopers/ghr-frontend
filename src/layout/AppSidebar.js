@@ -213,7 +213,8 @@ const employeeNavItems = [
 const AppSidebar = () => {
   const { user } = useAuth(); // Get user from auth context
   // const userRole = user?.role; // Extract role
-  const userRole = user?.role?.name || user?.role || 'EMPLOYEE';
+  // const userRole = user?.role?.name || user?.role || 'EMPLOYEE';
+  const userRole = user?.systemRole || 'EMPLOYEE'; // Use systemRole
 
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();

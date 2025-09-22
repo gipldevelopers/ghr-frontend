@@ -1,7 +1,10 @@
+// src/app/(dashboard)/hr/leave/components/LeaveRequestForm.js
 "use client";
 import { useState, useEffect, useRef } from 'react';
-import { X, Calendar, User, FileText, Paperclip, Download, Trash2, ArrowLeft } from 'lucide-react';
+import { X, Calendar, User, FileText, Paperclip, Download, Trash2, ArrowLeft, Users, Search, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { leaveRequestService } from '@/services/leaveRequestService';
+import { toast } from 'sonner';
 
 const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCancel }) => {
   const router = useRouter();
@@ -16,17 +19,28 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
     endDateBreakdown: 'full_day',
     status: 'pending',
     attachment: null,
-    attachmentName: ''
+    attachmentName: '',
+    cc: [] 
   });
 
   const [calculatedDays, setCalculatedDays] = useState(0);
   const [existingAttachment, setExistingAttachment] = useState(null);
+  const [isCcDropdownOpen, setIsCcDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [leaveTypes, setLeaveTypes] = useState([]);
+  const [ccOptions, setCcOptions] = useState([]);
   
   const fromDateRef = useRef(null);
   const toDateRef = useRef(null);
   const fileInputRef = useRef(null);
+  const ccDropdownRef = useRef(null);
 
-  // Update form data when initialData changes (edit mode)
+  useEffect(() => {
+    fetchLeaveTypes();
+    fetchCcOptions();
+  }, []);
+
   useEffect(() => {
     if (initialData) {
       // Convert date format from "11 Oct, 2023" to "2023-10-11" for input fields
@@ -55,7 +69,8 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
         endDateBreakdown: initialData.endDateBreakdown || 'full_day',
         status: initialData.status || 'pending',
         attachment: null,
-        attachmentName: initialData.attachmentName || ''
+        attachmentName: initialData.attachmentName || '',
+        cc: initialData.cc || []
       };
 
       setFormData(formData);
@@ -69,6 +84,71 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       calculateDays(formData);
     }
   }, [initialData]);
+
+  const fetchLeaveTypes = async () => {
+    try {
+      const response = await leaveRequestService.getLeaveTypesDropdown();
+      setLeaveTypes(response.data || []);
+    } catch (error) {
+      console.error('Error fetching leave types:', error);
+      toast.error('Failed to load leave types');
+    }
+  };
+
+  const fetchCcOptions = async () => {
+    // In a real app, you would fetch this from an API
+    // For now, using mock data
+    const mockCcOptions = [
+      { id: 1, name: 'John Smith', role: 'HR Manager', email: 'john.smith@company.com' },
+      { id: 2, name: 'Sarah Johnson', role: 'Department Head', email: 'sarah.j@company.com' },
+      { id: 3, name: 'Michael Brown', role: 'CEO', email: 'michael.b@company.com' },
+      { id: 4, name: 'Emily Davis', role: 'Team Lead', email: 'emily.d@company.com' },
+      { id: 5, name: 'David Wilson', role: 'Operations Manager', email: 'david.w@company.com' },
+      { id: 6, name: 'Jennifer Lee', role: 'HR Director', email: 'jennifer.l@company.com' },
+      { id: 7, name: 'Robert Taylor', role: 'Project Manager', email: 'robert.t@company.com' },
+      { id: 8, name: 'Maria Garcia', role: 'Department Manager', email: 'maria.g@company.com' }
+    ];
+    setCcOptions(mockCcOptions);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ccDropdownRef.current && !ccDropdownRef.current.contains(event.target)) {
+        setIsCcDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filtered CC options based on search
+  const filteredCcOptions = ccOptions.filter(option =>
+    option.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    option.role.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    option.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Handle CC selection
+  const handleCcSelect = (person) => {
+    if (!formData.cc.some(p => p.id === person.id)) {
+      setFormData(prev => ({
+        ...prev,
+        cc: [...prev.cc, person]
+      }));
+    }
+    setSearchQuery('');
+    setIsCcDropdownOpen(false);
+  };
+
+  // Remove CC person
+  const removeCcPerson = (personId) => {
+    setFormData(prev => ({
+      ...prev,
+      cc: prev.cc.filter(p => p.id !== personId)
+    }));
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -91,7 +171,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
     if (file) {
       // Check file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('File size must be less than 5MB');
+        toast.error('File size must be less than 5MB');
         return;
       }
       
@@ -99,7 +179,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf', 
                            'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       if (!allowedTypes.includes(file.type)) {
-        alert('Please select a valid file type (JPEG, PNG, PDF, DOC, DOCX)');
+        toast.error('Please select a valid file type (JPEG, PNG, PDF, DOC, DOCX)');
         return;
       }
       
@@ -166,6 +246,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
     
     if (!isNaN(diffDays)) {
       setCalculatedDays(diffDays);
+      setFormData(prev => ({ ...prev, days: diffDays }));
     }
   };
 
@@ -179,27 +260,36 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
     calculateDays(updatedFormData);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Convert dates back to the original format "11 Oct, 2023"
-    const formatDate = (dateStr) => {
-      const date = new Date(dateStr);
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return `${date.getDate()} ${months[date.getMonth()]}, ${date.getFullYear()}`;
-    };
+    setLoading(true);
 
-    const submitData = {
-      ...formData,
-      days: calculatedDays,
-      fromDate: formatDate(formData.fromDate),
-      toDate: formatDate(formData.toDate),
-      // Keep existing attachment if no new file was selected
-      attachment: formData.attachment || (initialData && initialData.attachment),
-      attachmentName: formData.attachmentName || (initialData && initialData.attachmentName)
-    };
+    try {
+      const submitData = {
+        ...formData,
+        days: calculatedDays,
+        fromDate: formData.fromDate,
+        toDate: formData.toDate,
+        attachment: formData.attachment,
+        cc: formData.cc
+      };
 
-    onSave(submitData);
+      if (isEditMode) {
+        await leaveRequestService.updateLeaveRequest(initialData.id, submitData);
+        toast.success('Leave request updated successfully');
+      } else {
+        await leaveRequestService.createLeaveRequest(submitData);
+        toast.success('Leave request submitted successfully');
+      }
+
+      router.push('/hr/leave/requests');
+      router.refresh();
+    } catch (error) {
+      console.error('Error saving leave request:', error);
+      toast.error(error.message || 'Failed to save leave request');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const openDatePicker = (ref) => {
@@ -238,10 +328,10 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6 space-y-4">
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {/* Employee Name (Read-only in edit mode, editable in add mode) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Employee Name
           </label>
           <div className="relative">
@@ -252,7 +342,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
                 name="employeeName"
                 value={formData.employeeName}
                 readOnly
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 cursor-not-allowed"
+                className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 cursor-not-allowed"
               />
             ) : (
               <input
@@ -260,7 +350,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
                 name="employeeName"
                 value={formData.employeeName}
                 onChange={handleChange}
-                className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
               />
             )}
@@ -274,31 +364,29 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
 
         {/* Leave Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Leave Type
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Leave Type *
           </label>
           <select
             name="leaveType"
             value={formData.leaveType}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             required
           >
             <option value="">Select Leave Type</option>
-            <option value="Medical Leave">Medical Leave</option>
-            <option value="Vacation">Vacation</option>
-            <option value="Sick Leave">Sick Leave</option>
-            <option value="Personal Leave">Personal Leave</option>
-            <option value="Emergency Leave">Emergency Leave</option>
-            <option value="Maternity Leave">Maternity Leave</option>
-            <option value="Paternity Leave">Paternity Leave</option>
+            {leaveTypes.map((type) => (
+              <option key={type.id} value={type.name}>
+                {type.name}
+              </option>
+            ))}
           </select>
         </div>
 
         {/* Reason */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Reason
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Reason *
           </label>
           <div className="relative">
             <FileText className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
@@ -308,16 +396,17 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
               onChange={handleChange}
               rows={3}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              placeholder="Please provide a detailed reason for your leave request"
               required
             />
           </div>
         </div>
 
         {/* Date Range with Calendar Icons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              From Date
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              From Date *
             </label>
             <div className="relative">
               <input
@@ -326,7 +415,8 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
                 name="fromDate"
                 value={formData.fromDate}
                 onChange={handleChange}
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                min={new Date().toISOString().split('T')[0]}
+                className="w-full pl-3 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
               />
               <Calendar 
@@ -336,22 +426,26 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
             </div>
             
             {/* Start Date Breakdown */}
-            <div className="mt-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Start Date Breakdown
               </label>
-              <div className="flex space-x-2">
-                {['full_day', 'first_half', 'second_half'].map(option => (
-                  <label key={option} className="flex items-center">
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { value: 'full_day', label: 'Full Day' },
+                  { value: 'first_half', label: 'First Half' },
+                  { value: 'second_half', label: 'Second Half' }
+                ].map(option => (
+                  <label key={option.value} className="flex items-center">
                     <input
                       type="radio"
                       name="startDateBreakdown"
-                      checked={formData.startDateBreakdown === option}
-                      onChange={() => handleBreakdownChange('startDateBreakdown', option)}
+                      checked={formData.startDateBreakdown === option.value}
+                      onChange={() => handleBreakdownChange('startDateBreakdown', option.value)}
                       className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">
-                      {option.replace('_', ' ')}
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      {option.label}
                     </span>
                   </label>
                 ))}
@@ -360,8 +454,8 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              To Date
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              To Date *
             </label>
             <div className="relative">
               <input
@@ -370,7 +464,8 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
                 name="toDate"
                 value={formData.toDate}
                 onChange={handleChange}
-                className="w-full pl-3 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                min={formData.fromDate || new Date().toISOString().split('T')[0]}
+                className="w-full pl-3 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
               />
               <Calendar 
@@ -380,22 +475,26 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
             </div>
             
             {/* End Date Breakdown */}
-            <div className="mt-2">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <div className="mt-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 End Date Breakdown
               </label>
-              <div className="flex space-x-2">
-                {['full_day', 'first_half', 'second_half'].map(option => (
-                  <label key={option} className="flex items-center">
+              <div className="flex flex-wrap gap-3">
+                {[
+                  { value: 'full_day', label: 'Full Day' },
+                  { value: 'first_half', label: 'First Half' },
+                  { value: 'second_half', label: 'Second Half' }
+                ].map(option => (
+                  <label key={option.value} className="flex items-center">
                     <input
                       type="radio"
                       name="endDateBreakdown"
-                      checked={formData.endDateBreakdown === option}
-                      onChange={() => handleBreakdownChange('endDateBreakdown', option)}
+                      checked={formData.endDateBreakdown === option.value}
+                      onChange={() => handleBreakdownChange('endDateBreakdown', option.value)}
                       className="focus:ring-blue-500 h-4 w-4 text-blue-600 border-gray-300"
                     />
-                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300 capitalize">
-                      {option.replace('_', ' ')}
+                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      {option.label}
                     </span>
                   </label>
                 ))}
@@ -405,7 +504,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
         </div>
 
         {/* Calculated Days Display */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+        <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-blue-800 dark:text-blue-300">
               Calculated Leave Days:
@@ -419,12 +518,92 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
           </p>
         </div>
 
+        {/* CC Field */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            CC (Managers & Supervisors)
+          </label>
+          <div className="relative" ref={ccDropdownRef}>
+            {/* Selected CC People */}
+            {formData.cc.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {formData.cc.map(person => (
+                  <div
+                    key={person.id}
+                    className="flex items-center bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full text-sm"
+                  >
+                    <span>{person.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeCcPerson(person.id)}
+                      className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Input and Dropdown */}
+            <div className="relative">
+              <div className="flex items-center">
+                <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <input
+                  type="text"
+                  placeholder="Search managers and supervisors..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsCcDropdownOpen(true)}
+                  className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                />
+                <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              </div>
+
+              {/* Dropdown */}
+              {isCcDropdownOpen && (
+                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  {filteredCcOptions.length > 0 ? (
+                    filteredCcOptions.map(person => (
+                      <div
+                        key={person.id}
+                        onClick={() => handleCcSelect(person)}
+                        className="flex items-center p-3 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer transition-colors"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                            {person.name}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                            {person.role} • {person.email}
+                          </p>
+                        </div>
+                        {formData.cc.some(p => p.id === person.id) && (
+                          <div className="w-2 h-2 bg-green-500 rounded-full ml-2" />
+                        )}
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-3 text-center text-sm text-gray-500 dark:text-gray-400">
+                      No matching people found
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Select managers and supervisors to notify about this leave request
+            </p>
+          </div>
+        </div>
+
         {/* Attachment Field */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Attachment (Optional)
           </label>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {/* File input (hidden) */}
             <input
               ref={fileInputRef}
@@ -451,7 +630,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
             
             {/* Display selected file or existing attachment */}
             {(formData.attachmentName || existingAttachment) && (
-              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg dark:bg-gray-700">
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center">
                   <Paperclip className="w-4 h-4 text-gray-500 mr-2" />
                   <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-xs">
@@ -486,14 +665,14 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
         {/* Status (only in edit mode) */}
         {isEditMode && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Status
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             >
               <option value="pending">Pending</option>
               <option value="approved">Approved</option>
@@ -503,19 +682,22 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
         )}
 
         {/* Actions */}
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="flex justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            disabled={loading}
+            className="px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={loading}
+            className="flex items-center px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {isEditMode ? 'Save Changes' : 'Create Leave Request'}
+            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {isEditMode ? 'Update Leave Request' : 'Submit Leave Request'}
           </button>
         </div>
       </form>

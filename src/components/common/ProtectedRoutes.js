@@ -14,9 +14,17 @@ export default function ProtectedRoute({ children, requiredRole }) {
       router.push('/auth/signin');
     }
     
-    if (!loading && user && requiredRole && user.role !== requiredRole) {
+    if (!loading && user && requiredRole && user.systemRole !== requiredRole) {
       // Redirect to appropriate dashboard based on role
-      router.push(user.role === 'HR Admin' ? '/hr/dashboard' : '/employee/dashboard');
+      // router.push(user.role === 'HR Admin' ? '/hr/dashboard' : '/employee/dashboard');
+       // Redirect based on actual systemRole
+      if (user.systemRole === 'HR_ADMIN') {
+        router.push('/hr/dashboard');
+      } else if (user.systemRole === 'SUPER_ADMIN') {
+        router.push('/super-admin/dashboard');
+      } else {
+        router.push('/employee/dashboard');
+      }
     }
   }, [user, loading, router, requiredRole]);
 
@@ -32,7 +40,7 @@ export default function ProtectedRoute({ children, requiredRole }) {
     return null; // Will redirect in useEffect
   }
 
-  if (requiredRole && user.role !== requiredRole) {
+  if (requiredRole && user.systemRole !== requiredRole) {
     return null; // Will redirect in useEffect
   }
 

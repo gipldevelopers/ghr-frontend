@@ -21,76 +21,152 @@ const STEPS = [
   { id: 2, title: 'Contact Information', component: 'contact' },
   { id: 3, title: 'Professional Information', component: 'professional' },
   { id: 4, title: 'Banking Information', component: 'banking' },
-  { id: 5, title: 'Documents', component: 'documents' }
+  // { id: 5, title: 'Documents', component: 'documents' }
 ];
 
 const STORAGE_KEY = 'hrms_employee_form_data';
 
-// Default form data structure
+// Default form data structure matching the new schema
+// const defaultFormData = {
+//   // Personal Information
+//   profileImage: null,
+//   firstName: '',
+//   lastName: '',
+//   dateOfBirth: '',
+//   gender: '',
+//   maritalStatus: '',
+//   bloodGroup: '',
+//   nationality: 'Indian',
+//   religion: '',
+//   personalEmail: '',
+//   birthPlace: '',
+//   height: '',
+//   weight: '',
+//   // physicalStatus: '',
+  
+//   // Contact Information
+//   email: '',
+//   phone: '',
+//   permanentAddress: '',
+//   currentAddress: '',
+//   city: '',
+//   state: '',
+//   pincode: '',
+//   country: 'India',
+//   emergencyContactName: '',
+//   emergencyContactRelation: '',
+//   emergencyContactPhone: '',
+  
+//   // Professional Information
+//   employeeId: '',
+//   departmentId: '',
+//   designationId: '',
+//   reportingManagerId: '',
+//   joiningDate: '',
+//   confirmationDate: '',
+//   employmentType: 'FULL_TIME',
+//   // employeeType: 'PERMANENT',
+//   workLocation: '',
+//   baseSalary: '',
+//   probationPeriod: '',
+//   workShift: '',
+//   weeklyHours: 40,
+//   overtimeEligible: false,
+  
+//   // Banking Information
+//   bankName: '',
+//   accountNumber: '',
+//   ifscCode: '',
+//   accountHolderName: '',
+//   branchName: '',
+//   accountType: 'SAVINGS',
+//   paymentMethod: 'BANK_TRANSFER',
+//   paymentFrequency: 'MONTHLY',
+  
+//   // Documents & Tax Information
+//   panNumber: '',
+//   aadhaarNumber: '',
+//   pfNumber: '',
+//   uanNumber: '',
+//   esiNumber: '',
+  
+//   // Status
+//   status: 'ACTIVE',
+//   onboardingStatus: 'PENDING',
+//   createUser: true
+// };
+
 const defaultFormData = {
   // Personal Information
-  profilePhoto: null,
+  profileImage: null,
   firstName: '',
   lastName: '',
-  middleName: '',
   dateOfBirth: '',
   gender: '',
   maritalStatus: '',
   bloodGroup: '',
-  nationality: '',
+  nationality: 'Indian',
   religion: '',
+  personalEmail: '',
+  birthPlace: '',
+  height: '',
+  weight: '',
   
   // Contact Information
   email: '',
   phone: '',
-  alternatePhone: '',
   permanentAddress: '',
   currentAddress: '',
   city: '',
   state: '',
   pincode: '',
   country: 'India',
-  
-  // Emergency Contact
   emergencyContactName: '',
   emergencyContactRelation: '',
   emergencyContactPhone: '',
   
   // Professional Information
   employeeId: '',
-  department: '',
-  designation: '',
-  reportingManager: '',
+  departmentId: '',
+  designationId: '',
+  reportingManagerId: '',
   joiningDate: '',
-  employmentType: '',
+  confirmationDate: '',
+  employmentType: 'FULL_TIME',
   workLocation: '',
-  salary: '',
+  baseSalary: '',
   probationPeriod: '',
   workShift: '',
+  weeklyHours: 40,
+  overtimeEligible: false,
   
   // Banking Information
   bankName: '',
   accountNumber: '',
   ifscCode: '',
   accountHolderName: '',
-  branchName: '',
+  accountType: 'SAVINGS',
   
-  // Documents
-  aadhaarNumber: '',
+  // Documents & Tax Information
   panNumber: '',
-  passportNumber: '',
-  drivingLicense: '',
-  voterIdNumber: '',
-  aadhaarDocument: null,
-  panDocument: null,
-  photo: null,
-  resume: null,
-  educationCertificates: []
+  aadhaarNumber: '',
+  
+  // Status
+  status: 'ACTIVE',
+  onboardingStatus: 'PENDING',
+  createUser: true
 };
 
 export default function AddEmployeePage() {
-   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [showRecoveryModal, setShowRecoveryModal] = useState(false);
+  const [recoveryData, setRecoveryData] = useState(null);
+  const [dropdownData, setDropdownData] = useState({
+    departments: [],
+    designations: [],
+    reportingManagers: []
+  });
+  const [loadingDropdowns, setLoadingDropdowns] = useState(true);
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -99,45 +175,65 @@ export default function AddEmployeePage() {
   const [formData, setFormData] = useState(defaultFormData);
   const [errors, setErrors] = useState({});
 
+  // Load dropdown data
+  useEffect(() => {
+    const loadDropdownData = async () => {
+      try {
+        // const [departments, designations, managers 
+        //   // reportingManagers
+        // ] = await Promise.all([
+        //   employeeService.getDepartments(),
+        //   employeeService.getDesignations(),
+        //   // employeeService.getReportingManagers()
+        //   employeeService.getManagers()
+        // ]);
+        const [departments, designations, managers] = await Promise.all([
+          employeeService.getDepartments(),
+          employeeService.getDesignations(),
+          employeeService.getManagers() // Make sure this endpoint exists
+        ]);
+
+        setDropdownData({
+          departments: departments.data || departments,
+          designations: designations.data || designations,
+          reportingManagers: managers.data || managers
+          // reportingManagers: reportingManagers.data || reportingManagers
+        });
+      } catch (error) {
+        toast.error('Failed to load dropdown data');
+        console.error('Error loading dropdown data:', error);
+      } finally {
+        setLoadingDropdowns(false);
+      }
+    };
+
+    loadDropdownData();
+  }, []);
+
   // Load saved data on component mount
-  // useEffect(() => {
-  //   const loadSavedData = () => {
-  //     try {
-  //       const saved = localStorage.getItem(STORAGE_KEY);
-  //       if (saved) {
-  //         setShowRecoveryModal(true);
-  //         const parsedData = JSON.parse(saved);
-  //         setFormData(parsedData.formData || defaultFormData);
-  //         setCurrentStep(parsedData.currentStep || 1);
-          
-  //         // Show recovery message
-  //         toast.success('Previous form data recovered');
-  //       }
-  //     } catch (error) {
-  //       console.error('Error loading saved form data:', error);
-  //       clearFormData(); // Clear corrupted data
-  //     }
-  //   };
-
-  //   loadSavedData();
-  // }, []);
-
-   useEffect(() => {
+  useEffect(() => {
     const loadSavedData = () => {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsedData = JSON.parse(saved);
-          setFormData(parsedData.formData || defaultFormData);
-          setCurrentStep(parsedData.currentStep || 1);
-          setIsDataLoaded(true); // Mark data as loaded
-          setShowRecoveryModal(true);
-        } else {
-          setIsDataLoaded(true); // No saved data, but still mark as loaded
+          const dataAge = parsedData.timestamp 
+            ? Date.now() - new Date(parsedData.timestamp).getTime()
+            : Infinity;
+            
+          const isDataRecent = dataAge < 24 * 60 * 60 * 1000;
+          
+          if (isDataRecent) {
+            setRecoveryData(parsedData);
+            setShowRecoveryModal(true);
+          } else {
+            localStorage.removeItem(STORAGE_KEY);
+          }
         }
       } catch (error) {
         console.error('Error loading saved form data:', error);
-        clearFormData();
+        localStorage.removeItem(STORAGE_KEY);
+      } finally {
         setIsDataLoaded(true);
       }
     };
@@ -147,6 +243,8 @@ export default function AddEmployeePage() {
 
   // Auto-save with debouncing
   useEffect(() => {
+    if (!isDataLoaded) return;
+
     const saveData = () => {
       try {
         const dataToSave = {
@@ -159,17 +257,15 @@ export default function AddEmployeePage() {
         setLastSaved(new Date());
         setIsSaved(true);
         
-        // Auto-hide saved indicator after 2 seconds
         setTimeout(() => setIsSaved(false), 2000);
       } catch (error) {
         console.error('Error saving form data:', error);
       }
     };
 
-    // Debounce the save operation
-    const timeoutId = setTimeout(saveData, 1000); // Save after 1 second of inactivity
+    const timeoutId = setTimeout(saveData, 1500);
     return () => clearTimeout(timeoutId);
-  }, [formData, currentStep]);
+  }, [formData, currentStep, isDataLoaded]);
 
   // Clear form data from storage
   const clearFormData = useCallback(() => {
@@ -177,6 +273,8 @@ export default function AddEmployeePage() {
     setFormData(defaultFormData);
     setCurrentStep(1);
     setErrors({});
+    setRecoveryData(null);
+    toast.success('Form cleared successfully');
   }, []);
 
   // Handle input changes
@@ -186,7 +284,6 @@ export default function AddEmployeePage() {
       [name]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -197,15 +294,9 @@ export default function AddEmployeePage() {
 
   // Navigation handlers
   const handleNext = useCallback(() => {
-    // Validate current step before proceeding
     const stepErrors = validateEmployeeForm(formData, currentStep);
 
-    console.log('Current step:', currentStep);
-    console.log('Form data:', formData);
-    console.log('Validation errors:', stepErrors);
-    console.log('Error count:', Object.keys(stepErrors).length);
-
-     if (Object.keys(stepErrors).length > 0) {
+    if (Object.keys(stepErrors).length > 0) {
       setErrors(stepErrors);
       toast.error('Please fix the errors before proceeding');
       return;
@@ -222,53 +313,257 @@ export default function AddEmployeePage() {
     }
   }, [currentStep]);
 
-  // Form submission
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
+  // Handle form submission
+  // const handleSubmit = async () => {
+  //   setIsSubmitting(true);
     
-    try {
-      // Prepare data for API
-      const submitData = {
-        ...formData,
-        // Convert string numbers to actual numbers
-        salary: formData.salary ? parseFloat(formData.salary) : null,
-        // Convert dates to ISO format
-        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth).toISOString() : null,
-        joiningDate: formData.joiningDate ? new Date(formData.joiningDate).toISOString() : null,
-        // Ensure createUser is boolean
-        createUser: Boolean(formData.createUser)
-      };
+  //   try {
+  //     // 1. First create the employee (without documents)
+  //     const submitData = {
+  //       ...formData,
+  //       profileImage: undefined // Will be handled separately if needed
+  //     };
 
-      // Call the API
-      const response = await employeeService.createEmployee(submitData);
+  //     const response = await employeeService.createEmployee(submitData);
+  //     const employeeId = response.data.id;
+
+  //     // 2. Upload profile photo if exists (optional)
+  //     if (formData.profileImage instanceof File) {
+  //       try {
+  //         const photoFormData = new FormData();
+  //         photoFormData.append('file', formData.profileImage);
+  //         photoFormData.append('name', 'Profile Photo');
+  //         photoFormData.append('type', 'PHOTO');
+          
+  //         await employeeService.uploadDocument(employeeId, photoFormData);
+  //       } catch (uploadError) {
+  //         console.error('Profile photo upload failed:', uploadError);
+  //         // Don't fail the entire creation if photo upload fails
+  //       }
+  //     }
+
+  //     // Clear form data from storage
+  //     localStorage.removeItem(STORAGE_KEY);
+
+  //      // 4. Redirect to employee profile with documents tab
+  //     toast.success('Employee created successfully! Redirecting to upload documents...');
+
+  //      // Redirect to documents page after a brief delay
+  //     setTimeout(() => {
+  //       router.push(`/hr/employees/${employeeId}?tab=documents&new=true`);
+  //     }, 1500);
       
-      // Clear saved data on successful submission
-      clearFormData();
+  //     // toast.success('Employee created successfully!');
+  //     // router.push('/hr/employees');
       
-      // Show success message and redirect
-      toast.success('Employee created successfully!');
-      router.push('/hr/employees');
+  //   } catch (error) {
+  //     console.error('Error creating employee:', error);
+  //     toast.error(error.message || 'Failed to create employee');
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+//   const handleSubmit = async () => {
+//   setIsSubmitting(true);
+  
+//   try {
+//     // 1. First create the employee (without documents)
+//     // Remove physicalStatus and other invalid fields
+//     const { physicalStatus, profileImage, ...submitData } = formData;
+
+//     const response = await employeeService.createEmployee(submitData);
+//     const employeeId = response.data.id;
+
+//     // 2. Upload profile photo if exists (optional)
+//     if (formData.profileImage instanceof File) {
+//       try {
+//         const photoFormData = new FormData();
+//         photoFormData.append('file', formData.profileImage);
+//         photoFormData.append('name', 'Profile Photo');
+//         photoFormData.append('type', 'PHOTO');
+        
+//         await employeeService.uploadDocument(employeeId, photoFormData);
+//       } catch (uploadError) {
+//         console.error('Profile photo upload failed:', uploadError);
+//         // Don't fail the entire creation if photo upload fails
+//       }
+//     }
+
+//     // Clear form data from storage
+//     localStorage.removeItem(STORAGE_KEY);
+
+//     // 3. Redirect to employee profile with documents tab
+//     toast.success('Employee created successfully! Redirecting to upload documents...');
+
+//     // Redirect to documents page after a brief delay
+//     setTimeout(() => {
+//       router.push(`/hr/employees/${employeeId}?tab=documents&new=true`);
+//     }, 1500);
+    
+//   } catch (error) {
+//     console.error('Error creating employee:', error);
+//     toast.error(error.message || 'Failed to create employee');
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
+
+// const handleSubmit = async () => {
+//   setIsSubmitting(true);
+  
+//   try {
+//     // Convert fields to appropriate types based on Prisma schema
+//     const processedData = {
+//       ...formData,
+//       // Convert IDs from string to integer
+//       departmentId: parseInt(formData.departmentId),
+//       designationId: parseInt(formData.designationId),
+//       reportingManagerId: parseInt(formData.reportingManagerId),
+//       companyId: parseInt(formData.companyId),
+//       createdBy: parseInt(formData.createdBy),
       
-    } catch (error) {
-      console.error('Error submitting form:', error);
+//       // Convert numeric fields to strings (as expected by Prisma)
+//       height: formData.height.toString(), // Convert to string
+//       weight: formData.weight.toString(), // Convert to string
       
-      // Handle validation errors from backend
-      if (error.response?.data?.errors) {
-        const validationErrors = {};
-        error.response.data.errors.forEach(err => {
-          validationErrors[err.field] = err.message;
-        });
-        setErrors(validationErrors);
-        toast.error('Please fix the validation errors');
-      } else {
-        toast.error(error.message || 'Failed to create employee. Please try again.');
+//       // Convert other numeric fields appropriately
+//       baseSalary: parseFloat(formData.baseSalary),
+//       probationPeriod: parseInt(formData.probationPeriod),
+//        weeklyHours: parseInt(formData.weeklyHours),
+//       overtimeEligible: Boolean(formData.overtimeEligible),
+//       // weeklyHours: parseInt(formData.weeklyHours),
+//     };
+
+//     // Remove physicalStatus and other invalid fields
+//     const { 
+//        profileImage, ...submitData } = processedData;
+
+//     const response = await employeeService.createEmployee(submitData);
+//     const employeeId = response.data.id;
+
+//     // 2. Upload profile photo if exists (optional)
+//     if (formData.profileImage instanceof File) {
+//       try {
+//         const photoFormData = new FormData();
+//         photoFormData.append('file', formData.profileImage);
+//         photoFormData.append('name', 'Profile Photo');
+//         photoFormData.append('type', 'PHOTO');
+        
+//         await employeeService.uploadDocument(employeeId, photoFormData);
+//       } catch (uploadError) {
+//         console.error('Profile photo upload failed:', uploadError);
+//         // Don't fail the entire creation if photo upload fails
+//       }
+//     }
+
+//        // Clear form data from storage
+//     localStorage.removeItem(STORAGE_KEY);
+
+//     // 3. Redirect to employee profile with documents tab
+//     toast.success('Employee created successfully! Redirecting to upload documents...');
+
+//     // Redirect to documents page after a brief delay
+//     setTimeout(() => {
+//       router.push(`/hr/employees/${employeeId}?tab=documents&new=true`);
+//     }, 1500);
+
+//     // ... rest of your code for file uploads
+//   } catch (error) {
+//     console.error('Error creating employee:', error);
+//     toast.error(error.message || 'Failed to create employee');
+//   } finally {
+//     setIsSubmitting(false);
+//   }
+// };
+
+const handleSubmit = async () => {
+  setIsSubmitting(true);
+  
+  try {
+    // Convert fields to appropriate types based on Prisma schema
+    const processedData = {
+      ...formData,
+      // Convert IDs from string to integer (handle empty values)
+      departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
+      designationId: formData.designationId ? parseInt(formData.designationId) : null,
+      reportingManagerId: formData.reportingManagerId ? parseInt(formData.reportingManagerId) : null,
+      
+      // Convert numeric fields appropriately
+      baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
+      probationPeriod: formData.probationPeriod ? parseInt(formData.probationPeriod) : null,
+      weeklyHours: formData.weeklyHours ? parseInt(formData.weeklyHours) : null,
+      overtimeEligible: Boolean(formData.overtimeEligible),
+      
+      // Convert height/weight to strings (as expected by Prisma)
+      height: formData.height ? formData.height.toString() : null,
+      weight: formData.weight ? formData.weight.toString() : null,
+      
+      // Convert dates to proper format
+      dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : null,
+      joiningDate: formData.joiningDate ? new Date(formData.joiningDate) : null,
+      confirmationDate: formData.confirmationDate ? new Date(formData.confirmationDate) : null,
+    };
+
+    // Remove profileImage from the main submission (handled separately)
+    const { profileImage, ...submitData } = processedData;
+
+    const response = await employeeService.createEmployee(submitData);
+    const employeeId = response.data.id;
+
+    // Upload profile photo if exists (optional)
+    if (formData.profileImage instanceof File) {
+      try {
+        const photoFormData = new FormData();
+        photoFormData.append('file', formData.profileImage);
+        photoFormData.append('name', 'Profile Photo');
+        photoFormData.append('type', 'PHOTO');
+        
+        await employeeService.uploadDocument(employeeId, photoFormData);
+      } catch (uploadError) {
+        console.error('Profile photo upload failed:', uploadError);
+        // Don't fail the entire creation if photo upload fails
       }
-    } finally {
-      setIsSubmitting(false);
     }
-  };
 
-  // Manual save function (optional)
+    // Clear form data from storage
+    localStorage.removeItem(STORAGE_KEY);
+
+    // Redirect to employee profile with documents tab
+    toast.success('Employee created successfully! Redirecting to upload documents...');
+
+    // Redirect to documents page after a brief delay
+    setTimeout(() => {
+      router.push(`/hr/employees/${employeeId}/documents?new=true`);
+    }, 1500);
+
+  } catch (error) {
+    console.error('Error creating employee:', error);
+    toast.error(error.message || 'Failed to create employee');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
+  // Recovery modal handlers
+  const handleRecover = useCallback(() => {
+    if (recoveryData) {
+      setFormData(recoveryData.formData || defaultFormData);
+      setCurrentStep(recoveryData.currentStep || 1);
+      setLastSaved(recoveryData.timestamp ? new Date(recoveryData.timestamp) : null);
+      toast.success('Form data recovered successfully');
+    }
+    setShowRecoveryModal(false);
+  }, [recoveryData]);
+
+  const handleDiscard = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+    setRecoveryData(null);
+    setShowRecoveryModal(false);
+    toast.info('Previous form data discarded');
+  }, []);
+
+  // Manual save function
   const handleManualSave = useCallback(() => {
     const dataToSave = {
       formData,
@@ -282,89 +577,43 @@ export default function AddEmployeePage() {
     setTimeout(() => setIsSaved(false), 2000);
     toast.success('Form progress saved');
   }, [formData, currentStep]);
-  
 
   // Render step content
   const renderStepContent = useCallback(() => {
-     if (!isDataLoaded) {
+    if (!isDataLoaded || loadingDropdowns) {
       return (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       );
     }
+
+    const commonProps = {
+      formData,
+      errors,
+      onChange: handleInputChange,
+      dropdownData
+    };
+
     switch(currentStep) {
-      case 1:
-        return (
-          <PersonalInfoForm 
-            formData={formData}
-            errors={errors}
-            onChange={handleInputChange}
-          />
-        );
-      case 2:
-        return (
-          <ContactInfoForm
-            formData={formData}
-            errors={errors}
-            onChange={handleInputChange}
-          />
-        );
-      case 3:
-        return (
-          <ProfessionalInfoForm 
-            formData={formData}
-            errors={errors}
-            onChange={handleInputChange}
-          />
-        );
-      case 4:
-        return (
-          <BankingInfoForm 
-            formData={formData}
-            errors={errors}
-            onChange={handleInputChange}
-          />
-        );
-      case 5:
-        return (
-          <DocumentsForm
-            formData={formData}
-            errors={errors}
-            onChange={handleInputChange}
-          />
-        );
-      default:
-        return null;
+      case 1: return <PersonalInfoForm {...commonProps} />;
+      case 2: return <ContactInfoForm {...commonProps} />;
+      case 3: return <ProfessionalInfoForm {...commonProps} />;
+      case 4: return <BankingInfoForm {...commonProps} />;
+      case 5: return <DocumentsForm {...commonProps} />;
+      default: return null;
     }
-  }, [currentStep, formData, errors, handleInputChange, isDataLoaded]);
-
-  const handleRecover = () => {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsedData = JSON.parse(saved);
-        setFormData(parsedData.formData || defaultFormData);
-        setCurrentStep(parsedData.currentStep || 1);
-        toast.success('Form data recovered successfully');
-      }
-    } catch (error) {
-      console.error('Error recovering form data:', error);
-      toast.error('Failed to recover form data');
-    } finally {
-      setShowRecoveryModal(false);
-    }
-  };
-
-  const handleDiscard = () => {
-    localStorage.removeItem(STORAGE_KEY);
-    setShowRecoveryModal(false);
-    toast.info('Previous form data discarded');
-  };
+  }, [currentStep, formData, errors, handleInputChange, isDataLoaded, loadingDropdowns, dropdownData]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Breadcrumb rightContent={null} />
+      <Breadcrumb 
+        items={[
+          { label: 'HR', href: '/hr' },
+          { label: 'Employees', href: '/hr/employees' },
+          { label: 'Add Employee', href: '/hr/employees/add' }
+        ]} 
+      />
 
       {/* Save Status Indicator */}
       <div className="px-6 pt-6">
@@ -374,20 +623,20 @@ export default function AddEmployeePage() {
               <span className="text-green-600 dark:text-green-400">✓ Saved</span>
             )}
             {lastSaved && (
-              <span>Last saved: {new Date(lastSaved).toLocaleTimeString()}</span>
+              <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
             )}
           </div>
           
           <div className="flex gap-2">
             <button
               onClick={handleManualSave}
-              className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50"
+              className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:hover:bg-blue-900/50 transition-colors"
             >
               Save Progress
             </button>
             <button
               onClick={clearFormData}
-              className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50"
+              className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 transition-colors"
             >
               Clear Form
             </button>
@@ -422,6 +671,7 @@ export default function AddEmployeePage() {
                 onSubmit={handleSubmit}
                 isSubmitting={isSubmitting}
                 canProceed={true}
+                submitButtonText="Create Employee & Upload Documents"
               />
             </div>
           </div>
@@ -433,8 +683,8 @@ export default function AddEmployeePage() {
         isOpen={showRecoveryModal}
         onRecover={handleRecover}
         onDiscard={handleDiscard}
+        lastSaved={recoveryData?.timestamp}
       />
-
     </div>
   );
 }

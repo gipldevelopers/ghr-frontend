@@ -14,13 +14,35 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+     const companyId = localStorage.getItem('company_id');
+    // const subdomain = localStorage.getItem('company_subdomain');
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-      // Don't set Content-Type for FormData (browser will set it automatically with boundary)
-    if (config.data instanceof FormData) {
+
+     // Add company ID to EVERY request (except auth routes)
+    const isAuthRoute = config.url?.includes('/auth/');
+    if (companyId && !isAuthRoute) {
+      config.headers['x-company-id'] = companyId;
+    }
+
+     // Don't block auth routes without company ID
+     // Block non-auth routes without company context
+    if (!companyId && !isAuthRoute && token) {
+      console.error('Company context missing! Redirecting to login.');
+      localStorage.removeItem('token');
+      localStorage.removeItem('hrms_user');
+      localStorage.removeItem('company_id');
+      localStorage.removeItem('company_subdomain');
+      window.location.href = '/signin';
+      return Promise.reject(new Error('Company context required'));
+    }
+
+      if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
     }
+    
     return config;
   },
   (error) => {
