@@ -65,26 +65,26 @@ export default function Regularization() {
             status === "Approved"
               ? "bg-green-100 text-green-700"
               : status === "Pending"
-              ? "bg-yellow-100 text-yellow-700"
-              : "bg-red-100 text-red-700";
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700";
           return <span className={`px-2 py-1 text-xs rounded-full ${color}`}>{status}</span>;
         },
       },
       {
-  header: "Action",
-  cell: ({ row }) => (
-    <button
-      onClick={() => {
-        setSelectedRow(row.original);
-        setFormData({ inTime: row.original.inTime, outTime: row.original.outTime, reason: "" });
-        setIsModalOpen(true);
-      }}
-      className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
-    >
-      <FileEdit className="w-5 h-5 text-blue-600" /> {/* 👈 icon instead of button */}
-    </button>
-  ),
-},
+        header: "Action",
+        cell: ({ row }) => (
+          <button
+            onClick={() => {
+              setSelectedRow(row.original);
+              setFormData({ inTime: row.original.inTime, outTime: row.original.outTime, reason: "" });
+              setIsModalOpen(true);
+            }}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
+            <FileEdit className="w-5 h-5 text-blue-600" /> {/* 👈 icon instead of button */}
+          </button>
+        ),
+      },
     ],
     []
   );
