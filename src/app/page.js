@@ -7,7 +7,7 @@ export default function Home() {
       <nav className="flex justify-between items-center p-6">
         <div className="text-2xl font-bold text-blue-800">HRMS Portal</div>
         <div className="flex gap-4">
-          <Link href="/signin" className="text-blue-700 hover:text-blue-900 font-medium">
+          <Link href="/signin" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
             Login
           </Link>
           <Link href="/register" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">

@@ -35,17 +35,18 @@ const Breadcrumb = ({ customTitle, rightContent }) => {
   const pathname = usePathname();
 
   const generateBreadcrumbs = () => {
-    const paths = pathname.split('/').filter((path) => path);
+    const paths = pathname.split('/').filter(Boolean);
     const filteredPaths = paths.filter(
       (path) => !breadcrumbConfig.hiddenPaths.includes(path)
     );
-    const breadcrumbs = [];
 
-    breadcrumbs.push({
-      href: '/',
-      label: <Home className="w-4 h-4" />,
-      isCurrent: false,
-    });
+    const breadcrumbs = [
+      {
+        href: '/',
+        label: <Home className="w-4 h-4" />,
+        isCurrent: false,
+      },
+    ];
 
     let accumulatedPath = '';
     for (let i = 0; i < filteredPaths.length; i++) {
@@ -59,11 +60,10 @@ const Breadcrumb = ({ customTitle, rightContent }) => {
         breadcrumbConfig.idPaths.includes(filteredPaths[i - 1]);
 
       if (isIdPath) {
-        if (i < filteredPaths.length - 1 && filteredPaths[i + 1] === 'edit') {
-          label = 'Edit';
-        } else {
-          label = 'Details';
-        }
+        label =
+          i < filteredPaths.length - 1 && filteredPaths[i + 1] === 'edit'
+            ? 'Edit'
+            : 'Details';
       } else if (breadcrumbConfig.specialPaths[path]) {
         label = breadcrumbConfig.specialPaths[path];
       } else {
@@ -90,58 +90,45 @@ const Breadcrumb = ({ customTitle, rightContent }) => {
 
   const breadcrumbs = generateBreadcrumbs();
 
-  let pageTitle;
+  let pageTitle = 'Dashboard';
   if (customTitle) {
     pageTitle = customTitle;
   } else if (breadcrumbs.length > 1) {
     pageTitle = breadcrumbs[breadcrumbs.length - 1].label;
-    const paths = pathname.split('/').filter((path) => path);
-    const lastPath = paths[paths.length - 1];
-
-    if (!isNaN(lastPath) && paths.length > 1) {
-      const parentPath = paths[paths.length - 2];
-      if (breadcrumbConfig.specialPaths[parentPath]) {
-        pageTitle = breadcrumbConfig.specialPaths[parentPath] + ' Details';
-      }
-    } else if (lastPath === 'new') {
-      pageTitle = 'Add New';
-    } else if (lastPath === 'edit') {
-      pageTitle = 'Edit';
-    } else if (lastPath === 'employees') {
-      pageTitle = 'Employee List';
-    }
-  } else {
-    pageTitle = 'Dashboard';
   }
 
   return (
     <div className="my-auto mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      {/* Left side: Title + breadcrumb */}
+      {/* Left side */}
       <div>
         <h2 className="mb-1 text-lg md:text-xl font-semibold text-gray-800 dark:text-white">
           {pageTitle}
         </h2>
+
         <nav className="overflow-x-auto">
           <ol className="breadcrumb mb-0 flex flex-wrap items-center text-sm whitespace-nowrap">
             {breadcrumbs.map((breadcrumb, index) => (
               <li
                 key={index}
-                className={`breadcrumb-item flex items-center ${
-                  breadcrumb.isCurrent
-                    ? 'active text-gray-600 dark:text-gray-400'
-                    : ''
-                }`}
+                className="breadcrumb-item flex items-center text-gray-600 dark:text-gray-400"
               >
-                {breadcrumb.isCurrent ? (
-                  <span aria-current="page">{breadcrumb.label}</span>
-                ) : (
+                {/* ONLY HOME IS CLICKABLE */}
+                {index === 0 ? (
                   <Link
                     href={breadcrumb.href}
                     className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors flex items-center"
                   >
                     {breadcrumb.label}
                   </Link>
+                ) : (
+                  <span
+                    aria-current={breadcrumb.isCurrent ? 'page' : undefined}
+                    className={breadcrumb.isCurrent ? 'font-medium' : ''}
+                  >
+                    {breadcrumb.label}
+                  </span>
                 )}
+
                 {index < breadcrumbs.length - 1 && (
                   <span className="mx-2 text-gray-400">/</span>
                 )}
@@ -151,7 +138,7 @@ const Breadcrumb = ({ customTitle, rightContent }) => {
         </nav>
       </div>
 
-      {/* Right side: Custom buttons (page-specific) */}
+      {/* Right side */}
       {rightContent && <div className="shrink-0">{rightContent}</div>}
     </div>
   );

@@ -7,6 +7,7 @@ import { useSidebar } from "@/context/SidebarContext";
 import {
   Grid,
   Users,
+  Target,
   Building,
   Calendar,
   Clock,
@@ -21,7 +22,8 @@ import {
   CreditCard,
   Package,
   Shield,
-  UserStar
+  UserStar,
+  CalendarDays
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -81,7 +83,7 @@ const hrNavItems = [
       { name: "Organization Chart", path: "/hr/departments/chart" },
     ],
   },
-   {
+  {
     icon: <Briefcase size={20} />,
     name: "Designation",
     subItems: [
@@ -121,7 +123,7 @@ const hrNavItems = [
     ],
   },
   {
-    icon: <CreditCard size={20} />, // You'll need to import CreditCard from lucide-react
+    icon: <CreditCard size={20} />,
     name: "Payroll Management",
     subItems: [
       { name: "Payroll Dashboard", path: "/hr/payroll" },
@@ -155,7 +157,7 @@ const hrNavItems = [
       { name: "Asset Reports", path: "/hr/assets/reports" },
     ],
   },
-   {
+  {
     icon: <Settings size={20} />,
     name: "System Settings",
     subItems: [
@@ -164,7 +166,7 @@ const hrNavItems = [
       { name: "User Access Control", path: "/hr/settings/user-access" },
     ],
   },
-    {
+  {
     icon: <UserStar size={20} />,
     name: "Roles & Permissions",
     subItems: [
@@ -184,30 +186,70 @@ const employeeNavItems = [
     icon: <Clock size={20} />,
     name: "Attendance",
     subItems: [
-      { name: "Punch In/Out", path: "/employee/attendance" },
-      { name: "My Records", path: "/employee/attendance/records" },
+      { name: "My Attendance", path: "/employee/attendance/my-attendance" },
+      { name: "My Leaves", path: "/employee/attendance/my-leaves" },
+      { name: "Leave Report", path: "/employee/attendance/leave-summery-details" },
+      { name: "Holidays", path: "/employee/attendance/holidays" },
+      { name: "Regularization", path: "/employee/attendance/regularization" },
+      { name: "Overtime", path: "/employee/attendance/overtime" },
     ],
   },
   {
     icon: <Calendar size={20} />,
     name: "Leave Management",
     subItems: [
-      { name: "Apply Leave", path: "/employee/leave" },
-      { name: "Leave Balance", path: "/employee/leave/balance" },
-      { name: "Leave History", path: "/employee/leave/history" },
-      { name: "Holiday Calendar", path: "/employee/leave/holidays" },
+      { name: "Request Leave", path: "/employee/leave/request-leave" },
+      { name: "Leave Balance", path: "/employee/leave/leave-balance" },
+      { name: "Leave History", path: "/employee/leave/leave-history" },
+      { name: "Holiday Calendar", path: "/employee/leave/team-calendar" },
+    ],
+  },
+  {
+    icon: <CalendarDays size={20} />,
+    name: "Holiday",
+    subItems: [
+      { name: "Holiday List", path: "/employee/holiday" }
     ],
   },
   {
     icon: <FileText size={20} />,
-    name: "Payslips",
-    path: "/employee/payslips",
+    name: "Payrolls",
+    subItems: [
+      { name: "Salery Summery", path: "/employee/payslips/salery-summery" },
+      { name: "Payslip", path: "/employee/payslips/pay-slips" },
+      { name: "Payment History", path: "/employee/payslips/payment-history" },
+      { name: "Tax Information", path: "/employee/payslips/tax-info" },
+      { name: "Rembursment", path: "/employee/payslips/rembursment" },
+    ],
   },
   {
-    icon: <Package size={20} />,
-    name: "My Assets",
-    path: "/employee/assets",
+    icon: <Settings size={20} />,
+    name: "Settings",
+    subItems: [
+      { name: "Profile Picture", path: "/employee/settings/profile-picture" },
+      { name: "Contact Information", path: "/employee/settings/contact-information" },
+      { name: "Password Management", path: "/employee/settings/password-management" },
+      { name: "Two-Factor Authentication (2FA)", path: "/employee/settings/two-factor-auth" },
+      { name: "Connected Devices", path: "/employee/settings/connected-devices" },
+    ],
   },
+  {
+    icon: <Target size={20} />,
+    name: "Performance & Goals",
+    subItems: [
+      { name: "Goals", path: "/employee/performance/goals" },
+      { name: "KPIs", path: "/employee/performance/kpis" },
+      { name: "Feedback", path: "/employee/performance/feedback" },
+      { name: "Skills", path: "/employee/performance/skills" },
+      { name: "Training", path: "/employee/performance/training" },
+      { name: "Recognition", path: "/employee/performance/recognition" },
+    ],
+  },
+  // {
+  //   icon: <Package size={20} />,
+  //   name: "My Assets",
+  //   path: "/employee/assets",
+  // },
 ];
 
 const AppSidebar = () => {
@@ -227,7 +269,7 @@ const AppSidebar = () => {
 
   // Get appropriate navigation items based on user role
   const getNavItems = () => {
-    switch(userRole) {
+    switch (userRole) {
       case "SUPER_ADMIN":  // Changed from "Super Admin"
         return superAdminNavItems;
       case "HR_ADMIN":     // Changed from "HR Admin"
@@ -240,7 +282,7 @@ const AppSidebar = () => {
   useEffect(() => {
     let submenuMatched = false;
     const items = getNavItems();
-    
+
     items.forEach((nav, index) => {
       if (nav.subItems) {
         nav.subItems.forEach((subItem) => {
@@ -287,22 +329,19 @@ const AppSidebar = () => {
           {nav.subItems ? (
             <button
               onClick={() => handleSubmenuToggle(index)}
-              className={`menu-item group w-full ${
-                openSubmenu?.index === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
-              } cursor-pointer ${
-                !isExpanded && !isHovered
+              className={`menu-item group w-full ${openSubmenu?.index === index
+                ? "menu-item-active"
+                : "menu-item-inactive"
+                } cursor-pointer ${!isExpanded && !isHovered
                   ? "lg:justify-center"
                   : "lg:justify-start"
-              }`}
+                }`}
             >
               <span
-                className={`${
-                  openSubmenu?.index === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
-                }`}
+                className={`${openSubmenu?.index === index
+                  ? "menu-item-icon-active"
+                  : "menu-item-icon-inactive"
+                  }`}
               >
                 {nav.icon}
               </span>
@@ -312,11 +351,10 @@ const AppSidebar = () => {
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDown
                   size={20}
-                  className={`ml-auto transition-transform duration-200 ${
-                    openSubmenu?.index === index
-                      ? "rotate-180 text-brand-500"
-                      : ""
-                  }`}
+                  className={`ml-auto transition-transform duration-200 ${openSubmenu?.index === index
+                    ? "rotate-180 text-brand-500"
+                    : ""
+                    }`}
                 />
               )}
             </button>
@@ -324,16 +362,14 @@ const AppSidebar = () => {
             nav.path && (
               <Link
                 href={nav.path}
-                className={`menu-item group w-full ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
+                className={`menu-item group w-full ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                  }`}
               >
                 <span
-                  className={`${
-                    isActive(nav.path)
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
-                  }`}
+                  className={`${isActive(nav.path)
+                    ? "menu-item-icon-active"
+                    : "menu-item-icon-inactive"
+                    }`}
                 >
                   {nav.icon}
                 </span>
@@ -361,11 +397,10 @@ const AppSidebar = () => {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
-                      className={`menu-dropdown-item ${
-                        isActive(subItem.path)
-                          ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
-                      }`}
+                      className={`menu-dropdown-item ${isActive(subItem.path)
+                        ? "menu-dropdown-item-active"
+                        : "menu-dropdown-item-inactive"
+                        }`}
                     >
                       {subItem.name}
                     </Link>
@@ -376,25 +411,23 @@ const AppSidebar = () => {
           )}
         </li>
       ))}
-      
+
       {/* My Profile - Always visible for all users */}
       <li>
         <Link
           href={
             userRole === "SUPER_ADMIN" ? "/super-admin/profile" :
-            userRole === "HR_ADMIN" ? "/hr/profile" : 
-            "/employee/profile"
+              userRole === "HR_ADMIN" ? "/hr/profile" :
+                "/employee/profile"
           }
-          className={`menu-item group w-full ${
-            pathname.includes("profile") ? "menu-item-active" : "menu-item-inactive"
-          }`}
+          className={`menu-item group w-full ${pathname.includes("profile") ? "menu-item-active" : "menu-item-inactive"
+            }`}
         >
           <span
-            className={`${
-              pathname.includes("profile")
-                ? "menu-item-icon-active"
-                : "menu-item-icon-inactive"
-            }`}
+            className={`${pathname.includes("profile")
+              ? "menu-item-icon-active"
+              : "menu-item-icon-inactive"
+              }`}
           >
             <UserCircle size={20} />
           </span>
@@ -409,10 +442,9 @@ const AppSidebar = () => {
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
+        ${isExpanded || isMobileOpen
+          ? "w-[290px]"
+          : isHovered
             ? "w-[290px]"
             : "w-[90px]"
         }
@@ -422,9 +454,8 @@ const AppSidebar = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div
-        className={`py-4 flex border-b border-transparent ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
-        }`}
+        className={`py-4 flex border-b border-transparent ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
+          }`}
       >
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
@@ -465,19 +496,18 @@ const AppSidebar = () => {
           <div className="flex flex-col gap-4">
             <div>
               <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
+                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
+                  ? "lg:justify-center"
+                  : "justify-start"
+                  }`}
               >
-                 {isExpanded || isHovered || isMobileOpen ? (
-                    userRole === "SUPER_ADMIN" ? "Super Admin Portal" :
-                    userRole === "HR_ADMIN" ? "HR Management" : 
-                    "Employee Portal"
-                  ) : (
-                    <MoreHorizontal size={16} />
-                  )}
+                {isExpanded || isHovered || isMobileOpen ? (
+                  userRole === "SUPER_ADMIN" ? "Super Admin Portal" :
+                    userRole === "HR_ADMIN" ? "HR Management" :
+                      "Employee Portal"
+                ) : (
+                  <MoreHorizontal size={16} />
+                )}
               </h2>
               {renderMenuItems(getNavItems())}
             </div>
