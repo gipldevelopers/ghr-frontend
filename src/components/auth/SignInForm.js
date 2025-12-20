@@ -151,20 +151,6 @@ export default function SignInForm() {
             </div>
           </form>
 
-          {/* Demo credentials hint */}
-          <div className="p-4 mt-6 text-sm bg-blue-50 rounded-lg dark:bg-blue-900/20">
-            <p className="font-medium text-blue-800 dark:text-blue-300">Demo Credentials:</p>
-            <p className="mt-1 text-blue-700 dark:text-blue-200">
-              HR: hr@ghr.com / hr123
-            </p>
-            <p className="text-blue-700 dark:text-blue-200">
-              Employee: employee@gipl.com / emp123
-            </p>
-            <p className="text-blue-700 dark:text-blue-200">
-              Super Admin: admin@hrms.com / admin123
-            </p>
-          </div>
-
           <div className="mt-5">
             <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start flex justify-between">
               Can&apos;t remember password?{""}

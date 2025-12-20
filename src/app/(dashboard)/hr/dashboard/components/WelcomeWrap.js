@@ -2,7 +2,12 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 
-const WelcomeWrap = ({ userName, pendingApprovals, leaveRequests, avatarUrl }) => {
+const WelcomeWrap = ({
+  userName,
+  pendingApprovals,
+  leaveRequests,
+  avatarUrl,
+}) => {
   const [currentTime, setCurrentTime] = useState("");
 
   useEffect(() => {
@@ -14,39 +19,57 @@ const WelcomeWrap = ({ userName, pendingApprovals, leaveRequests, avatarUrl }) =
         year: "numeric",
         hour: "2-digit",
         minute: "2-digit",
-        second: "2-digit",      };
-      const formatted = now.toLocaleDateString("en-GB", options).replace(",", ",");
+        second: "2-digit",
+      };
+      const formatted = now
+        .toLocaleDateString("en-GB", options)
+        .replace(",", ",");
       setCurrentTime(formatted);
     };
 
     updateTime();
-    const timer = setInterval(updateTime, 1000); // update every 1 min
+    const timer = setInterval(updateTime, 1000);
     return () => clearInterval(timer);
   }, []);
 
   return (
-    <div className="card border-0 bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
-      <div className="card-body p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        {/* Left side */}
-        <div className="flex items-center gap-4">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 w-full">
+      <div
+        className="p-4 sm:p-6 flex flex-col md:flex-row 
+                   md:items-center md:justify-between gap-4"
+      >
+        {/* Left */}
+        <div className="flex items-center gap-4 min-w-0">
+          {/* Avatar */}
           <div className="flex-shrink-0">
-            <div className="avatar-wrapper w-16 h-16 rounded-full overflow-hidden border-2 border-white dark:border-gray-700 shadow-md">
+            <div
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden 
+                         border-2 border-white dark:border-gray-700 shadow-md"
+            >
               <Image
                 src={avatarUrl || "/images/users/default-avatar.png"}
                 alt={userName}
                 width={64}
                 height={64}
-                className="object-cover w-full h-full"
+                className="w-full h-full object-cover"
               />
             </div>
           </div>
-          <div>
-            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-1">
-              Welcome Back, {userName}
-              <button className="edit-icon ml-2 text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+
+          {/* Text */}
+          <div className="min-w-0">
+            <h3
+              className="text-base sm:text-xl font-semibold 
+                         text-gray-800 dark:text-white flex items-center gap-2"
+            >
+              <span className="truncate">Welcome Back, {userName}</span>
+              <button
+                className="text-blue-500 hover:text-blue-700 
+                           dark:text-blue-400 dark:hover:text-blue-300"
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 inline"
+                  className="h-4 w-4"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -57,13 +80,14 @@ const WelcomeWrap = ({ userName, pendingApprovals, leaveRequests, avatarUrl }) =
                 </svg>
               </button>
             </h3>
-            <p className="text-gray-600 dark:text-gray-300">
+
+            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 truncate">
               You have{" "}
-              <span className="text-blue-600 dark:text-blue-400 underline font-medium">
+              <span className="text-blue-600 dark:text-blue-400 font-medium underline">
                 {pendingApprovals}
               </span>{" "}
               Pending Approvals &{" "}
-              <span className="text-blue-600 dark:text-blue-400 underline font-medium">
+              <span className="text-blue-600 dark:text-blue-400 font-medium underline">
                 {leaveRequests}
               </span>{" "}
               Leave Requests
@@ -71,15 +95,22 @@ const WelcomeWrap = ({ userName, pendingApprovals, leaveRequests, avatarUrl }) =
           </div>
         </div>
 
-        {/* Right side: Current Time */}
-        <div className="bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-xl shadow-sm flex items-center gap-2 text-sm font-medium text-gray-800 dark:text-gray-200">
+        {/* Right – Time */}
+        <div
+          className="bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-xl 
+                     flex items-center gap-3 shadow-sm w-full md:w-auto"
+        >
           <div>
-            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">Current Time</p>
-            <p className="text-base font-semibold text-blue-700 dark:text-blue-400">{currentTime}</p>
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+              Current Time
+            </p>
+            <p className="text-sm sm:text-base font-semibold text-blue-700 dark:text-blue-400">
+              {currentTime}
+            </p>
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 text-blue-600 dark:text-blue-400"
+            className="h-5 w-5 text-blue-600 dark:text-blue-400 flex-shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

@@ -224,7 +224,7 @@ export default function HrDashboard() {
         {/* Stats + Chart in One Row */}
         <div className="grid grid-cols-1 xl:grid-cols-9 gap-4 md:gap-6">
           {/* Stats Cards */}
-          <div className="xl:col-span-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="xl:col-span-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
             {statsData.map((stat, index) => (
               <StatsCard
                 key={index}
@@ -250,33 +250,33 @@ export default function HrDashboard() {
         <div className="flex flex-wrap gap-4 md:gap-6">
           {/* Job Applicants Component */}
           {/* <div className="lg:col-span-1"> */}
-          <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
             <JobApplicants />
           </div>
 
           {/* Schedules Component */}
-          <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
             <Schedules />
           </div>
           {/* Attendance Overview Component */}
-          <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
             <AttendanceOverview />
           </div>
         </div>
 
         <div className="flex flex-wrap gap-4 md:gap-6">
           {/* Birthdays Component */}
-          <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
             <Birthdays />
           </div>
 
           {/* ClockInOut Component */}
-          <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
             <ClockInOut />
           </div>
 
           {/* Employees Table Component */}
-          <div className="flex-1 min-w-[300px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
             <EmployeesTable />
           </div>
 
@@ -284,3 +284,4 @@ export default function HrDashboard() {
       </div>
   );
 }
+

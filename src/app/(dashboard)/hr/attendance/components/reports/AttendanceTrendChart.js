@@ -1,6 +1,7 @@
 // src/app/(dashboard)/hr/attendance/reports/components/charts/AttendanceTrendChart.js
 "use client";
-import { CHART_TYPES } from '@/types/attendanceReports';
+
+import { CHART_TYPES } from "@/types/attendanceReports";
 import {
   BarChart,
   Bar,
@@ -14,143 +15,168 @@ import {
   Line,
   PieChart,
   Pie,
-  Cell
-} from 'recharts';
+  Cell,
+} from "recharts";
+import { useEffect, useState } from "react";
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884D8"];
 
-export default function AttendanceTrendChart({ data, chartType, dateRange, customDateRange }) {
+export default function AttendanceTrendChart({
+  data,
+  chartType,
+  dateRange,
+  customDateRange,
+}) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect screen size
+  useEffect(() => {
+    const checkScreen = () => setIsMobile(window.innerWidth < 640);
+    checkScreen();
+    window.addEventListener("resize", checkScreen);
+    return () => window.removeEventListener("resize", checkScreen);
+  }, []);
+
   if (!data || data.length === 0) {
-    return <div className="text-center py-12 text-gray-500">No data available for the selected period</div>;
+    return (
+      <div className="text-center py-12 text-gray-500 text-sm">
+        No data available for the selected period
+      </div>
+    );
   }
 
   const renderChart = () => {
     switch (chartType) {
       case CHART_TYPES.BAR:
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Bar dataKey="present" fill="#0088FE" name="Present" />
-              <Bar dataKey="late" fill="#FFBB28" name="Late" />
-              <Bar dataKey="absent" fill="#FF8042" name="Absent" />
-              <Bar dataKey="overtime" fill="#00C49F" name="Overtime" />
-            </BarChart>
-          </ResponsiveContainer>
+          <div className="h-64 sm:h-80 lg:h-96 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  angle={isMobile ? -45 : 0}
+                  textAnchor={isMobile ? "end" : "middle"}
+                  height={isMobile ? 60 : 40}
+                  tick={{ fontSize: isMobile ? 10 : 12 }}
+                />
+                <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 12 }} />
+                <Bar dataKey="present" fill="#0088FE" name="Present" />
+                <Bar dataKey="late" fill="#FFBB28" name="Late" />
+                <Bar dataKey="absent" fill="#FF8042" name="Absent" />
+                <Bar dataKey="overtime" fill="#00C49F" name="Overtime" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         );
-      
+
       case CHART_TYPES.LINE:
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
-              <Tooltip />
-              <Legend />
-              <Line type="monotone" dataKey="present" stroke="#0088FE" name="Present" />
-              <Line type="monotone" dataKey="late" stroke="#FFBB28" name="Late" />
-              <Line type="monotone" dataKey="absent" stroke="#FF8042" name="Absent" />
-              <Line type="monotone" dataKey="overtime" stroke="#00C49F" name="Overtime" />
-            </LineChart>
-          </ResponsiveContainer>
+          <div className="h-64 sm:h-80 lg:h-96 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 40 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  angle={isMobile ? -45 : 0}
+                  textAnchor={isMobile ? "end" : "middle"}
+                  height={isMobile ? 60 : 40}
+                  tick={{ fontSize: isMobile ? 10 : 12 }}
+                />
+                <YAxis tick={{ fontSize: isMobile ? 10 : 12 }} />
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 12 }} />
+                <Line type="monotone" dataKey="present" stroke="#0088FE" />
+                <Line type="monotone" dataKey="late" stroke="#FFBB28" />
+                <Line type="monotone" dataKey="absent" stroke="#FF8042" />
+                <Line type="monotone" dataKey="overtime" stroke="#00C49F" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
         );
-      
+
       case CHART_TYPES.PIE:
-        // For pie chart, we need to aggregate the data
         const aggregatedData = [
-          { name: 'Present', value: data.reduce((sum, item) => sum + item.present, 0) },
-          { name: 'Late', value: data.reduce((sum, item) => sum + item.late, 0) },
-          { name: 'Absent', value: data.reduce((sum, item) => sum + item.absent, 0) },
-          { name: 'Overtime', value: data.reduce((sum, item) => sum + item.overtime, 0) }
+          { name: "Present", value: data.reduce((s, i) => s + i.present, 0) },
+          { name: "Late", value: data.reduce((s, i) => s + i.late, 0) },
+          { name: "Absent", value: data.reduce((s, i) => s + i.absent, 0) },
+          { name: "Overtime", value: data.reduce((s, i) => s + i.overtime, 0) },
         ];
-        
+
         return (
-          <ResponsiveContainer width="100%" height={400}>
-            <PieChart>
-              <Pie
-                data={aggregatedData}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                outerRadius={120}
-                fill="#8884d8"
-                dataKey="value"
-              >
-                {aggregatedData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
+          <div className="h-64 sm:h-80 lg:h-96 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={aggregatedData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={isMobile ? 80 : 120}
+                  labelLine={false}
+                  label={
+                    isMobile
+                      ? false
+                      : ({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                  }
+                  dataKey="value"
+                >
+                  {aggregatedData.map((_, index) => (
+                    <Cell key={index} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 12 }} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
         );
-      
+
       case CHART_TYPES.TABLE:
         return (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+            <table className="min-w-[600px] w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Present
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Late
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Absent
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Overtime
-                  </th>
+                  {["Date", "Present", "Late", "Absent", "Overtime"].map((h) => (
+                    <th
+                      key={h}
+                      className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500 dark:text-gray-400"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
+              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                 {data.map((item, index) => (
                   <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {item.date}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {item.present}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {item.late}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {item.absent}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                      {item.overtime}
-                    </td>
+                    <td className="px-4 py-3 text-sm">{item.date}</td>
+                    <td className="px-4 py-3 text-sm">{item.present}</td>
+                    <td className="px-4 py-3 text-sm">{item.late}</td>
+                    <td className="px-4 py-3 text-sm">{item.absent}</td>
+                    <td className="px-4 py-3 text-sm">{item.overtime}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         );
-      
+
       default:
         return null;
     }
   };
 
   return (
-    <div>
-      <div className="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        Showing data for {dateRange === 'custom' 
+    <div className="w-full">
+      <div className="mb-3 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
+        Showing data for{" "}
+        {dateRange === "custom"
           ? `${customDateRange.startDate.toLocaleDateString()} to ${customDateRange.endDate.toLocaleDateString()}`
-          : dateRange.replace('_', ' ')}
+          : dateRange.replace("_", " ")}
       </div>
       {renderChart()}
     </div>
