@@ -22,36 +22,36 @@ const HolidayCard = ({ holiday, onClick }) => {
   const isPast = daysUntil < 0;
 
   return (
-    <div 
+    <div
       onClick={onClick}
       className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
     >
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex flex-wrap items-start justify-between mb-3 gap-2">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           {holiday.name}
         </h3>
-        <span 
-          className="px-2 py-1 rounded-full text-xs font-medium capitalize"
-          style={{ 
-            backgroundColor: `${holiday.color}20`, 
-            color: holiday.color 
+        <span
+          className="px-2 py-1 rounded-full text-xs font-medium capitalize shrink-0"
+          style={{
+            backgroundColor: `${holiday.color}20`,
+            color: holiday.color
           }}
         >
           {holiday.type}
         </span>
       </div>
-      
+
       <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4" />
           {formatDate(holiday.date)}
         </div>
-        
+
         <div className="flex items-center gap-2">
           <MapPin className="w-4 h-4" />
           {holiday.applicableTo === 'all' ? 'Nationwide' : holiday.state}
         </div>
-        
+
         {!isPast && (
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
@@ -59,13 +59,13 @@ const HolidayCard = ({ holiday, onClick }) => {
           </div>
         )}
       </div>
-      
+
       {holiday.description && (
         <p className="text-gray-700 dark:text-gray-300 text-sm mt-3">
           {holiday.description}
         </p>
       )}
-      
+
       {holiday.isRecurring && (
         <div className="mt-3 text-xs text-green-600 dark:text-green-400">
           🔁 Recurring annually

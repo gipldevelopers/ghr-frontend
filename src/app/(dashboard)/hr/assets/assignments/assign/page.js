@@ -28,14 +28,14 @@ export default function AssignAsset() {
       { id: 'AST-004', name: 'iPad Pro', category: 'Tablet', status: 'available' },
       { id: 'AST-006', name: 'Dell Monitor 27"', category: 'Monitor', status: 'available' }
     ];
-    
+
     const mockEmployees = [
       { id: 'Emp-010', name: 'Lori Broaddus', department: 'Finance' },
       { id: 'Emp-011', name: 'John Smith', department: 'Engineering' },
       { id: 'Emp-012', name: 'Sarah Johnson', department: 'HR' },
       { id: 'Emp-013', name: 'Michael Brown', department: 'Product' }
     ];
-    
+
     setAssets(mockAssets.filter(asset => asset.status === 'available'));
     setEmployees(mockEmployees);
   }, []);
@@ -43,10 +43,10 @@ export default function AssignAsset() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // In real app, submit to API
     console.log('Asset assigned:', formData);
     router.push('/hr/assets/assignments');
@@ -94,7 +94,7 @@ export default function AssignAsset() {
       />
 
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Assign Asset to Employee</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">

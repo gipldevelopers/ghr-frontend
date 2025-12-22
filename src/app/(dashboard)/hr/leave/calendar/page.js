@@ -114,7 +114,7 @@ const initialLeaves = [
     department: 'Operations',
     position: 'Operations Manager',
     leaveType: 'Unpaid Leave',
-     startDate: '2025-09-09',
+    startDate: '2025-09-09',
     endDate: '2025-09-09',
     status: 'pending',
     days: 8,
@@ -180,7 +180,7 @@ export default function LeaveCalendar() {
     leaveType: 'all',
     employee: 'all'
   });
-  
+
   const [selectedLeave, setSelectedLeave] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -211,17 +211,17 @@ export default function LeaveCalendar() {
       const matchesDepartment = filters.department === 'all' || leave.department === filters.department;
       const matchesStatus = filters.status === 'all' || leave.status === filters.status;
       const matchesLeaveType = filters.leaveType === 'all' || leave.leaveType === filters.leaveType;
-      const matchesSearch = searchTerm === '' || 
+      const matchesSearch = searchTerm === '' ||
         leave.employeeName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         leave.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
         leave.leaveType.toLowerCase().includes(searchTerm.toLowerCase());
-      
+
       return matchesDepartment && matchesStatus && matchesLeaveType && matchesSearch;
     });
   }, [filters, searchTerm]);
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -230,7 +230,7 @@ export default function LeaveCalendar() {
         ]}
       />
 
-      <LeaveCalendarHeader 
+      <LeaveCalendarHeader
         currentDate={currentDate}
         onDateChange={setCurrentDate}
         view={filters.view}
@@ -238,11 +238,11 @@ export default function LeaveCalendar() {
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
       />
-      
+
       <QuickStats leaves={filteredLeaves} />
-      
+
       <div className="mt-6">
-        <CalendarFilters 
+        <CalendarFilters
           filters={filters}
           onFilterChange={handleFilterChange}
           leaves={initialLeaves}

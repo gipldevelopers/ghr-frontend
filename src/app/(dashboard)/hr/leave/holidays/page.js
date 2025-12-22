@@ -151,7 +151,7 @@ export default function Holidays() {
     const holidayYear = new Date(holiday.date).getFullYear();
     const matchesYear = holidayYear === yearFilter;
     const matchesType = typeFilter === 'all' || holiday.type === typeFilter;
-    
+
     return matchesYear && matchesType;
   });
 
@@ -160,7 +160,7 @@ export default function Holidays() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -177,7 +177,7 @@ export default function Holidays() {
         }
       />
 
-      <HolidaysHeader 
+      <HolidaysHeader
         view={view}
         onViewChange={setView}
         yearFilter={yearFilter}
@@ -186,12 +186,12 @@ export default function Holidays() {
         onTypeFilterChange={setTypeFilter}
         totalHolidays={filteredHolidays.length}
       />
-      
+
       <div className="mt-6 bg-white rounded-lg shadow dark:bg-gray-800">
         {view === 'calendar' ? (
           <HolidaysCalendar holidays={filteredHolidays} />
         ) : (
-          <HolidaysList 
+          <HolidaysList
             holidays={filteredHolidays}
             onDeleteHoliday={handleDeleteHoliday}
           />

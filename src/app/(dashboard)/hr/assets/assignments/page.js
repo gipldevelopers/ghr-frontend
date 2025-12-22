@@ -72,21 +72,21 @@ export default function AssetAssignments() {
 
   const filteredAssignments = assignments.filter(assignment => {
     if (filters.status !== 'all' && assignment.status !== filters.status) return false;
-    if (filters.search && 
-        !assignment.assetName.toLowerCase().includes(filters.search.toLowerCase()) &&
-        !assignment.employeeName.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.search &&
+      !assignment.assetName.toLowerCase().includes(filters.search.toLowerCase()) &&
+      !assignment.employeeName.toLowerCase().includes(filters.search.toLowerCase())) return false;
     return true;
   });
 
-//   const handleReturnAsset = (assignmentId) => {
-//     if (confirm('Are you sure you want to mark this asset as returned?')) {
-//       setAssignments(assignments.map(assignment => 
-//         assignment.id === assignmentId 
-//           ? { ...assignment, status: 'returned', actualReturnDate: new Date().toISOString().split('T')[0] }
-//           : assignment
-//       ));
-//     }
-//   };
+  //   const handleReturnAsset = (assignmentId) => {
+  //     if (confirm('Are you sure you want to mark this asset as returned?')) {
+  //       setAssignments(assignments.map(assignment => 
+  //         assignment.id === assignmentId 
+  //           ? { ...assignment, status: 'returned', actualReturnDate: new Date().toISOString().split('T')[0] }
+  //           : assignment
+  //       ));
+  //     }
+  //   };
 
   const handleDeleteAssignment = (assignmentId) => {
     if (confirm('Are you sure you want to delete this assignment record?')) {
@@ -100,15 +100,15 @@ export default function AssetAssignments() {
   };
 
   const handleReturnAsset = (assignmentId, returnData) => {
-    setAssignments(assignments.map(assignment => 
-      assignment.id === assignmentId 
-        ? { 
-            ...assignment, 
-            status: 'returned', 
-            actualReturnDate: returnData.returnDate,
-            conditionReturned: returnData.conditionReturned,
-            notes: returnData.notes ? `${assignment.notes}\nReturn notes: ${returnData.notes}` : assignment.notes
-          }
+    setAssignments(assignments.map(assignment =>
+      assignment.id === assignmentId
+        ? {
+          ...assignment,
+          status: 'returned',
+          actualReturnDate: returnData.returnDate,
+          conditionReturned: returnData.conditionReturned,
+          notes: returnData.notes ? `${assignment.notes}\nReturn notes: ${returnData.notes}` : assignment.notes
+        }
         : assignment
     ));
   };
@@ -152,9 +152,9 @@ export default function AssetAssignments() {
 
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         {/* Filters */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col gap-4">
+            <div className="w-full">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
@@ -166,18 +166,18 @@ export default function AssetAssignments() {
                 />
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 sm:flex gap-2">
               <select
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
                 <option value="returned">Returned</option>
                 <option value="overdue">Overdue</option>
               </select>
-              <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600">
+              <button className="w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 flex items-center justify-center">
                 <Filter className="w-4 h-4" />
               </button>
             </div>
@@ -257,7 +257,7 @@ export default function AssetAssignments() {
                         <Eye className="w-4 h-4" />
                       </button>
                       {assignment.status === 'active' && (
-                        <button 
+                        <button
                           onClick={() => handleOpenReturnModal(assignment)}
                           className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                           title="Mark as returned"
@@ -265,7 +265,7 @@ export default function AssetAssignments() {
                           <UserCheck className="w-4 h-4" />
                         </button>
                       )}
-                      <button 
+                      <button
                         onClick={() => handleDeleteAssignment(assignment.id)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                       >
@@ -322,12 +322,12 @@ export default function AssetAssignments() {
         </div>
       </div>
 
-       <ReturnAssetModal
+      <ReturnAssetModal
         assignment={selectedAssignment}
         isOpen={returnModalOpen}
         onClose={() => setReturnModalOpen(false)}
         onReturn={handleReturnAsset}
-        />
+      />
     </div>
   );
 }

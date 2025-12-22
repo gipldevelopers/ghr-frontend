@@ -130,9 +130,9 @@ export default function AssetCategories() {
 
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         {/* Filters */}
-        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
+        <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col gap-4">
+            <div className="w-full">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <input
@@ -144,7 +144,7 @@ export default function AssetCategories() {
                 />
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex justify-end">
               <button className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600">
                 <Filter className="w-4 h-4" />
               </button>

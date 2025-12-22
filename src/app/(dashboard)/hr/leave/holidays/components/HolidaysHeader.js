@@ -1,17 +1,17 @@
 import { Calendar, List, Filter, Calendar as CalendarIcon } from 'lucide-react';
 
-const HolidaysHeader = ({ 
-  view, 
-  onViewChange, 
-  yearFilter, 
-  onYearFilterChange, 
-  typeFilter, 
-  onTypeFilterChange, 
-  totalHolidays 
+const HolidaysHeader = ({
+  view,
+  onViewChange,
+  yearFilter,
+  onYearFilterChange,
+  typeFilter,
+  onTypeFilterChange,
+  totalHolidays
 }) => {
   const currentYear = new Date().getFullYear();
   const yearOptions = [currentYear - 1, currentYear, currentYear + 1];
-  
+
   const typeOptions = [
     { value: 'all', label: 'All Types' },
     { value: 'national', label: 'National' },
@@ -36,25 +36,23 @@ const HolidaysHeader = ({
 
       <div className="flex flex-col sm:flex-row gap-4">
         {/* View Toggle */}
-        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+        <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1 self-start sm:self-auto">
           <button
             onClick={() => onViewChange('list')}
-            className={`p-2 rounded-md flex items-center gap-2 text-sm ${
-              view === 'list'
+            className={`p-2 rounded-md flex items-center gap-2 text-sm ${view === 'list'
                 ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow'
                 : 'text-gray-600 dark:text-gray-400'
-            }`}
+              }`}
           >
             <List size={16} />
             List View
           </button>
-           <button
+          <button
             onClick={() => onViewChange('calendar')}
-            className={`p-2 rounded-md flex items-center gap-2 text-sm ${
-              view === 'calendar'
+            className={`p-2 rounded-md flex items-center gap-2 text-sm ${view === 'calendar'
                 ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow'
                 : 'text-gray-600 dark:text-gray-400'
-            }`}
+              }`}
           >
             <CalendarIcon size={16} />
             Calendar View
@@ -62,7 +60,7 @@ const HolidaysHeader = ({
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-gray-400" />
             <select

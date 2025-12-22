@@ -45,13 +45,13 @@ export default function HolidayForm({ holiday = null, isEdit = false }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       console.log(isEdit ? 'Updating holiday:' : 'Adding holiday:', formData);
-      
+
       // Redirect back to holidays list after successful submission
       router.push('/hr/leave/holidays');
       router.refresh();
@@ -184,7 +184,7 @@ export default function HolidayForm({ holiday = null, isEdit = false }) {
                     </svg>
                   </div>
                 </div>
-                <div 
+                <div
                   className="w-10 h-10 rounded border"
                   style={{ backgroundColor: formData.color }}
                 />
@@ -265,7 +265,7 @@ export default function HolidayForm({ holiday = null, isEdit = false }) {
           </div>
 
           {/* Form Actions */}
-          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={() => router.push('/hr/leave/holidays')}
@@ -280,7 +280,7 @@ export default function HolidayForm({ holiday = null, isEdit = false }) {
               className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               <Save size={18} />
-              {isSubmitting 
+              {isSubmitting
                 ? (isEdit ? 'Updating...' : 'Creating...')
                 : (isEdit ? 'Update Holiday' : 'Create Holiday')
               }

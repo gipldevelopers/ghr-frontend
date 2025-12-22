@@ -77,42 +77,42 @@ const ReportList = ({ onDownload }) => {
       'employee-wise': { label: 'Employee', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
       'default': { label: 'Report', color: 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400' }
     };
-    
+
     const { label, color } = typeMap[type] || typeMap.default;
     return <span className={`px-2.5 py-0.5 rounded-xs text-xs font-medium ${color}`}>{label}</span>;
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <h2 className="text-lg font-semibold text-gray-800 dark:text-white mb-6">Recent Reports</h2>
-      
+
       <div className="space-y-4">
         {reports.map((report) => (
-          <div key={report.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700">
-            <div className="flex items-center space-x-4">
-              <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm">
+          <div key={report.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700 gap-4 sm:gap-0">
+            <div className="flex items-start sm:items-center space-x-4 w-full sm:w-auto">
+              <div className="p-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm shrink-0">
                 {getReportIcon(report.format)}
               </div>
-              
-              <div>
-                <h3 className="font-medium text-gray-800 dark:text-white">{report.name}</h3>
-                <div className="flex items-center space-x-3 mt-1">
+
+              <div className="min-w-0 flex-1">
+                <h3 className="font-medium text-gray-800 dark:text-white truncate">{report.name}</h3>
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-1">
                   {getTypeBadge(report.type)}
-                  <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center">
+                  <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center whitespace-nowrap">
                     <Calendar className="w-3 h-3 mr-1" />
                     {report.generatedDate}
                   </span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{report.period}</span>
-                  <span className="text-sm text-gray-600 dark:text-gray-400">{report.size}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">{report.period}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-400 whitespace-nowrap">{report.size}</span>
                 </div>
               </div>
             </div>
-            
-            <div className="flex items-center space-x-2">
+
+            <div className="flex items-center space-x-2 w-full sm:w-auto justify-end">
               <button className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
                 <Eye className="w-4 h-4" />
               </button>
-              <button 
+              <button
                 onClick={() => onDownload(report)}
                 className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
               >
@@ -122,7 +122,7 @@ const ReportList = ({ onDownload }) => {
           </div>
         ))}
       </div>
-      
+
       <div className="mt-6 text-center">
         <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
           View All Reports →

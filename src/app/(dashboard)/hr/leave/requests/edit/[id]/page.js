@@ -33,18 +33,18 @@
 //     // In a real app, you would fetch the leave request data from an API
 //     const requestId = params.id;
 //     const request = defaultData.find(item => item.id === requestId);
-    
+
 //     if (request) {
 //       setLeaveRequest(request);
 //     }
-    
+
 //     setLoading(false);
 //   }, [params.id]);
 
 //   const handleSave = (formData) => {
 //     // Here you would typically send the updated data to your API
 //     console.log('Updating leave request:', formData);
-    
+
 //     // For now, just redirect back to the leave requests page
 //     router.push('/hr/leave/requests');
 //   };
@@ -74,7 +74,7 @@
 // //             { name: 'Edit Leave Request', href: '#' },
 // //           ]}
 // //         />
-        
+
 // //         <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
 // //           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
 // //             Leave Request Not Found
@@ -103,7 +103,7 @@
 //           { name: 'Edit Leave Request', href: '#' },
 //         ]}
 //       />
-      
+
 //       <div className="mt-6">
 //         <LeaveRequestForm 
 //           isEditMode={true}
@@ -169,7 +169,7 @@ export default function EditLeaveRequest() {
 
   if (loading) {
     return (
-      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
@@ -179,7 +179,7 @@ export default function EditLeaveRequest() {
 
   if (!leaveRequest) {
     return (
-      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
         <Breadcrumb
           pages={[
             { name: 'HR', href: '/hr' },
@@ -188,7 +188,7 @@ export default function EditLeaveRequest() {
             { name: 'Edit Leave Request', href: '#' },
           ]}
         />
-        
+
         <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Leave Request Not Found
@@ -208,7 +208,7 @@ export default function EditLeaveRequest() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -217,9 +217,9 @@ export default function EditLeaveRequest() {
           { name: 'Edit Leave Request', href: '#' },
         ]}
       />
-      
+
       <div className="mt-6">
-        <LeaveRequestForm 
+        <LeaveRequestForm
           isEditMode={true}
           initialData={leaveRequest}
           onSave={handleSave}

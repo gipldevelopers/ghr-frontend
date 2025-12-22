@@ -23,12 +23,12 @@ const CalendarFilters = ({ filters, onFilterChange, leaves }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-4">
         <Filter className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Calendar Filters</h3>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Department Filter */}
         <div>
@@ -97,15 +97,14 @@ const CalendarFilters = ({ filters, onFilterChange, leaves }) => {
             <button
               key={status}
               onClick={() => handleFilterChange('status', status)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
-                filters.status === status
-                  ? status === 'approved' 
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${filters.status === status
+                  ? status === 'approved'
                     ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                     : status === 'pending'
-                    ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                      : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                   : 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
-              }`}
+                }`}
             >
               {getStatusIcon(status)}
               {status.charAt(0).toUpperCase() + status.slice(1)}

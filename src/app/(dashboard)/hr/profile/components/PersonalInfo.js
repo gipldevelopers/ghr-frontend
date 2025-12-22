@@ -33,7 +33,7 @@ export default function PersonalInfo({ data, onUpdate }) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Personal Information</h2>
         {!isEditing ? (
           <button

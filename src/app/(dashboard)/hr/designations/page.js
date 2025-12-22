@@ -6,7 +6,7 @@ import Link from 'next/link';
 
 export default function DesignationPage() {
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       {/* Breadcrumb with Add Designation button */}
       <Breadcrumb
         rightContent={
@@ -18,7 +18,7 @@ export default function DesignationPage() {
           </Link>
         }
       />
-      
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         <DesignationTable />
       </div>

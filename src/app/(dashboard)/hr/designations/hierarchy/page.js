@@ -41,10 +41,10 @@ export default function DesignationHierarchyPage() {
   ];
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb rightContent={null} />
-      
-      <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+
+      <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
         {/* Header */}
         <div className="flex items-center mb-6">
           <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 mr-3">

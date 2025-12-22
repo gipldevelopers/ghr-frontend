@@ -14,7 +14,7 @@ import Pagination from '@/components/common/Pagination';
 import EmployeeFilters from './EmployeeFilters';
 
 // Mock data for employees with image paths
- const defaultData = [
+const defaultData = [
   {
     id: 'Emp-010',
     name: 'Lori Broaddus',
@@ -163,8 +163,8 @@ export default function EmployeeTable() {
         header: 'Name',
         cell: info => (
           <div className="flex items-center">
-            <img 
-              src={info.row.original.image} 
+            <img
+              src={info.row.original.image}
               alt={info.getValue()}
               className="w-8 h-8 rounded-full mr-3 object-cover"
             />
@@ -261,14 +261,14 @@ export default function EmployeeTable() {
     []
   );
 
-    // Apply all filters and return filtered data
+  // Apply all filters and return filtered data
   const filteredData = useMemo(() => {
     let result = [...data];
-    
+
     // Apply global search filter
     if (globalFilter) {
       const searchTerm = globalFilter.toLowerCase();
-      result = result.filter(employee => 
+      result = result.filter(employee =>
         employee.name.toLowerCase().includes(searchTerm) ||
         employee.email.toLowerCase().includes(searchTerm) ||
         employee.phone.toLowerCase().includes(searchTerm) ||
@@ -277,23 +277,23 @@ export default function EmployeeTable() {
         employee.id.toLowerCase().includes(searchTerm)
       );
     }
-     // Apply status filter
+    // Apply status filter
     if (statusFilter !== 'all') {
       result = result.filter(employee => employee.status === statusFilter);
     }
-    
+
     // Apply designation filter
     if (designationFilter !== 'all') {
       result = result.filter(employee => employee.designation === designationFilter);
     }
-    
+
     // Apply department filter
     // if (departmentFilter !== 'all') {
     //   result = result.filter(employee => employee.department === departmentFilter);
     // }
-    
+
     return result;
-  }, [data, globalFilter, statusFilter, designationFilter, 
+  }, [data, globalFilter, statusFilter, designationFilter,
     // departmentFilter
   ]);
 
@@ -314,7 +314,7 @@ export default function EmployeeTable() {
     getPaginationRowModel: getPaginationRowModel(),
     pageCount: Math.ceil(filteredData.length / pagination.pageSize),
   });
- // Get unique values for filter dropdowns
+  // Get unique values for filter dropdowns
   const statuses = useMemo(() => {
     const uniqueStatuses = new Set(data.map(emp => emp.status));
     return ['all', ...Array.from(uniqueStatuses)];
@@ -330,7 +330,7 @@ export default function EmployeeTable() {
   //   return ['all', ...Array.from(uniqueDepartments)];
   // }, [data]);
 
- // Clear all filters
+  // Clear all filters
   const clearFilters = () => {
     setStatusFilter('all');
     setDesignationFilter('all');
@@ -338,7 +338,7 @@ export default function EmployeeTable() {
     setGlobalFilter('');
   };
 
-   // Handle actions
+  // Handle actions
   const handleView = (employee) => console.log('View employee:', employee);
   const handleEdit = (employee) => console.log('Edit employee:', employee);
   const handleDelete = (employee) => {
@@ -348,7 +348,7 @@ export default function EmployeeTable() {
   };
 
   return (
-    <div className="p-4 sm:p-6">
+    <div className="p-3 sm:p-6">
       {/* Filters Section */}
       <div className="mb-6">
         <EmployeeFilters
@@ -399,11 +399,11 @@ export default function EmployeeTable() {
                               asc: <ChevronUp className="ml-1 w-4 h-4 text-blue-500" />,
                               desc: <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />,
                             }[header.column.getIsSorted()] ?? (
-                              <div className="ml-1 flex flex-col">
-                                <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
-                                <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
-                              </div>
-                            )}
+                                <div className="ml-1 flex flex-col">
+                                  <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
+                                  <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
+                                </div>
+                              )}
                           </>
                         )}
                       </div>
@@ -415,8 +415,8 @@ export default function EmployeeTable() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map(row => (
-                  <tr 
-                    key={row.id} 
+                  <tr
+                    key={row.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
                     onMouseEnter={() => setHoveredRow(row.id)}
                     onMouseLeave={() => setHoveredRow(null)}

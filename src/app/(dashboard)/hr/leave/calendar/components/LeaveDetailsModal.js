@@ -34,7 +34,7 @@ const LeaveDetailsModal = ({ leave, onClose, onStatusUpdate }) => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
         <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">
               Leaves on {formatDate(leave.date)}
             </h3>
@@ -46,7 +46,7 @@ const LeaveDetailsModal = ({ leave, onClose, onStatusUpdate }) => {
             </button>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <div className="grid gap-4">
               {leave.leaves.map((leaveItem) => (
                 <div key={leaveItem.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
@@ -110,7 +110,7 @@ const LeaveDetailsModal = ({ leave, onClose, onStatusUpdate }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Leave Details
           </h3>
@@ -123,7 +123,7 @@ const LeaveDetailsModal = ({ leave, onClose, onStatusUpdate }) => {
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-6">
           {/* Employee Information */}
           <div>
             <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-3">

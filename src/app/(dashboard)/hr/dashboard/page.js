@@ -222,9 +222,9 @@ export default function HrDashboard() {
         />
 
         {/* Stats + Chart in One Row */}
-        <div className="grid grid-cols-1 xl:grid-cols-9 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 md:gap-6">
           {/* Stats Cards */}
-          <div className="xl:col-span-6 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
+          <div className="xl:col-span-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
             {statsData.map((stat, index) => (
               <StatsCard
                 key={index}
@@ -240,43 +240,39 @@ export default function HrDashboard() {
           </div>
 
           {/* Employee Department Chart */}
-          <div className="xl:col-span-3">
+          <div className="xl:col-span-4 h-full">
             <EmployeeDepartmentChart />
           </div>
         </div>
 
         {/* New Row for Additional Components */}
-        {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6"> */}
-        <div className="flex flex-wrap gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {/* Job Applicants Component */}
-          {/* <div className="lg:col-span-1"> */}
-          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full">
             <JobApplicants />
           </div>
 
           {/* Schedules Component */}
-          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full">
             <Schedules />
           </div>
           {/* Attendance Overview Component */}
-          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full">
             <AttendanceOverview />
           </div>
-        </div>
 
-        <div className="flex flex-wrap gap-4 md:gap-6">
           {/* Birthdays Component */}
-          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full">
             <Birthdays />
           </div>
-
+        
           {/* ClockInOut Component */}
-          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:col-span-2 lg:col-span-1 xl:col-span-2">
             <ClockInOut />
           </div>
 
           {/* Employees Table Component */}
-          <div className="w-full sm:flex-1 sm:min-w-[220px] lg:min-w-0 lg:flex-[1_1_30%]">
+          <div className="w-full sm:col-span-2 lg:col-span-2 xl:col-span-2">
             <EmployeesTable />
           </div>
 

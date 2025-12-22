@@ -97,9 +97,9 @@ export default function LeavePolicies() {
 
   const filteredPolicies = policies.filter(policy => {
     const matchesSearch = policy.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         policy.description.toLowerCase().includes(searchTerm.toLowerCase());
+      policy.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === 'all' || policy.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -108,15 +108,15 @@ export default function LeavePolicies() {
   };
 
   const handleStatusChange = (policyId, newStatus) => {
-    setPolicies(policies.map(policy => 
-      policy.id === policyId 
+    setPolicies(policies.map(policy =>
+      policy.id === policyId
         ? { ...policy, status: newStatus, updatedAt: new Date().toISOString() }
         : policy
     ));
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -133,16 +133,16 @@ export default function LeavePolicies() {
         }
       />
 
-      <PoliciesHeader 
+      <PoliciesHeader
         searchTerm={searchTerm}
         onSearchChange={setSearchTerm}
         statusFilter={statusFilter}
         onStatusFilterChange={setStatusFilter}
         totalPolicies={filteredPolicies.length}
       />
-      
+
       <div className="mt-6 bg-white rounded-lg shadow dark:bg-gray-800">
-        <PoliciesTable 
+        <PoliciesTable
           policies={filteredPolicies}
           onDeletePolicy={handleDeletePolicy}
           onStatusChange={handleStatusChange}

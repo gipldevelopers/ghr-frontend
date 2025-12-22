@@ -10,7 +10,7 @@
 // //   const handleSave = (formData) => {
 // //     // Here you would typically send the data to your API
 // //     console.log('Saving leave request:', formData);
-    
+
 // //     // For now, just redirect back to the leave requests page
 // //     router.push('/hr/leave/requests');
 // //   };
@@ -29,7 +29,7 @@
 // //           { name: 'Add Leave Request', href: '#' },
 // //         ]}
 // //       />
-      
+
 // //       <div className="mt-6">
 // //         <LeaveRequestForm 
 // //           isEditMode={false}
@@ -82,7 +82,7 @@
 //           { name: 'Add Leave Request', href: '#' },
 //         ]}
 //       />
-      
+
 //       <div className="mt-6">
 //         <LeaveRequestForm 
 //           isEditMode={false}
@@ -128,7 +128,7 @@ export default function AddLeaveRequest() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -137,9 +137,9 @@ export default function AddLeaveRequest() {
           { name: 'Add Leave Request', href: '#' },
         ]}
       />
-      
+
       <div className="mt-6">
-        <LeaveRequestForm 
+        <LeaveRequestForm
           isEditMode={false}
           onSave={handleSave}
           onCancel={handleCancel}

@@ -20,7 +20,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
     status: 'pending',
     attachment: null,
     attachmentName: '',
-    cc: [] 
+    cc: []
   });
 
   const [calculatedDays, setCalculatedDays] = useState(0);
@@ -30,7 +30,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
   const [loading, setLoading] = useState(false);
   const [leaveTypes, setLeaveTypes] = useState([]);
   const [ccOptions, setCcOptions] = useState([]);
-  
+
   const fromDateRef = useRef(null);
   const toDateRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -49,12 +49,12 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
           'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
           'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12'
         };
-        
+
         const parts = dateStr.split(' ');
         const day = parts[0];
         const month = months[parts[1]];
         const year = parts[2].replace(',', '');
-        
+
         return `${year}-${month}-${day.padStart(2, '0')}`;
       };
 
@@ -74,12 +74,12 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       };
 
       setFormData(formData);
-      
+
       // Set existing attachment if present
       if (initialData.attachment) {
         setExistingAttachment(initialData.attachment);
       }
-      
+
       // Calculate initial days
       calculateDays(formData);
     }
@@ -156,12 +156,12 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       ...formData,
       [name]: value
     };
-    
+
     setFormData(updatedFormData);
 
     // Recalculate days if date or breakdown fields change
-    if (name === 'fromDate' || name === 'toDate' || 
-        name === 'startDateBreakdown' || name === 'endDateBreakdown') {
+    if (name === 'fromDate' || name === 'toDate' ||
+      name === 'startDateBreakdown' || name === 'endDateBreakdown') {
       calculateDays(updatedFormData);
     }
   };
@@ -174,21 +174,21 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
         toast.error('File size must be less than 5MB');
         return;
       }
-      
+
       // Check file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf', 
-                           'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf',
+        'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
       if (!allowedTypes.includes(file.type)) {
         toast.error('Please select a valid file type (JPEG, PNG, PDF, DOC, DOCX)');
         return;
       }
-      
+
       setFormData(prev => ({
         ...prev,
         attachment: file,
         attachmentName: file.name
       }));
-      
+
       // Clear existing attachment when new file is selected
       setExistingAttachment(null);
     }
@@ -201,7 +201,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       attachmentName: ''
     }));
     setExistingAttachment(null);
-    
+
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -216,34 +216,34 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
 
     const start = new Date(data.fromDate);
     const end = new Date(data.toDate);
-    
+
     // If it's the same day, check breakdown to determine days
     if (start.toDateString() === end.toDateString()) {
       let dayCount = 0;
-      
+
       if (data.startDateBreakdown === 'full_day') {
         dayCount = 1;
       } else {
         dayCount = 0.5;
       }
-      
+
       setCalculatedDays(dayCount);
       return;
     }
-    
+
     // Calculate full days between dates
     const diffTime = Math.abs(end - start);
     let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    
+
     // Adjust for partial days at start and end
     if (data.startDateBreakdown !== 'full_day') {
       diffDays -= 0.5;
     }
-    
+
     if (data.endDateBreakdown !== 'full_day') {
       diffDays -= 0.5;
     }
-    
+
     if (!isNaN(diffDays)) {
       setCalculatedDays(diffDays);
       setFormData(prev => ({ ...prev, days: diffDays }));
@@ -255,7 +255,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       ...formData,
       [field]: value
     };
-    
+
     setFormData(updatedFormData);
     calculateDays(updatedFormData);
   };
@@ -307,7 +307,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <button
             onClick={onCancel}
@@ -328,7 +328,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
         {/* Employee Name (Read-only in edit mode, editable in add mode) */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -419,12 +419,12 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
                 className="w-full pl-3 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
               />
-              <Calendar 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 cursor-pointer" 
+              <Calendar
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 cursor-pointer"
                 onClick={() => openDatePicker(fromDateRef)}
               />
             </div>
-            
+
             {/* Start Date Breakdown */}
             <div className="mt-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -452,7 +452,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
               </div>
             </div>
           </div>
-          
+
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               To Date *
@@ -468,12 +468,12 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
                 className="w-full pl-3 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
               />
-              <Calendar 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 cursor-pointer" 
+              <Calendar
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 cursor-pointer"
                 onClick={() => openDatePicker(toDateRef)}
               />
             </div>
-            
+
             {/* End Date Breakdown */}
             <div className="mt-3">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -612,7 +612,7 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
               accept=".jpg,.jpeg,.png,.pdf,.doc,.docx"
               className="hidden"
             />
-            
+
             {/* Upload button */}
             <button
               type="button"
@@ -622,12 +622,12 @@ const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCa
               <Paperclip className="w-4 h-4 mr-2" />
               Upload File
             </button>
-            
+
             {/* File info and restrictions */}
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Supported formats: JPG, PNG, PDF, DOC, DOCX (Max 5MB)
             </p>
-            
+
             {/* Display selected file or existing attachment */}
             {(formData.attachmentName || existingAttachment) && (
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg dark:bg-gray-700 border border-gray-200 dark:border-gray-600">

@@ -61,7 +61,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <button
             onClick={onCancel}
@@ -82,7 +82,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
         {/* Basic Information */}
         <div>
           <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">

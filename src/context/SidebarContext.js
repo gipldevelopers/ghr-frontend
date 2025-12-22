@@ -36,6 +36,21 @@ export const SidebarProvider = ({ children }) => {
     };
   }, []);
 
+  // Close mobile sidebar when resizing to desktop (>= 1024)
+  useEffect(() => {
+    const handleResizeClose = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMobileOpen(false);
+      }
+    };
+
+    window.addEventListener("resize", handleResizeClose);
+    // run once to ensure correct initial state
+    handleResizeClose();
+
+    return () => window.removeEventListener("resize", handleResizeClose);
+  }, []);
+
   const toggleSidebar = () => {
     setIsExpanded((prev) => !prev);
   };
@@ -61,6 +76,9 @@ export const SidebarProvider = ({ children }) => {
         setIsHovered,
         setActiveItem,
         toggleSubmenu,
+        // added setters as requested
+        setIsExpanded,
+        setIsMobileOpen,
       }}
     >
       {children}

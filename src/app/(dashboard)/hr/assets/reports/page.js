@@ -25,7 +25,7 @@ export default function AssetReports() {
     const fetchReportData = async () => {
       setLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Mock data based on report type
       const mockData = {
         inventory: {
@@ -119,7 +119,7 @@ export default function AssetReports() {
           }
         }
       };
-      
+
       setReportData(mockData[activeReport]);
       setLoading(false);
     };
@@ -169,7 +169,7 @@ export default function AssetReports() {
 
   const renderCharts = () => {
     if (!reportData || !reportData.data) return null;
-    
+
     switch (activeReport) {
       case 'inventory':
         return <InventoryCharts data={reportData.data} />;
@@ -210,16 +210,16 @@ export default function AssetReports() {
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         rightContent={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 w-full sm:w-auto">
             <button
               onClick={() => handleExport('pdf')}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
             >
               <Download size={18} /> Export PDF
             </button>
             <button
               onClick={() => handleExport('excel')}
-              className="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
+              className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 hover:bg-gray-50 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700"
             >
               <Download size={18} /> Export Excel
             </button>
@@ -239,11 +239,10 @@ export default function AssetReports() {
                   <button
                     key={report.id}
                     onClick={() => setActiveReport(report.id)}
-                    className={`w-full text-left p-4 rounded-lg transition-colors ${
-                      activeReport === report.id
-                        ? 'bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
-                        : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600'
-                    }`}
+                    className={`w-full text-left p-4 rounded-lg transition-colors ${activeReport === report.id
+                      ? 'bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
+                      : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600'
+                      }`}
                   >
                     <div className="flex items-center">
                       <Icon className="w-5 h-5 mr-3" />
@@ -264,7 +263,7 @@ export default function AssetReports() {
           <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
             {reportData && reportData.data && (
               <>
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                       {reportData.title}
@@ -404,7 +403,7 @@ export default function AssetReports() {
                       {activeReport === 'depreciation' && 'Depreciation by Category'}
                       {activeReport === 'assignments' && 'Assignments by Department'}
                     </h3>
-                    
+
                     <div className="overflow-x-auto">
                       <table className="w-full">
                         <thead>
@@ -463,8 +462,8 @@ export default function AssetReports() {
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                 <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
-                                  <div 
-                                    className="bg-blue-600 h-2 rounded-full" 
+                                  <div
+                                    className="bg-blue-600 h-2 rounded-full"
                                     style={{ width: `${Math.round(item.count / getSafeNumber(reportData.data.totalAssignments) * 100)}%` }}
                                   ></div>
                                 </div>

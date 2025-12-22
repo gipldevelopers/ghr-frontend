@@ -174,7 +174,7 @@ export default function EmployeeSelectionTable({ selectedEmployees, onChange, on
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-2 sm:gap-0">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Select Employees</h2>
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {selectedEmployees.length} of {data.length} employees selected
@@ -183,7 +183,7 @@ export default function EmployeeSelectionTable({ selectedEmployees, onChange, on
 
       {/* Search */}
       <div className="mb-6">
-        <div className="relative max-w-md">
+        <div className="relative max-w-md w-full">
           <input
             placeholder="Search employees..."
             value={globalFilter}
@@ -200,66 +200,68 @@ export default function EmployeeSelectionTable({ selectedEmployees, onChange, on
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
-        <table className="w-full">
-          <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-            {table.getHeaderGroups().map(headerGroup => (
-              <tr key={headerGroup.id} className="border-b border-gray-200 dark:border-gray-700">
-                {headerGroup.headers.map(header => (
-                  <th
-                    key={header.id}
-                    className="px-3 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300"
-                    {...(header.column.getCanSort() ? {
-                      onClick: header.column.getToggleSortingHandler(),
-                      className: "px-3 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                    } : {})}
-                  >
-                    <div className="flex items-center">
-                      {flexRender(header.column.columnDef.header, header.getContext())}
-                      {header.column.getCanSort() && (
-                        <>
-                          {{
-                            asc: <ChevronUp className="ml-1 w-4 h-4 text-blue-500" />,
-                            desc: <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />,
-                          }[header.column.getIsSorted()] ?? (
-                            <div className="ml-1 flex flex-col">
-                              <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
-                              <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
-                            </div>
-                          )}
-                        </>
-                      )}
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {table.getRowModel().rows.map(row => (
-              <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
-                {row.getVisibleCells().map(cell => (
-                  <td key={cell.id} className="px-3 py-4 whitespace-nowrap">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="min-w-[800px]">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+              {table.getHeaderGroups().map(headerGroup => (
+                <tr key={headerGroup.id} className="border-b border-gray-200 dark:border-gray-700">
+                  {headerGroup.headers.map(header => (
+                    <th
+                      key={header.id}
+                      className="px-3 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300"
+                      {...(header.column.getCanSort() ? {
+                        onClick: header.column.getToggleSortingHandler(),
+                        className: "px-3 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                      } : {})}
+                    >
+                      <div className="flex items-center">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {header.column.getCanSort() && (
+                          <>
+                            {{
+                              asc: <ChevronUp className="ml-1 w-4 h-4 text-blue-500" />,
+                              desc: <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />,
+                            }[header.column.getIsSorted()] ?? (
+                                <div className="ml-1 flex flex-col">
+                                  <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
+                                  <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
+                                </div>
+                              )}
+                          </>
+                        )}
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {table.getRowModel().rows.map(row => (
+                <tr key={row.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                  {row.getVisibleCells().map(cell => (
+                    <td key={cell.id} className="px-3 py-4 whitespace-nowrap">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-col-reverse sm:flex-row justify-between pt-4 gap-3 sm:gap-0">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 text-gray-800 hover:bg-gray-300 transition dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 text-gray-800 hover:bg-gray-300 transition dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 w-full sm:w-auto"
         >
           <ArrowLeft size={18} />
           Back
         </button>
         <button
           onClick={handleNext}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-white hover:bg-blue-700 transition"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-white hover:bg-blue-700 transition w-full sm:w-auto"
         >
           Next: Review & Process
           <ArrowRight size={18} />

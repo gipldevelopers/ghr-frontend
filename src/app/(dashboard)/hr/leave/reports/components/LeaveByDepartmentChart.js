@@ -102,7 +102,7 @@ const LeaveByDepartmentChart = ({ filters }) => {
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Leave by Department
       </h3>

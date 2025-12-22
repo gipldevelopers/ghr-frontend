@@ -27,16 +27,16 @@ export default function AdvancedReports() {
         title="Advanced Reports"
         subtitle="Generate detailed attendance analytics and insights"
       />
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mt-6">
         {/* Filters Sidebar */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6 sticky top-6">
+          <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6 sticky top-6">
             <ReportSelector
               selectedReport={selectedReport}
               onReportChange={setSelectedReport}
             />
-            
+
             <div className="mt-6">
               <ReportFilters
                 dateRange={dateRange}
@@ -54,7 +54,7 @@ export default function AdvancedReports() {
 
         {/* Report Content */}
         <div className="lg:col-span-3">
-          <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+          <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
             <ReportRenderer
               reportType={selectedReport}
               dateRange={dateRange}

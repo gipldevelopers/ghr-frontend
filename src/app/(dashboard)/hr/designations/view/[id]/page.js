@@ -74,8 +74,8 @@ export default function DesignationViewPage() {
 
   if (loading) {
     return (
-      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
-        <div className="bg-white rounded-xl shadow-sm p-6 text-center dark:bg-gray-800">
+      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center dark:bg-gray-800">
           <div className="animate-pulse">Loading designation data...</div>
         </div>
       </div>
@@ -84,10 +84,10 @@ export default function DesignationViewPage() {
 
   if (!designation) {
     return (
-      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
-        <div className="bg-white rounded-xl shadow-sm p-6 text-center dark:bg-gray-800">
+      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 text-center dark:bg-gray-800">
           <p className="text-gray-600 dark:text-gray-400">Designation not found</p>
-          <button 
+          <button
             onClick={() => window.location.href = '/hr/designations'}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
@@ -99,10 +99,10 @@ export default function DesignationViewPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       {/* Breadcrumb */}
       <Breadcrumb rightContent={null} />
-      
+
       <div className='bg-white rounded-lg shadow dark:bg-gray-800'>
         <div className="p-4 sm:p-6">
           {/* Header with back button */}

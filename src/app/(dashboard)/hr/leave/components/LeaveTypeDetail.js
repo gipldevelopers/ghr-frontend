@@ -4,12 +4,12 @@ import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { Trash2, Edit, X } from 'lucide-react';
 
-const LeaveTypeDetail = ({ 
-  isOpen, 
-  onClose, 
-  leaveType, 
-  onEdit, 
-  onDelete 
+const LeaveTypeDetail = ({
+  isOpen,
+  onClose,
+  leaveType,
+  onEdit,
+  onDelete
 }) => {
   if (!leaveType) return null;
 
@@ -40,7 +40,7 @@ const LeaveTypeDetail = ({
           >
             <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 shadow-xl transition-all ring-1 ring-black/5">
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
                 <div className="flex items-center">
                   <span className="text-3xl mr-4">{leaveType.icon || '🏖️'}</span>
                   <div>
@@ -61,16 +61,15 @@ const LeaveTypeDetail = ({
               </div>
 
               {/* Content - Scrollable */}
-              <div className="max-h-[60vh] overflow-y-auto p-6">
+              <div className="max-h-[60vh] overflow-y-auto p-4 sm:p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Status */}
                   <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Status</p>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      leaveType.isActive
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${leaveType.isActive
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                         : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                    }`}>
+                      }`}>
                       {leaveType.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </div>
@@ -178,7 +177,7 @@ const LeaveTypeDetail = ({
               </div>
 
               {/* Fixed Footer */}
-              <div className="bg-gray-50 dark:bg-gray-700 px-6 py-4 border-t border-gray-200 dark:border-gray-600">
+              <div className="bg-gray-50 dark:bg-gray-700 p-4 sm:px-6 sm:py-4 border-t border-gray-200 dark:border-gray-600">
                 <div className="flex justify-between items-center">
                   <button
                     onClick={onDelete}

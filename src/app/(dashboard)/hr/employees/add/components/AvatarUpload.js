@@ -36,7 +36,7 @@ export default function AvatarUpload({ value, onChange }) {
   }
 
   return (
-    <div className="flex items-start gap-4">
+    <div className="flex flex-col sm:flex-row items-start gap-4">
       <div className="w-24 h-24 rounded-full overflow-hidden border border-gray-200">
         <img src={preview} alt="avatar preview" className="w-full h-full object-cover" />
       </div>

@@ -94,9 +94,8 @@ const EmployeeDepartmentChart = () => {
             </svg>
             {labelMap[selectedPeriod]}
             <svg
-              className={`h-3 w-3 transition-transform ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`h-3 w-3 transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -119,11 +118,10 @@ const EmployeeDepartmentChart = () => {
                     setSelectedPeriod(key);
                     setIsDropdownOpen(false);
                   }}
-                  className={`block w-full text-left px-4 py-2 text-xs ${
-                    selectedPeriod === key
+                  className={`block w-full text-left px-4 py-2 text-xs ${selectedPeriod === key
                       ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  }`}
+                    }`}
                 >
                   {labelMap[key]}
                 </button>
@@ -140,7 +138,7 @@ const EmployeeDepartmentChart = () => {
             <BarChart
               data={dataByPeriod[selectedPeriod]}
               layout={isMobile ? "horizontal" : "vertical"}
-              margin={{ top: 5, right: 20, left: isMobile ? 10 : 40, bottom: 5 }}
+              margin={{ top: 5, right: 20, left: isMobile ? -20 : 40, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               {isMobile ? (

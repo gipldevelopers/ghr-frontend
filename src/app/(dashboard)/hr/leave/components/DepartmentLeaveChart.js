@@ -72,7 +72,7 @@ const DepartmentLeaveChart = () => {
         boxPadding: 6,
         usePointStyle: true,
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             const label = context.label || '';
             const value = context.parsed || 0;
             const total = context.dataset.data.reduce((a, b) => a + b, 0);
@@ -85,17 +85,17 @@ const DepartmentLeaveChart = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
           Department Leave Distribution
         </h2>
       </div>
-      
+
       <div className="h-64">
         <Doughnut data={data} options={options} />
       </div>
-      
+
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600 dark:text-gray-300">
           Total Leave Requests: <span className="font-semibold">110</span>

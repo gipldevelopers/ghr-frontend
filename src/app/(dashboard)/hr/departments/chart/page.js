@@ -11,8 +11,8 @@ export default function OrganizationChartPage() {
       <Breadcrumb
         rightContent={null}
       />
-      
-      <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+
+      <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">

@@ -58,9 +58,9 @@ export default function AssetTable({ assets, loading, filters, onFilterChange, o
   return (
     <div className="bg-white rounded-lg shadow dark:bg-gray-800">
       {/* Filters */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex flex-col md:flex-row gap-4 mb-4">
-          <div className="flex-1">
+      <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col gap-4">
+          <div className="w-full">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <input
@@ -72,7 +72,7 @@ export default function AssetTable({ assets, loading, filters, onFilterChange, o
               />
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange('status', e.target.value)}
@@ -99,9 +99,9 @@ export default function AssetTable({ assets, loading, filters, onFilterChange, o
             </select>
             <button
               onClick={clearFilters}
-              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600"
+              className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 flex items-center justify-center"
             >
-              <Filter className="w-4 h-4" />
+              <Filter className="w-4 h-4 mr-2" /> Clear Filters
             </button>
           </div>
         </div>
@@ -190,7 +190,7 @@ export default function AssetTable({ assets, loading, filters, onFilterChange, o
                     <button className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
                       <QrCode className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                       onClick={() => onDeleteAsset(asset.id)}
                       className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                     >

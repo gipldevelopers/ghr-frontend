@@ -10,7 +10,7 @@ export default function AddPolicy() {
   const handleSave = (formData) => {
     // Here you would typically send the data to your API
     console.log('Saving policy:', formData);
-    
+
     // For now, just redirect back to the policies page
     router.push('/hr/leave/policies');
   };
@@ -20,7 +20,7 @@ export default function AddPolicy() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -29,9 +29,9 @@ export default function AddPolicy() {
           { name: 'Add Policy', href: '#' },
         ]}
       />
-      
+
       <div className="mt-6">
-        <PolicyForm 
+        <PolicyForm
           onSave={handleSave}
           onCancel={handleCancel}
         />

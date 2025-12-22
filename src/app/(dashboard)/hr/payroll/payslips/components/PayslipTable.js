@@ -218,27 +218,27 @@ export default function PayslipTable() {
   // Apply all filters and return filtered data
   const filteredData = useMemo(() => {
     let result = [...data];
-    
+
     // Apply global search filter
     if (globalFilter) {
       const searchTerm = globalFilter.toLowerCase();
-      result = result.filter(payslip => 
+      result = result.filter(payslip =>
         payslip.employee.toLowerCase().includes(searchTerm) ||
         payslip.employeeId.toLowerCase().includes(searchTerm) ||
         payslip.id.toLowerCase().includes(searchTerm)
       );
     }
-    
+
     // Apply status filter
     if (statusFilter !== 'all') {
       result = result.filter(payslip => payslip.status === statusFilter);
     }
-    
+
     // Apply period filter
     if (periodFilter !== 'all') {
       result = result.filter(payslip => payslip.period === periodFilter);
     }
-    
+
     return result;
   }, [data, globalFilter, statusFilter, periodFilter]);
 
@@ -297,7 +297,7 @@ export default function PayslipTable() {
   return (
     <div className="p-4 sm:p-6">
       {/* Header with stats */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-0">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Employee Payslips</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
@@ -357,11 +357,11 @@ export default function PayslipTable() {
                               asc: <ChevronUp className="ml-1 w-4 h-4 text-blue-500" />,
                               desc: <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />,
                             }[header.column.getIsSorted()] ?? (
-                              <div className="ml-1 flex flex-col">
-                                <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
-                                <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
-                              </div>
-                            )}
+                                <div className="ml-1 flex flex-col">
+                                  <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
+                                  <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
+                                </div>
+                              )}
                           </>
                         )}
                       </div>
@@ -373,8 +373,8 @@ export default function PayslipTable() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map(row => (
-                  <tr 
-                    key={row.id} 
+                  <tr
+                    key={row.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
                   >
                     {row.getVisibleCells().map(cell => (

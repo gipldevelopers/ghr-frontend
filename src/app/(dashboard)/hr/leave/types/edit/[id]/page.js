@@ -96,18 +96,18 @@
 //     // In a real app, you would fetch the leave type data from an API
 //     const typeId = parseInt(params.id);
 //     const foundType = initialLeaveTypes.find(item => item.id === typeId);
-    
+
 //     if (foundType) {
 //       setLeaveType(foundType);
 //     }
-    
+
 //     setLoading(false);
 //   }, [params.id]);
 
 //   const handleSave = (formData) => {
 //     // Here you would typically send the updated data to your API
 //     console.log('Updating leave type:', formData);
-    
+
 //     // For now, just redirect back to the leave types page
 //     router.push('/hr/leave/types');
 //   };
@@ -137,7 +137,7 @@
 //             { name: 'Edit Leave Type', href: '#' },
 //           ]}
 //         />
-        
+
 //         <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
 //           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
 //             Leave Type Not Found
@@ -166,7 +166,7 @@
 //           { name: 'Edit Leave Type', href: '#' },
 //         ]}
 //       />
-      
+
 //       <div className="mt-6">
 //         <LeaveTypeForm 
 //           initialData={leaveType}
@@ -251,7 +251,7 @@ export default function EditLeaveType() {
             { name: 'Edit Leave Type', href: '#' },
           ]}
         />
-        
+
         <div className="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow p-6 text-center">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Leave Type Not Found
@@ -271,7 +271,7 @@ export default function EditLeaveType() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -280,9 +280,9 @@ export default function EditLeaveType() {
           { name: 'Edit Leave Type', href: '#' },
         ]}
       />
-      
+
       <div className="mt-6">
-        <LeaveTypeForm 
+        <LeaveTypeForm
           initialData={leaveType}
           onSave={handleSave}
           onCancel={handleCancel}

@@ -11,14 +11,14 @@ const UpcomingHolidays = () => {
   ];
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
       <div className="flex items-center mb-6">
         <Calendar className="h-5 w-5 text-blue-500 mr-2" />
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
           Upcoming Holidays
         </h2>
       </div>
-      
+
       <div className="space-y-4">
         {holidays.map((holiday) => (
           <div key={holiday.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
@@ -38,7 +38,7 @@ const UpcomingHolidays = () => {
           </div>
         ))}
       </div>
-      
+
       <button className="w-full mt-4 px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 border border-dashed border-gray-300 dark:border-gray-600 rounded-md hover:border-blue-300 dark:hover:border-blue-600 transition-colors">
         View All Holidays
       </button>

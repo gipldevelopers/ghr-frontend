@@ -22,23 +22,23 @@ const HolidaysCalendar = ({ holidays }) => {
     const startDay = firstDay.getDay();
 
     const days = [];
-    
+
     // Add empty cells for days before the first day of the month
     for (let i = 0; i < startDay; i++) {
       days.push(null);
     }
-    
+
     // Add days of the month
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(currentYear, currentMonth, day));
     }
-    
+
     return days;
   }, [currentYear, currentMonth]);
 
   const getHolidaysForDate = (date) => {
     if (!date) return [];
-    
+
     const dateStr = date.toISOString().split('T')[0];
     return holidays.filter(holiday => holiday.date === dateStr);
   };
@@ -57,8 +57,8 @@ const HolidaysCalendar = ({ holidays }) => {
     if (!date) return false;
     const today = new Date();
     return date.getDate() === today.getDate() &&
-           date.getMonth() === today.getMonth() &&
-           date.getFullYear() === today.getFullYear();
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
   };
 
   const isWeekend = (date) => {
@@ -68,7 +68,7 @@ const HolidaysCalendar = ({ holidays }) => {
   };
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       {/* Calendar Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
@@ -96,71 +96,73 @@ const HolidaysCalendar = ({ holidays }) => {
         </div>
       </div>
 
-      {/* Weekday Headers */}
-      <div className="grid grid-cols-7 gap-2 mb-4">
-        {weekDays.map(day => (
-          <div key={day} className="text-center font-semibold text-gray-600 dark:text-gray-400 py-2">
-            {day}
+      <div className="overflow-x-auto">
+        <div className="min-w-[600px]">
+          {/* Weekday Headers */}
+          <div className="grid grid-cols-7 gap-2 mb-4">
+            {weekDays.map(day => (
+              <div key={day} className="text-center font-semibold text-gray-600 dark:text-gray-400 py-2">
+                {day}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {/* Calendar Grid */}
-      <div className="grid grid-cols-7 gap-2">
-        {calendarDays.map((date, index) => {
-          const dateHolidays = getHolidaysForDate(date);
-          const isEmpty = !date;
-          const isWeekendDay = !isEmpty && isWeekend(date);
-          const isTodayDate = !isEmpty && isToday(date);
+          {/* Calendar Grid */}
+          <div className="grid grid-cols-7 gap-2">
+            {calendarDays.map((date, index) => {
+              const dateHolidays = getHolidaysForDate(date);
+              const isEmpty = !date;
+              const isWeekendDay = !isEmpty && isWeekend(date);
+              const isTodayDate = !isEmpty && isToday(date);
 
-          return (
-            <div
-              key={index}
-              className={`min-h-[120px] p-2 border rounded-lg ${
-                isEmpty 
-                  ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700' 
-                  : isTodayDate
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' 
-                  : isWeekendDay
-                  ? 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'
-                  : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-              }`}
-            >
-              {/* Date Number */}
-              <div className={`text-sm font-medium mb-2 ${
-                isTodayDate 
-                  ? 'text-blue-600 dark:text-blue-400' 
-                  : isEmpty
-                  ? 'text-gray-400 dark:text-gray-600'
-                  : 'text-gray-900 dark:text-white'
-              }`}>
-                {date ? date.getDate() : ''}
-              </div>
-              
-              {/* Holidays */}
-              <div className="space-y-1">
-                {dateHolidays.map(holiday => (
-                  <div
-                    key={holiday.id}
-                    onClick={() => setSelectedHoliday(holiday)}
-                    className="text-xs p-1 rounded cursor-pointer hover:opacity-80 transition-opacity"
-                    style={{ backgroundColor: `${holiday.color}20` }}
-                  >
-                    <div 
-                      className="font-medium truncate"
-                      style={{ color: holiday.color }}
-                    >
-                      {holiday.name}
-                    </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-300">
-                      {holiday.type}
-                    </div>
+              return (
+                <div
+                  key={index}
+                  className={`min-h-[100px] sm:min-h-[120px] p-2 border rounded-lg ${isEmpty
+                      ? 'bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                      : isTodayDate
+                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                        : isWeekendDay
+                          ? 'bg-gray-50 dark:bg-gray-700/50 border-gray-200 dark:border-gray-600'
+                          : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                    }`}
+                >
+                  {/* Date Number */}
+                  <div className={`text-sm font-medium mb-2 ${isTodayDate
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : isEmpty
+                        ? 'text-gray-400 dark:text-gray-600'
+                        : 'text-gray-900 dark:text-white'
+                    }`}>
+                    {date ? date.getDate() : ''}
                   </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+
+                  {/* Holidays */}
+                  <div className="space-y-1">
+                    {dateHolidays.map(holiday => (
+                      <div
+                        key={holiday.id}
+                        onClick={() => setSelectedHoliday(holiday)}
+                        className="text-xs p-1 rounded cursor-pointer hover:opacity-80 transition-opacity"
+                        style={{ backgroundColor: `${holiday.color}20` }}
+                      >
+                        <div
+                          className="font-medium truncate"
+                          style={{ color: holiday.color }}
+                        >
+                          {holiday.name}
+                        </div>
+                        <div className="text-xs text-gray-600 dark:text-gray-300 hidden sm:block">
+                          {holiday.type}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Holiday Details Modal */}
@@ -178,7 +180,7 @@ const HolidaysCalendar = ({ holidays }) => {
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-3">
               <div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">Date: </span>
@@ -191,28 +193,28 @@ const HolidaysCalendar = ({ holidays }) => {
                   })}
                 </span>
               </div>
-              
+
               <div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">Type: </span>
                 <span className="text-gray-900 dark:text-white capitalize">
                   {selectedHoliday.type}
                 </span>
               </div>
-              
+
               <div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">Applicable To: </span>
                 <span className="text-gray-900 dark:text-white">
                   {selectedHoliday.applicableTo === 'all' ? 'All Employees' : selectedHoliday.state}
                 </span>
               </div>
-              
+
               <div>
                 <span className="text-sm text-gray-600 dark:text-gray-400">Description: </span>
                 <p className="text-gray-900 dark:text-white mt-1">
                   {selectedHoliday.description}
                 </p>
               </div>
-              
+
               {selectedHoliday.isRecurring && (
                 <div className="text-sm text-green-600 dark:text-green-400">
                   📅 Recurring annually

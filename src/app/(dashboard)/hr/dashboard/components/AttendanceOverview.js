@@ -85,9 +85,8 @@ const AttendanceOverview = () => {
             </svg>
             {selectedPeriod}
             <svg
-              className={`h-3 w-3 transition-transform ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
+              className={`h-3 w-3 transition-transform ${isDropdownOpen ? "rotate-180" : ""
+                }`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -107,11 +106,10 @@ const AttendanceOverview = () => {
                     setSelectedPeriod(period);
                     setIsDropdownOpen(false);
                   }}
-                  className={`w-full text-left px-3 py-2 text-xs ${
-                    selectedPeriod === period
+                  className={`w-full text-left px-3 py-2 text-xs ${selectedPeriod === period
                       ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                       : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
-                  }`}
+                    }`}
                 >
                   {period}
                 </button>
@@ -122,7 +120,7 @@ const AttendanceOverview = () => {
       </div>
 
       {/* Body */}
-      <div className="p-4 sm:p-5">
+      <div className="p-3 sm:p-5">
         {/* Chart */}
         <div className="relative mx-auto mb-6 h-40 sm:h-48 md:h-52">
           <Doughnut data={chartData} options={chartOptions} />

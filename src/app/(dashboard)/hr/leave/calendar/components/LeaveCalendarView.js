@@ -13,7 +13,7 @@ const LeaveCalendarView = ({ leaves, currentDate, view, onLeaveClick }) => {
     const start = new Date(leave.startDate);
     const end = new Date(leave.endDate);
     const current = new Date(start);
-    
+
     while (current <= end) {
       const dateStr = current.toISOString().split('T')[0];
       if (!acc[dateStr]) {
@@ -22,26 +22,26 @@ const LeaveCalendarView = ({ leaves, currentDate, view, onLeaveClick }) => {
       acc[dateStr].push(leave);
       current.setDate(current.getDate() + 1);
     }
-    
+
     return acc;
   }, {});
 
   // Custom calendar plugin to render leave indicators
-  const leaveIndicatorPlugin = function(instance) {
+  const leaveIndicatorPlugin = function (instance) {
     return {
-      onMonthChange: function() {
+      onMonthChange: function () {
         // Update month view when calendar month changes
         setMonthViewDate(instance.currentYear, instance.currentMonth + 1);
       },
-      onDayCreate: function(dObj, dStr, fp, dayElem) {
+      onDayCreate: function (dObj, dStr, fp, dayElem) {
         const dateStr = dayElem.dateObj.toISOString().split('T')[0];
         const dayLeaves = leavesByDate[dateStr];
-        
+
         if (dayLeaves && dayLeaves.length > 0) {
           // Add leave indicator dots
           const indicatorContainer = document.createElement('div');
           indicatorContainer.className = 'flex justify-center gap-1 mt-1';
-          
+
           dayLeaves.slice(0, 3).forEach(leave => {
             const dot = document.createElement('div');
             dot.className = 'w-2 h-2 rounded-full cursor-pointer';
@@ -53,7 +53,7 @@ const LeaveCalendarView = ({ leaves, currentDate, view, onLeaveClick }) => {
             };
             indicatorContainer.appendChild(dot);
           });
-          
+
           if (dayLeaves.length > 3) {
             const moreDot = document.createElement('div');
             moreDot.className = 'w-2 h-2 rounded-full bg-gray-400 cursor-pointer';
@@ -65,15 +65,15 @@ const LeaveCalendarView = ({ leaves, currentDate, view, onLeaveClick }) => {
                 ...leave,
                 date: dateStr
               }));
-              onLeaveClick({ 
-                date: dateStr, 
+              onLeaveClick({
+                date: dateStr,
                 leaves: dateLeaves,
-                isMulti: true 
+                isMulti: true
               });
             };
             indicatorContainer.appendChild(moreDot);
           }
-          
+
           dayElem.appendChild(indicatorContainer);
         }
       }
@@ -85,15 +85,15 @@ const LeaveCalendarView = ({ leaves, currentDate, view, onLeaveClick }) => {
       setSelectedDate(selectedDates[0]);
       const dateStr = selectedDates[0].toISOString().split('T')[0];
       const dateLeaves = leavesByDate[dateStr];
-      
+
       if (dateLeaves && dateLeaves.length > 0) {
         if (dateLeaves.length === 1) {
           onLeaveClick(dateLeaves[0]);
         } else {
-          onLeaveClick({ 
-            date: dateStr, 
+          onLeaveClick({
+            date: dateStr,
             leaves: dateLeaves,
-            isMulti: true 
+            isMulti: true
           });
         }
       }
@@ -124,20 +124,20 @@ const LeaveCalendarView = ({ leaves, currentDate, view, onLeaveClick }) => {
   }, [currentDate]);
 
   return (
-    <div className="p-6">
+    <div className="p-4 sm:p-6">
       <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         <Flatpickr
           options={flatpickrConfig}
           className="hidden" // Hide the input, we only want the calendar
         />
-        
+
         {/* Custom header for the calendar */}
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {currentDate.toLocaleDateString('en-US', { 
-                month: 'long', 
-                year: 'numeric' 
+              {currentDate.toLocaleDateString('en-US', {
+                month: 'long',
+                year: 'numeric'
               })}
             </h3>
             <div className="flex items-center gap-2">

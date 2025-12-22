@@ -70,7 +70,7 @@ const Birthdays = () => {
                 <div
                   key={empIndex}
                   className="bg-gray-50 dark:bg-gray-700 
-                             p-3 rounded-lg border border-dashed 
+                             p-2 sm:p-3 rounded-lg border border-dashed 
                              border-gray-200 dark:border-gray-600"
                 >
                   <div className="flex items-center justify-between gap-3">

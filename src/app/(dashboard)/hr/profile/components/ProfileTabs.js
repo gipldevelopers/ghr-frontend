@@ -21,37 +21,37 @@ export default function ProfileTabs({ activeTab, setActiveTab, profileData, onUp
     switch (activeTab) {
       case 'personal':
         return (
-          <PersonalInfo 
-            data={profileData.personal} 
-            onUpdate={(data) => onUpdateProfile('personal', data)} 
+          <PersonalInfo
+            data={profileData.personal}
+            onUpdate={(data) => onUpdateProfile('personal', data)}
           />
         );
       case 'employment':
         return (
-          <EmploymentInfo 
-            data={profileData.employment} 
-            onUpdate={(data) => onUpdateProfile('employment', data)} 
+          <EmploymentInfo
+            data={profileData.employment}
+            onUpdate={(data) => onUpdateProfile('employment', data)}
           />
         );
       case 'bank':
         return (
-          <BankInfo 
-            data={profileData.bank} 
-            onUpdate={(data) => onUpdateProfile('bank', data)} 
+          <BankInfo
+            data={profileData.bank}
+            onUpdate={(data) => onUpdateProfile('bank', data)}
           />
         );
       case 'documents':
         return (
-          <Documents 
-            data={profileData.documents} 
-            onUpdate={(data) => onUpdateProfile('documents', data)} 
+          <Documents
+            data={profileData.documents}
+            onUpdate={(data) => onUpdateProfile('documents', data)}
           />
         );
       case 'settings':
         return (
-          <Settings 
-            data={profileData.settings} 
-            onUpdate={(data) => onUpdateProfile('settings', data)} 
+          <Settings
+            data={profileData.settings}
+            onUpdate={(data) => onUpdateProfile('settings', data)}
           />
         );
       default:
@@ -70,11 +70,10 @@ export default function ProfileTabs({ activeTab, setActiveTab, profileData, onUp
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-6 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${
-                  activeTab === tab.id
+                className={`py-4 px-6 text-sm font-medium border-b-2 flex items-center whitespace-nowrap ${activeTab === tab.id
                     ? 'border-blue-500 text-blue-600 dark:text-blue-400'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
-                }`}
+                  }`}
               >
                 <Icon size={18} className="mr-2" />
                 {tab.name}
@@ -85,7 +84,7 @@ export default function ProfileTabs({ activeTab, setActiveTab, profileData, onUp
       </div>
 
       {/* Tab Content */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {renderTabContent()}
       </div>
     </div>

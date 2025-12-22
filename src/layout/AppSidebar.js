@@ -23,7 +23,9 @@ import {
   Package,
   Shield,
   UserStar,
-  CalendarDays
+  CalendarDays,
+  Menu,
+  X
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -71,7 +73,6 @@ const hrNavItems = [
     subItems: [
       { name: "Employee List", path: "/hr/employees" },
       { name: "Add Employee", path: "/hr/employees/add" },
-      // { name: "Employee Directory", path: "/hr/employees/directory" },
     ],
   },
   {
@@ -134,19 +135,8 @@ const hrNavItems = [
       { name: "Tax Settings", path: "/hr/payroll/tax-settings" },
     ],
   },
-  // {
-  //   icon: <Settings size={20} />,
-  //   name: "Settings",
-  //   subItems: [
-  //     { name: "Company Information", path: "/hr/settings/company" },
-  //     { name: "System Settings", path: "/hr/settings/system" },
-  //     { name: "User Management", path: "/hr/settings/users" },
-  //     { name: "Leave Policies", path: "/hr/settings/leave-policies" },
-  //     { name: "Holiday Calendar", path: "/hr/settings/holidays" },
-  //   ],
-  // },
   {
-    icon: <Package size={20} />, // Import Package from lucide-react
+    icon: <Package size={20} />,
     name: "Asset Management",
     subItems: [
       { name: "Asset Inventory", path: "/hr/assets" },
@@ -157,23 +147,23 @@ const hrNavItems = [
       { name: "Asset Reports", path: "/hr/assets/reports" },
     ],
   },
-  {
-    icon: <Settings size={20} />,
-    name: "System Settings",
-    subItems: [
-      { name: "Role Management", path: "/hr/settings/roles" },
-      { name: "Permission Management", path: "/hr/settings/permissions" },
-      { name: "User Access Control", path: "/hr/settings/user-access" },
-    ],
-  },
-  {
-    icon: <UserStar size={20} />,
-    name: "Roles & Permissions",
-    subItems: [
-      { name: "Role Management", path: "/super-admin/roles-permissions" },
-      { name: "Add New Role", path: "/super-admin/roles-permissions/add" },
-    ],
-  },
+  // {
+  //   icon: <Settings size={20} />,
+  //   name: "System Settings",
+  //   subItems: [
+  //     { name: "Role Management", path: "/hr/settings/roles" },
+  //     { name: "Permission Management", path: "/hr/settings/permissions" },
+  //     { name: "User Access Control", path: "/hr/settings/user-access" },
+  //   ],
+  // },
+  // {
+  //   icon: <UserStar size={20} />,
+  //   name: "Roles & Permissions",
+  //   subItems: [
+  //     { name: "Role Management", path: "/super-admin/roles-permissions" },
+  //     { name: "Add New Role", path: "/super-admin/roles-permissions/add" },
+  //   ],
+  // },
 ];
 
 const employeeNavItems = [
@@ -245,20 +235,13 @@ const employeeNavItems = [
       { name: "Recognition", path: "/employee/performance/recognition" },
     ],
   },
-  // {
-  //   icon: <Package size={20} />,
-  //   name: "My Assets",
-  //   path: "/employee/assets",
-  // },
 ];
 
 const AppSidebar = () => {
-  const { user } = useAuth(); // Get user from auth context
-  // const userRole = user?.role; // Extract role
-  // const userRole = user?.role?.name || user?.role || 'EMPLOYEE';
-  const userRole = user?.systemRole || 'EMPLOYEE'; // Use systemRole
-
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { user } = useAuth();
+  const userRole = user?.systemRole || 'EMPLOYEE';
+  
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
   const pathname = usePathname();
 
   const [openSubmenu, setOpenSubmenu] = useState(null);
@@ -270,9 +253,9 @@ const AppSidebar = () => {
   // Get appropriate navigation items based on user role
   const getNavItems = () => {
     switch (userRole) {
-      case "SUPER_ADMIN":  // Changed from "Super Admin"
+      case "SUPER_ADMIN":
         return superAdminNavItems;
-      case "HR_ADMIN":     // Changed from "HR Admin"
+      case "HR_ADMIN":
         return hrNavItems;
       default:
         return employeeNavItems;
@@ -362,6 +345,12 @@ const AppSidebar = () => {
             nav.path && (
               <Link
                 href={nav.path}
+                onClick={() => {
+                  // Close sidebar on mobile when clicking a link
+                  if (window.innerWidth < 1024) {
+                    toggleMobileSidebar();
+                  }
+                }}
                 className={`menu-item group w-full ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                   }`}
               >
@@ -397,6 +386,12 @@ const AppSidebar = () => {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
+                      onClick={() => {
+                        // Close sidebar on mobile when clicking a submenu link
+                        if (window.innerWidth < 1024) {
+                          toggleMobileSidebar();
+                        }
+                      }}
                       className={`menu-dropdown-item ${isActive(subItem.path)
                         ? "menu-dropdown-item-active"
                         : "menu-dropdown-item-inactive"
@@ -420,6 +415,11 @@ const AppSidebar = () => {
               userRole === "HR_ADMIN" ? "/hr/profile" :
                 "/employee/profile"
           }
+          onClick={() => {
+            if (window.innerWidth < 1024) {
+              toggleMobileSidebar();
+            }
+          }}
           className={`menu-item group w-full ${pathname.includes("profile") ? "menu-item-active" : "menu-item-inactive"
             }`}
         >
@@ -440,81 +440,123 @@ const AppSidebar = () => {
   );
 
   return (
-    <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${isExpanded || isMobileOpen
-          ? "w-[290px]"
-          : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
-        }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div
-        className={`py-4 flex border-b border-transparent ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
-          }`}
-      >
-        <Link href="/">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <>
-              <Image
-                className="dark:hidden"
-                src="/images/logo/GHR.PNG"
-                alt="Logo"
-                width={150}
-                height={40}
-                style={{ width: 'auto', height: 'auto' }} // Maintain aspect ratio
-                priority
-              />
-              <Image
-                className="hidden dark:block"
-                src="/images/logo/GHR2.PNG"
-                alt="Logo"
-                width={150}
-                height={40}
-                style={{ width: 'auto', height: 'auto' }} // Maintain aspect ratio
-              />
-            </>
-          ) : (
-            <Image
-              src="/images/logo/GHR-COLLAPSED.PNG"
-              alt="Logo"
-              width={50}
-              height={50}
-              style={{ width: 'auto', height: 'auto' }}
-            />
-          )}
-        </Link>
-      </div>
-      <div className="h-[1px] w-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500 mb-4"></div>
+    <>
+      {/* Mobile backdrop overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          onClick={toggleMobileSidebar}
+        />
+      )}
 
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar flex-1">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "justify-start"
-                  }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  userRole === "SUPER_ADMIN" ? "Super Admin Portal" :
-                    userRole === "HR_ADMIN" ? "HR Management" :
-                      "Employee Portal"
-                ) : (
-                  <MoreHorizontal size={16} />
-                )}
-              </h2>
-              {renderMenuItems(getNavItems())}
+      {/* Mobile header toggle button */}
+      <button
+        onClick={toggleMobileSidebar}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-md"
+      >
+        {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      <aside
+        className={`fixed flex flex-col top-0 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+          /* Mobile: Full screen with backdrop */
+          ${isMobileOpen ? "translate-x-0 w-[280px]" : "-translate-x-full w-[280px]"}
+          
+          /* Tablet: Half width or collapsed */
+          md:${isMobileOpen ? "translate-x-0 w-[280px]" : "-translate-x-full w-[280px]"}
+          
+          /* Desktop: Responsive width */
+          lg:translate-x-0 lg:w-auto
+          lg:${isExpanded || isHovered ? "lg:w-[290px]" : "lg:w-[90px]"}
+        `}
+        onMouseEnter={() => !isExpanded && setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Close button for mobile/tablet */}
+        <div className="lg:hidden flex justify-end p-4">
+          <button
+            onClick={toggleMobileSidebar}
+            className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <div
+          className={`py-4 px-4 flex border-b border-transparent ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
+            }`}
+        >
+          <Link href="/" onClick={() => {
+            if (window.innerWidth < 1024) {
+              toggleMobileSidebar();
+            }
+          }}>
+            {isExpanded || isHovered || isMobileOpen ? (
+              <>
+                <Image
+                  className="dark:hidden"
+                  src="/images/logo/GHR.PNG"
+                  alt="Logo"
+                  width={150}
+                  height={40}
+                  style={{ width: 'auto', height: 'auto' }}
+                  priority
+                />
+                <Image
+                  className="hidden dark:block"
+                  src="/images/logo/GHR2.PNG"
+                  alt="Logo"
+                  width={150}
+                  height={40}
+                  style={{ width: 'auto', height: 'auto' }}
+                />
+              </>
+            ) : (
+              <Image
+                src="/images/logo/GHR-COLLAPSED.PNG"
+                alt="Logo"
+                width={50}
+                height={50}
+                style={{ width: 'auto', height: 'auto' }}
+              />
+            )}
+          </Link>
+        </div>
+        <div className="h-[1px] w-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500 mb-4"></div>
+
+        <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar flex-1 px-4">
+          <nav className="mb-6">
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2
+                  className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${!isExpanded && !isHovered
+                    ? "lg:justify-center"
+                    : "justify-start"
+                    }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    userRole === "SUPER_ADMIN" ? "Super Admin Portal" :
+                      userRole === "HR_ADMIN" ? "HR Management" :
+                        "Employee Portal"
+                  ) : (
+                    <MoreHorizontal size={16} />
+                  )}
+                </h2>
+                {renderMenuItems(getNavItems())}
+              </div>
             </div>
+          </nav>
+        </div>
+
+        {/* Mobile footer info (optional) */}
+        <div className="lg:hidden p-4 border-t border-gray-200 dark:border-gray-800">
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            <p>Version 1.0.0</p>
+            <p className="mt-1">© 2024 Your Company</p>
           </div>
-        </nav>
-      </div>
-    </aside>
+        </div>
+      </aside>
+    </>
   );
 };
 

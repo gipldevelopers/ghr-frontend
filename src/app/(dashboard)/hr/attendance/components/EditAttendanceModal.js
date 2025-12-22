@@ -141,12 +141,12 @@ export default function EditAttendanceModal({ isOpen, onClose, attendance, onSav
 
   const formatTime = (timeStr) => {
     if (!timeStr) return '';
-    
+
     // If it's already in the correct format, return it
     if (timeStr.includes('AM') || timeStr.includes('PM')) {
       return timeStr;
     }
-    
+
     // Convert 24-hour format to 12-hour format with AM/PM
     const [hours, minutes] = timeStr.split(':');
     const hour = parseInt(hours);
@@ -162,19 +162,19 @@ export default function EditAttendanceModal({ isOpen, onClose, attendance, onSav
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Convert date back to display format
     const dateObj = new Date(formData.date);
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const formattedDate = `${dateObj.getDate().toString().padStart(2, '0')} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
-    
+
     const updatedAttendance = {
       ...attendance,
       ...formData,
       date: formattedDate
     };
-    
+
     onSave(updatedAttendance);
   };
 
@@ -184,7 +184,7 @@ export default function EditAttendanceModal({ isOpen, onClose, attendance, onSav
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
           <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
             Edit Attendance
           </h4>
@@ -197,7 +197,7 @@ export default function EditAttendanceModal({ isOpen, onClose, attendance, onSav
         </div>
 
         {/* Modal Body */}
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6">
           <div className="space-y-4">
             {/* Date Field */}
             {/* <div>
@@ -217,28 +217,28 @@ export default function EditAttendanceModal({ isOpen, onClose, attendance, onSav
             {/* Date Field */}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Date
+                Date
               </label>
               <div className="relative">
-                  <Flatpickr
+                <Flatpickr
                   value={formData.date}
                   onChange={(date) => handleInputChange('date', date[0].toISOString().split('T')[0])}
                   options={{
-                      dateFormat: "Y-m-d",
-                      altInput: true,
-                      altFormat: "F j, Y", // Human-friendly format
-                      allowInput: true,
-                      clickOpens: true,
-                      static: true // Prevents issues with modal rendering :cite[9]
+                    dateFormat: "Y-m-d",
+                    altInput: true,
+                    altFormat: "F j, Y", // Human-friendly format
+                    allowInput: true,
+                    clickOpens: true,
+                    static: true // Prevents issues with modal rendering :cite[9]
                   }}
                   className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                  />
-                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
+                />
+                <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4 pointer-events-none" />
               </div>
             </div>
 
             {/* Check In and Check Out */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Check In
@@ -271,7 +271,7 @@ export default function EditAttendanceModal({ isOpen, onClose, attendance, onSav
             </div>
 
             {/* Break and Late */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Break

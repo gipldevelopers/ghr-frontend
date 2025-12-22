@@ -43,7 +43,7 @@ const STORAGE_KEY = 'hrms_employee_form_data';
 //   height: '',
 //   weight: '',
 //   // physicalStatus: '',
-  
+
 //   // Contact Information
 //   email: '',
 //   phone: '',
@@ -56,7 +56,7 @@ const STORAGE_KEY = 'hrms_employee_form_data';
 //   emergencyContactName: '',
 //   emergencyContactRelation: '',
 //   emergencyContactPhone: '',
-  
+
 //   // Professional Information
 //   employeeId: '',
 //   departmentId: '',
@@ -72,7 +72,7 @@ const STORAGE_KEY = 'hrms_employee_form_data';
 //   workShift: '',
 //   weeklyHours: 40,
 //   overtimeEligible: false,
-  
+
 //   // Banking Information
 //   bankName: '',
 //   accountNumber: '',
@@ -82,14 +82,14 @@ const STORAGE_KEY = 'hrms_employee_form_data';
 //   accountType: 'SAVINGS',
 //   paymentMethod: 'BANK_TRANSFER',
 //   paymentFrequency: 'MONTHLY',
-  
+
 //   // Documents & Tax Information
 //   panNumber: '',
 //   aadhaarNumber: '',
 //   pfNumber: '',
 //   uanNumber: '',
 //   esiNumber: '',
-  
+
 //   // Status
 //   status: 'ACTIVE',
 //   onboardingStatus: 'PENDING',
@@ -111,7 +111,7 @@ const defaultFormData = {
   birthPlace: '',
   height: '',
   weight: '',
-  
+
   // Contact Information
   email: '',
   phone: '',
@@ -124,7 +124,7 @@ const defaultFormData = {
   emergencyContactName: '',
   emergencyContactRelation: '',
   emergencyContactPhone: '',
-  
+
   // Professional Information
   employeeId: '',
   departmentId: '',
@@ -139,18 +139,18 @@ const defaultFormData = {
   workShift: '',
   weeklyHours: 40,
   overtimeEligible: false,
-  
+
   // Banking Information
   bankName: '',
   accountNumber: '',
   ifscCode: '',
   accountHolderName: '',
   accountType: 'SAVINGS',
-  
+
   // Documents & Tax Information
   panNumber: '',
   aadhaarNumber: '',
-  
+
   // Status
   status: 'ACTIVE',
   onboardingStatus: 'PENDING',
@@ -217,12 +217,12 @@ export default function AddEmployeePage() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
           const parsedData = JSON.parse(saved);
-          const dataAge = parsedData.timestamp 
+          const dataAge = parsedData.timestamp
             ? Date.now() - new Date(parsedData.timestamp).getTime()
             : Infinity;
-            
+
           const isDataRecent = dataAge < 24 * 60 * 60 * 1000;
-          
+
           if (isDataRecent) {
             setRecoveryData(parsedData);
             setShowRecoveryModal(true);
@@ -252,11 +252,11 @@ export default function AddEmployeePage() {
           currentStep,
           timestamp: new Date().toISOString()
         };
-        
+
         localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
         setLastSaved(new Date());
         setIsSaved(true);
-        
+
         setTimeout(() => setIsSaved(false), 2000);
       } catch (error) {
         console.error('Error saving form data:', error);
@@ -283,7 +283,7 @@ export default function AddEmployeePage() {
       ...prev,
       [name]: value
     }));
-    
+
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -313,237 +313,73 @@ export default function AddEmployeePage() {
     }
   }, [currentStep]);
 
-  // Handle form submission
-  // const handleSubmit = async () => {
-  //   setIsSubmitting(true);
-    
-  //   try {
-  //     // 1. First create the employee (without documents)
-  //     const submitData = {
-  //       ...formData,
-  //       profileImage: undefined // Will be handled separately if needed
-  //     };
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
 
-  //     const response = await employeeService.createEmployee(submitData);
-  //     const employeeId = response.data.id;
+    try {
+      // Convert fields to appropriate types based on Prisma schema
+      const processedData = {
+        ...formData,
+        // Convert IDs from string to integer (handle empty values)
+        departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
+        designationId: formData.designationId ? parseInt(formData.designationId) : null,
+        reportingManagerId: formData.reportingManagerId ? parseInt(formData.reportingManagerId) : null,
 
-  //     // 2. Upload profile photo if exists (optional)
-  //     if (formData.profileImage instanceof File) {
-  //       try {
-  //         const photoFormData = new FormData();
-  //         photoFormData.append('file', formData.profileImage);
-  //         photoFormData.append('name', 'Profile Photo');
-  //         photoFormData.append('type', 'PHOTO');
-          
-  //         await employeeService.uploadDocument(employeeId, photoFormData);
-  //       } catch (uploadError) {
-  //         console.error('Profile photo upload failed:', uploadError);
-  //         // Don't fail the entire creation if photo upload fails
-  //       }
-  //     }
+        // Convert numeric fields appropriately
+        baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
+        probationPeriod: formData.probationPeriod ? parseInt(formData.probationPeriod) : null,
+        weeklyHours: formData.weeklyHours ? parseInt(formData.weeklyHours) : null,
+        overtimeEligible: Boolean(formData.overtimeEligible),
 
-  //     // Clear form data from storage
-  //     localStorage.removeItem(STORAGE_KEY);
+        // Convert height/weight to strings (as expected by Prisma)
+        height: formData.height ? formData.height.toString() : null,
+        weight: formData.weight ? formData.weight.toString() : null,
 
-  //      // 4. Redirect to employee profile with documents tab
-  //     toast.success('Employee created successfully! Redirecting to upload documents...');
+        // Convert dates to proper format
+        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : null,
+        joiningDate: formData.joiningDate ? new Date(formData.joiningDate) : null,
+        confirmationDate: formData.confirmationDate ? new Date(formData.confirmationDate) : null,
+      };
 
-  //      // Redirect to documents page after a brief delay
-  //     setTimeout(() => {
-  //       router.push(`/hr/employees/${employeeId}?tab=documents&new=true`);
-  //     }, 1500);
-      
-  //     // toast.success('Employee created successfully!');
-  //     // router.push('/hr/employees');
-      
-  //   } catch (error) {
-  //     console.error('Error creating employee:', error);
-  //     toast.error(error.message || 'Failed to create employee');
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
+      // Remove profileImage from the main submission (handled separately)
+      const { profileImage, ...submitData } = processedData;
 
-//   const handleSubmit = async () => {
-//   setIsSubmitting(true);
-  
-//   try {
-//     // 1. First create the employee (without documents)
-//     // Remove physicalStatus and other invalid fields
-//     const { physicalStatus, profileImage, ...submitData } = formData;
+      const response = await employeeService.createEmployee(submitData);
+      const employeeId = response.data.id;
 
-//     const response = await employeeService.createEmployee(submitData);
-//     const employeeId = response.data.id;
+      // Upload profile photo if exists (optional)
+      if (formData.profileImage instanceof File) {
+        try {
+          const photoFormData = new FormData();
+          photoFormData.append('file', formData.profileImage);
+          photoFormData.append('name', 'Profile Photo');
+          photoFormData.append('type', 'PHOTO');
 
-//     // 2. Upload profile photo if exists (optional)
-//     if (formData.profileImage instanceof File) {
-//       try {
-//         const photoFormData = new FormData();
-//         photoFormData.append('file', formData.profileImage);
-//         photoFormData.append('name', 'Profile Photo');
-//         photoFormData.append('type', 'PHOTO');
-        
-//         await employeeService.uploadDocument(employeeId, photoFormData);
-//       } catch (uploadError) {
-//         console.error('Profile photo upload failed:', uploadError);
-//         // Don't fail the entire creation if photo upload fails
-//       }
-//     }
-
-//     // Clear form data from storage
-//     localStorage.removeItem(STORAGE_KEY);
-
-//     // 3. Redirect to employee profile with documents tab
-//     toast.success('Employee created successfully! Redirecting to upload documents...');
-
-//     // Redirect to documents page after a brief delay
-//     setTimeout(() => {
-//       router.push(`/hr/employees/${employeeId}?tab=documents&new=true`);
-//     }, 1500);
-    
-//   } catch (error) {
-//     console.error('Error creating employee:', error);
-//     toast.error(error.message || 'Failed to create employee');
-//   } finally {
-//     setIsSubmitting(false);
-//   }
-// };
-
-// const handleSubmit = async () => {
-//   setIsSubmitting(true);
-  
-//   try {
-//     // Convert fields to appropriate types based on Prisma schema
-//     const processedData = {
-//       ...formData,
-//       // Convert IDs from string to integer
-//       departmentId: parseInt(formData.departmentId),
-//       designationId: parseInt(formData.designationId),
-//       reportingManagerId: parseInt(formData.reportingManagerId),
-//       companyId: parseInt(formData.companyId),
-//       createdBy: parseInt(formData.createdBy),
-      
-//       // Convert numeric fields to strings (as expected by Prisma)
-//       height: formData.height.toString(), // Convert to string
-//       weight: formData.weight.toString(), // Convert to string
-      
-//       // Convert other numeric fields appropriately
-//       baseSalary: parseFloat(formData.baseSalary),
-//       probationPeriod: parseInt(formData.probationPeriod),
-//        weeklyHours: parseInt(formData.weeklyHours),
-//       overtimeEligible: Boolean(formData.overtimeEligible),
-//       // weeklyHours: parseInt(formData.weeklyHours),
-//     };
-
-//     // Remove physicalStatus and other invalid fields
-//     const { 
-//        profileImage, ...submitData } = processedData;
-
-//     const response = await employeeService.createEmployee(submitData);
-//     const employeeId = response.data.id;
-
-//     // 2. Upload profile photo if exists (optional)
-//     if (formData.profileImage instanceof File) {
-//       try {
-//         const photoFormData = new FormData();
-//         photoFormData.append('file', formData.profileImage);
-//         photoFormData.append('name', 'Profile Photo');
-//         photoFormData.append('type', 'PHOTO');
-        
-//         await employeeService.uploadDocument(employeeId, photoFormData);
-//       } catch (uploadError) {
-//         console.error('Profile photo upload failed:', uploadError);
-//         // Don't fail the entire creation if photo upload fails
-//       }
-//     }
-
-//        // Clear form data from storage
-//     localStorage.removeItem(STORAGE_KEY);
-
-//     // 3. Redirect to employee profile with documents tab
-//     toast.success('Employee created successfully! Redirecting to upload documents...');
-
-//     // Redirect to documents page after a brief delay
-//     setTimeout(() => {
-//       router.push(`/hr/employees/${employeeId}?tab=documents&new=true`);
-//     }, 1500);
-
-//     // ... rest of your code for file uploads
-//   } catch (error) {
-//     console.error('Error creating employee:', error);
-//     toast.error(error.message || 'Failed to create employee');
-//   } finally {
-//     setIsSubmitting(false);
-//   }
-// };
-
-const handleSubmit = async () => {
-  setIsSubmitting(true);
-  
-  try {
-    // Convert fields to appropriate types based on Prisma schema
-    const processedData = {
-      ...formData,
-      // Convert IDs from string to integer (handle empty values)
-      departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
-      designationId: formData.designationId ? parseInt(formData.designationId) : null,
-      reportingManagerId: formData.reportingManagerId ? parseInt(formData.reportingManagerId) : null,
-      
-      // Convert numeric fields appropriately
-      baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
-      probationPeriod: formData.probationPeriod ? parseInt(formData.probationPeriod) : null,
-      weeklyHours: formData.weeklyHours ? parseInt(formData.weeklyHours) : null,
-      overtimeEligible: Boolean(formData.overtimeEligible),
-      
-      // Convert height/weight to strings (as expected by Prisma)
-      height: formData.height ? formData.height.toString() : null,
-      weight: formData.weight ? formData.weight.toString() : null,
-      
-      // Convert dates to proper format
-      dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : null,
-      joiningDate: formData.joiningDate ? new Date(formData.joiningDate) : null,
-      confirmationDate: formData.confirmationDate ? new Date(formData.confirmationDate) : null,
-    };
-
-    // Remove profileImage from the main submission (handled separately)
-    const { profileImage, ...submitData } = processedData;
-
-    const response = await employeeService.createEmployee(submitData);
-    const employeeId = response.data.id;
-
-    // Upload profile photo if exists (optional)
-    if (formData.profileImage instanceof File) {
-      try {
-        const photoFormData = new FormData();
-        photoFormData.append('file', formData.profileImage);
-        photoFormData.append('name', 'Profile Photo');
-        photoFormData.append('type', 'PHOTO');
-        
-        await employeeService.uploadDocument(employeeId, photoFormData);
-      } catch (uploadError) {
-        console.error('Profile photo upload failed:', uploadError);
-        // Don't fail the entire creation if photo upload fails
+          await employeeService.uploadDocument(employeeId, photoFormData);
+        } catch (uploadError) {
+          console.error('Profile photo upload failed:', uploadError);
+          // Don't fail the entire creation if photo upload fails
+        }
       }
+
+      // Clear form data from storage
+      localStorage.removeItem(STORAGE_KEY);
+
+      // Redirect to employee profile with documents tab
+      toast.success('Employee created successfully! Redirecting to upload documents...');
+
+      // Redirect to documents page after a brief delay
+      setTimeout(() => {
+        router.push(`/hr/employees/${employeeId}/documents?new=true`);
+      }, 1500);
+
+    } catch (error) {
+      console.error('Error creating employee:', error);
+      toast.error(error.message || 'Failed to create employee');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // Clear form data from storage
-    localStorage.removeItem(STORAGE_KEY);
-
-    // Redirect to employee profile with documents tab
-    toast.success('Employee created successfully! Redirecting to upload documents...');
-
-    // Redirect to documents page after a brief delay
-    setTimeout(() => {
-      router.push(`/hr/employees/${employeeId}/documents?new=true`);
-    }, 1500);
-
-  } catch (error) {
-    console.error('Error creating employee:', error);
-    toast.error(error.message || 'Failed to create employee');
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   // Recovery modal handlers
   const handleRecover = useCallback(() => {
@@ -570,7 +406,7 @@ const handleSubmit = async () => {
       currentStep,
       timestamp: new Date().toISOString()
     };
-    
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(dataToSave));
     setLastSaved(new Date());
     setIsSaved(true);
@@ -595,7 +431,7 @@ const handleSubmit = async () => {
       dropdownData
     };
 
-    switch(currentStep) {
+    switch (currentStep) {
       case 1: return <PersonalInfoForm {...commonProps} />;
       case 2: return <ContactInfoForm {...commonProps} />;
       case 3: return <ProfessionalInfoForm {...commonProps} />;
@@ -607,12 +443,12 @@ const handleSubmit = async () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Breadcrumb 
+      <Breadcrumb
         items={[
           { label: 'HR', href: '/hr' },
           { label: 'Employees', href: '/hr/employees' },
           { label: 'Add Employee', href: '/hr/employees/add' }
-        ]} 
+        ]}
       />
 
       {/* Save Status Indicator */}
@@ -626,7 +462,7 @@ const handleSubmit = async () => {
               <span>Last saved: {lastSaved.toLocaleTimeString()}</span>
             )}
           </div>
-          
+
           <div className="flex gap-2">
             <button
               onClick={handleManualSave}
@@ -646,23 +482,23 @@ const handleSubmit = async () => {
 
       {/* Progress Indicator */}
       <div className="px-6 my-6">
-        <ProgressIndicator 
+        <ProgressIndicator
           steps={STEPS}
           currentStep={currentStep}
         />
       </div>
 
       {/* Form Container */}
-      <div className="px-6 pb-8">
+      <div className="px-4 md:px-6 pb-8">
         <div className="max-w-4xl mx-auto">
           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
             {/* Step Content */}
-            <div className="p-8">
+            <div className="p-4 md:p-8">
               {renderStepContent()}
             </div>
 
             {/* Form Navigation */}
-            <div className="px-8 py-6 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl border-t border-gray-200 dark:border-gray-700">
+            <div className="px-4 py-4 md:px-8 md:py-6 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl border-t border-gray-200 dark:border-gray-700">
               <FormNavigation
                 currentStep={currentStep}
                 totalSteps={STEPS.length}

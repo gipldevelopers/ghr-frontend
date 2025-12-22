@@ -9,25 +9,25 @@ const EmployeeFilters = ({
   setStatusFilter,
   designationFilter,
   setDesignationFilter,
-//   departmentFilter,
-//   setDepartmentFilter,
+  //   departmentFilter,
+  //   setDepartmentFilter,
   statuses,
   designations,
-//   departments,
+  //   departments,
   onClearFilters
 }) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
-  const hasActiveFilters = statusFilter !== 'all' || 
-                          designationFilter !== 'all' || 
-                        //   departmentFilter !== 'all' || 
-                          globalFilter;
+  const hasActiveFilters = statusFilter !== 'all' ||
+    designationFilter !== 'all' ||
+    //   departmentFilter !== 'all' || 
+    globalFilter;
 
   // Function to get unique values with indexes to ensure unique keys
   const getUniqueOptions = (items) => {
     const uniqueItems = [];
     const seen = new Set();
-    
+
     items.filter(item => item !== 'all').forEach((item, index) => {
       if (!seen.has(item)) {
         seen.add(item);
@@ -37,13 +37,13 @@ const EmployeeFilters = ({
         uniqueItems.push({ value: item, key: `${item}-${index}` });
       }
     });
-    
+
     return uniqueItems;
   };
 
   const uniqueStatuses = getUniqueOptions(statuses);
   const uniqueDesignations = getUniqueOptions(designations);
-//   const uniqueDepartments = getUniqueOptions(departments);
+  //   const uniqueDepartments = getUniqueOptions(departments);
 
   return (
     <div className="space-y-4">
@@ -74,7 +74,7 @@ const EmployeeFilters = ({
 
       {/* Filters Container */}
       <div className={`${isFiltersOpen ? 'block' : 'hidden'} md:block`}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           {/* Status Filter */}
           <div className="space-y-1">
             <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Status</label>
@@ -85,7 +85,7 @@ const EmployeeFilters = ({
                 className="w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none"
               >
                 <option value="all">All Status</option>
-                {uniqueStatuses.map(({value, key}) => (
+                {uniqueStatuses.map(({ value, key }) => (
                   <option key={key} value={value}>{value}</option>
                 ))}
               </select>
@@ -105,7 +105,7 @@ const EmployeeFilters = ({
                 className="w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none"
               >
                 <option value="all">All Designations</option>
-                {uniqueDesignations.map(({value, key}) => (
+                {uniqueDesignations.map(({ value, key }) => (
                   <option key={key} value={value}>{value}</option>
                 ))}
               </select>
@@ -114,26 +114,6 @@ const EmployeeFilters = ({
               </div>
             </div>
           </div>
-
-          {/* Department Filter (New) */}
-          {/* <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Department</label>
-            <div className="relative">
-              <select
-                value={departmentFilter}
-                onChange={e => setDepartmentFilter(e.target.value)}
-                className="w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none"
-              >
-                <option value="all">All Departments</option>
-                {uniqueDepartments.map(({value, key}) => (
-                  <option key={key} value={value}>{value}</option>
-                ))}
-              </select>
-              <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                <Filter className="w-4 h-4 text-gray-400" />
-              </div>
-            </div>
-          </div> */}
 
           {/* Clear Filters Button */}
           <div className="flex items-end">
@@ -176,14 +156,6 @@ const EmployeeFilters = ({
               </button>
             </span>
           )}
-          {/* {departmentFilter !== 'all' && (
-            <span className="inline-flex items-center px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full dark:bg-orange-900/30 dark:text-orange-400">
-              Department: {departmentFilter}
-              <button onClick={() => setDepartmentFilter('all')} className="ml-1">
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          )} */}
         </div>
       )}
     </div>

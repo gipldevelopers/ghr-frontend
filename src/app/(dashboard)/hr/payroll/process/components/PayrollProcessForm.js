@@ -25,7 +25,7 @@ export default function PayrollProcessForm({ payrollData, onChange, onNext }) {
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Select Payroll Period</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -89,7 +89,7 @@ export default function PayrollProcessForm({ payrollData, onChange, onNext }) {
         <div className="flex justify-end pt-4">
           <button
             type="submit"
-            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-white hover:bg-blue-700 transition"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-white hover:bg-blue-700 transition w-full sm:w-auto"
           >
             Next: Select Employees
             <ArrowRight size={18} />

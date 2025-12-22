@@ -6,6 +6,16 @@
   --color-primary-hover: #1d4ed8; /* same as your hover color */
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 
 [data-color="primary"] .btn-primary {
   background-color: var(--color-primary);

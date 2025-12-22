@@ -8,9 +8,9 @@ import Link from 'next/link';
 
 export default function EmployeeDirectory() {
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
-      
-       {/* Breadcrumb with Add Employee button */}
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-3 sm:p-6">
+
+      {/* Breadcrumb with Add Employee button */}
       <Breadcrumb
         rightContent={
           <Link
@@ -23,7 +23,7 @@ export default function EmployeeDirectory() {
       />
 
       <EmployeeStatsCards />
-      
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         <EmployeeTable />
       </div>

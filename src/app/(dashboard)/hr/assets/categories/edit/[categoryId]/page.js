@@ -10,7 +10,7 @@ export default function EditCategory() {
   const router = useRouter();
   const params = useParams();
   const categoryId = params.categoryId;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
@@ -31,7 +31,7 @@ export default function EditCategory() {
       assetCount: 45,
       createdAt: '2023-01-15'
     };
-    
+
     setFormData({
       name: mockCategory.name,
       description: mockCategory.description,
@@ -44,10 +44,10 @@ export default function EditCategory() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // In real app, submit to API
     console.log('Category updated:', formData);
     router.push('/hr/assets/categories');
@@ -87,7 +87,7 @@ export default function EditCategory() {
       />
 
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Asset Category</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">

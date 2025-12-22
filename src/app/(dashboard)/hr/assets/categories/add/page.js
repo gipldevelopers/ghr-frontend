@@ -19,10 +19,10 @@ export default function AddCategory() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // In real app, submit to API
     console.log('Category created:', formData);
     router.push('/hr/assets/categories');
@@ -49,7 +49,7 @@ export default function AddCategory() {
       />
 
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Asset Category</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">

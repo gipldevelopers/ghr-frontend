@@ -48,7 +48,7 @@ export default function Documents({ data, onUpdate }) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Documents</h2>
         <button
           onClick={() => setIsUploading(true)}
@@ -60,9 +60,9 @@ export default function Documents({ data, onUpdate }) {
       </div>
 
       {isUploading ? (
-        <div className="bg-gray-50 dark:bg-gray-700/30 p-6 rounded-lg mb-6">
+        <div className="bg-gray-50 dark:bg-gray-700/30 p-4 sm:p-6 rounded-lg mb-6">
           <h3 className="text-md font-medium text-gray-800 dark:text-white mb-4">Upload New Document</h3>
-          
+
           {uploadedFile ? (
             <div className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 mb-4">
               <div className="flex items-center">
@@ -122,7 +122,7 @@ export default function Documents({ data, onUpdate }) {
       <div className="space-y-4">
         {data.length > 0 ? (
           data.map((document) => (
-            <div key={document.id} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700">
+            <div key={document.id} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="flex items-center">
                 <FileText className="text-gray-500 mr-3" size={20} />
                 <div>

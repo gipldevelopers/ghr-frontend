@@ -94,8 +94,8 @@ const LeaveRequestsDashboardTable = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
           Recent Leave Requests
         </h2>
@@ -103,7 +103,7 @@ const LeaveRequestsDashboardTable = () => {
           View All
         </button>
       </div>
-      
+
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>

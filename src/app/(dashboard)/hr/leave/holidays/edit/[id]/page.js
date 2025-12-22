@@ -52,7 +52,7 @@ export default function EditHolidayPage() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -62,7 +62,7 @@ export default function EditHolidayPage() {
         ]}
         rightContent={null}
       />
-      
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800 mt-6">
         <HolidayForm holiday={holiday} isEdit={true} />
       </div>

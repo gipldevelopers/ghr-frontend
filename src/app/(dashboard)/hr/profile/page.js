@@ -61,9 +61,9 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       {/* Breadcrumb */}
-      <Breadcrumb 
+      <Breadcrumb
         pageTitle="My Profile"
         rightContent={null}
       />

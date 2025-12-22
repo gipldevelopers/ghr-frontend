@@ -31,17 +31,17 @@ export default function AddMaintenanceRecord() {
       { id: 'AST-005', name: 'MacBook Pro 16"', category: 'Laptop' },
       { id: 'AST-006', name: 'Dell Monitor 27"', category: 'Monitor' }
     ];
-    
+
     setAssets(mockAssets);
   }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // In real app, submit to API
     console.log('Maintenance record created:', formData);
     router.push('/hr/assets/maintenance');
@@ -59,7 +59,7 @@ export default function AddMaintenanceRecord() {
     if (!date) return '';
     const maintenanceDate = new Date(date);
     const nextDate = new Date(maintenanceDate);
-    
+
     switch (type) {
       case 'preventive':
         nextDate.setMonth(nextDate.getMonth() + 3); // 3 months for preventive
@@ -73,7 +73,7 @@ export default function AddMaintenanceRecord() {
       default:
         nextDate.setMonth(nextDate.getMonth() + 3);
     }
-    
+
     return nextDate.toISOString().split('T')[0];
   };
 
@@ -102,7 +102,7 @@ export default function AddMaintenanceRecord() {
       />
 
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Maintenance Record</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">

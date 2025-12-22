@@ -73,10 +73,10 @@ const ReportChart = ({ title, type, data }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{title}</h3>
-        <button 
+        <button
           onClick={handleDownloadChart}
           className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all duration-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
           title="Download Chart"
@@ -84,7 +84,7 @@ const ReportChart = ({ title, type, data }) => {
           <Download className="w-4 h-4" />
         </button>
       </div>
-      
+
       <div className="h-64">
         <Chart
           ref={chartRef}

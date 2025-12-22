@@ -190,28 +190,28 @@ export default function SalaryStructureTable() {
   // Apply all filters and return filtered data
   const filteredData = useMemo(() => {
     let result = [...data];
-    
+
     // Apply global search filter
     if (globalFilter) {
       const searchTerm = globalFilter.toLowerCase();
-      result = result.filter(structure => 
+      result = result.filter(structure =>
         structure.employee.toLowerCase().includes(searchTerm) ||
         structure.designation.toLowerCase().includes(searchTerm) ||
         structure.department.toLowerCase().includes(searchTerm) ||
         structure.id.toLowerCase().includes(searchTerm)
       );
     }
-    
+
     // Apply status filter
     if (statusFilter !== 'all') {
       result = result.filter(structure => structure.status === statusFilter);
     }
-    
+
     // Apply department filter
     if (departmentFilter !== 'all') {
       result = result.filter(structure => structure.department === departmentFilter);
     }
-    
+
     return result;
   }, [data, globalFilter, statusFilter, departmentFilter]);
 
@@ -263,14 +263,14 @@ export default function SalaryStructureTable() {
   return (
     <div className="p-4 sm:p-6">
       {/* Header with title and stats */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-0">
         <div>
           <h2 className="text-xl font-semibold text-gray-800 dark:text-white">Salary Structures</h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Manage employee salary components and structures
           </p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg dark:bg-blue-900/30 dark:text-blue-400">
+        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg dark:bg-blue-900/30 dark:text-blue-400 w-full sm:w-auto justify-center">
           <IndianRupee size={18} />
           <span className="font-medium">Total: ${data.reduce((sum, item) => sum + item.total, 0).toLocaleString()}</span>
         </div>
@@ -301,7 +301,7 @@ export default function SalaryStructureTable() {
 
       {/* Table */}
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-        <div className="min-w-[1000px] md:min-w-full">
+        <div className="min-w-[1000px]">
           <table className="w-full">
             <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
               {table.getHeaderGroups().map(headerGroup => (
@@ -323,11 +323,11 @@ export default function SalaryStructureTable() {
                               asc: <ChevronUp className="ml-1 w-4 h-4 text-blue-500" />,
                               desc: <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />,
                             }[header.column.getIsSorted()] ?? (
-                              <div className="ml-1 flex flex-col">
-                                <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
-                                <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
-                              </div>
-                            )}
+                                <div className="ml-1 flex flex-col">
+                                  <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
+                                  <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
+                                </div>
+                              )}
                           </>
                         )}
                       </div>
@@ -339,8 +339,8 @@ export default function SalaryStructureTable() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map(row => (
-                  <tr 
-                    key={row.id} 
+                  <tr
+                    key={row.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
                   >
                     {row.getVisibleCells().map(cell => (

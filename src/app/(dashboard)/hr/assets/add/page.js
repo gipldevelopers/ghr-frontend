@@ -29,10 +29,10 @@ export default function AddAsset() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // In real app, submit to API
     console.log('Asset created:', formData);
     router.push('/hr/assets');
@@ -72,11 +72,11 @@ export default function AddAsset() {
       />
 
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add New Asset</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Asset Name *

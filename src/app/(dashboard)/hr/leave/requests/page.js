@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export default function LeaveRequests() {
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       {/* Breadcrumb with Add Leave Request button */}
       <Breadcrumb
         pages={[
@@ -26,7 +26,7 @@ export default function LeaveRequests() {
       />
 
       <LeaveRequestsStatsCards />
-      
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800 mt-6">
         <LeaveRequestsTable />
       </div>

@@ -1,53 +1,3 @@
-// // src/app/(dashboard)/hr/departments/edit/[id]/page.js
-// "use client";
-// import { useParams } from 'next/navigation';
-// import Breadcrumb from '@/components/common/Breadcrumb';
-// import DepartmentForm from '../../components/DepartmentForm';
-
-// // This would typically fetch the department data from an API
-// const getDepartmentData = (id) => {
-//   // Mock data - replace with actual API call
-//   const departments = [
-//     {
-//       id: 1,
-//       name: 'Human Resources',
-//       headOfDepartment: 'Sarah Johnson',
-//       phone: '(168) 8392 825',
-//       email: 'hr@company.com',
-//       employeeCount: 12,
-//       status: 'Active',
-//     },
-//     // ... other departments
-//   ];
-//   return departments.find(dept => dept.id === parseInt(id));
-// };
-
-// export default function EditDepartmentPage() {
-//   const params = useParams();
-//   const department = getDepartmentData(params.id);
-
-// //   if (!department) {
-// //     return (
-// //       <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
-// //         <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6 text-center">
-// //           <p className="text-gray-600 dark:text-gray-400">Department not found</p>
-// //         </div>
-// //       </div>
-// //     );
-// //   }
-
-//   return (
-//     <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
-//       {/* Breadcrumb */}
-//       <Breadcrumb />
-      
-//       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
-//         <DepartmentForm department={department} isEdit={true} />
-//       </div>
-//     </div>
-//   );
-// }
-
 // src/app/(dashboard)/hr/departments/edit/[id]/page.js
 "use client";
 import { useParams, useRouter } from 'next/navigation';
@@ -68,7 +18,7 @@ export default function EditDepartmentPage() {
   useEffect(() => {
     const fetchDepartment = async () => {
       if (!params.id) return;
-      
+
       try {
         setIsLoading(true);
         const departmentData = await departmentService.getDepartmentById(params.id);
@@ -88,7 +38,7 @@ export default function EditDepartmentPage() {
   if (isLoading) {
     return (
       <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <div className="flex justify-center items-center h-64">
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
             <span className="ml-2 text-gray-600 dark:text-gray-400">Loading department...</span>
@@ -102,7 +52,7 @@ export default function EditDepartmentPage() {
     return (
       <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
         <Breadcrumb />
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6 text-center">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6 text-center">
           <p className="text-gray-600 dark:text-gray-400">
             {error || 'Department not found'}
           </p>
@@ -121,7 +71,7 @@ export default function EditDepartmentPage() {
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
       {/* Breadcrumb */}
       <Breadcrumb />
-      
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         <DepartmentForm department={department} isEdit={true} />
       </div>

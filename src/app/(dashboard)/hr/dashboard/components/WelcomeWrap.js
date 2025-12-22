@@ -35,15 +35,15 @@ const WelcomeWrap = ({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 w-full">
       <div
-        className="p-4 sm:p-6 flex flex-col md:flex-row 
+        className="p-3 sm:p-6 flex flex-col md:flex-row 
                    md:items-center md:justify-between gap-4"
       >
         {/* Left */}
-        <div className="flex items-center gap-4 min-w-0">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           {/* Avatar */}
           <div className="flex-shrink-0">
             <div
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden 
+              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full overflow-hidden 
                          border-2 border-white dark:border-gray-700 shadow-md"
             >
               <Image
@@ -59,7 +59,7 @@ const WelcomeWrap = ({
           {/* Text */}
           <div className="min-w-0">
             <h3
-              className="text-base sm:text-xl font-semibold 
+              className="text-sm sm:text-xl font-semibold 
                          text-gray-800 dark:text-white flex items-center gap-2"
             >
               <span className="truncate">Welcome Back, {userName}</span>
@@ -81,7 +81,7 @@ const WelcomeWrap = ({
               </button>
             </h3>
 
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-300 truncate">
+            <p className="text-xs sm:text-base text-gray-600 dark:text-gray-300 truncate">
               You have{" "}
               <span className="text-blue-600 dark:text-blue-400 font-medium underline">
                 {pendingApprovals}
@@ -97,7 +97,7 @@ const WelcomeWrap = ({
 
         {/* Right – Time */}
         <div
-          className="bg-gray-100 dark:bg-gray-700 px-4 py-3 rounded-xl 
+          className="bg-gray-100 dark:bg-gray-700 px-3 py-2 sm:px-4 sm:py-3 rounded-xl 
                      flex items-center gap-3 shadow-sm w-full md:w-auto"
         >
           <div>

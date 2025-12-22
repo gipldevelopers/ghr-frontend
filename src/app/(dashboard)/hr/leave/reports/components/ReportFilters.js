@@ -30,12 +30,12 @@ const ReportFilters = ({ filters, onFilterChange }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-4">
         <Filter className="w-5 h-5 text-gray-600 dark:text-gray-400" />
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Report Filters</h3>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -104,7 +104,7 @@ const ReportFilters = ({ filters, onFilterChange }) => {
         </div>
       )}
 
-      <div className="flex justify-end gap-3 mt-6">
+      <div className="flex flex-col sm:flex-row justify-end gap-3 mt-6">
         <button
           onClick={() => onFilterChange({
             dateRange: 'this_month',

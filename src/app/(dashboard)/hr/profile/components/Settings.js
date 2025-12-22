@@ -28,7 +28,7 @@ export default function Settings({ data, onUpdate }) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Account Settings</h2>
         {!isEditing ? (
           <button
@@ -59,9 +59,9 @@ export default function Settings({ data, onUpdate }) {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <h3 className="text-md font-medium text-gray-800 dark:text-white mb-4">Notification Preferences</h3>
-          
+
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-gray-800 dark:text-white">Email Notifications</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Receive important updates via email</p>
@@ -79,7 +79,7 @@ export default function Settings({ data, onUpdate }) {
               </label>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-gray-800 dark:text-white">SMS Notifications</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Receive important updates via SMS</p>
@@ -97,7 +97,7 @@ export default function Settings({ data, onUpdate }) {
               </label>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-medium text-gray-800 dark:text-white">Two-Factor Authentication</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security to your account</p>
@@ -119,7 +119,7 @@ export default function Settings({ data, onUpdate }) {
 
         <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
           <h3 className="text-md font-medium text-gray-800 dark:text-white mb-4">Preferences</h3>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -161,18 +161,18 @@ export default function Settings({ data, onUpdate }) {
 
         <div className="pt-6 border-t border-gray-200 dark:border-gray-700">
           <h3 className="text-md font-medium text-gray-800 dark:text-white mb-4">Security</h3>
-          
-          <div className="space-y-4">
+
+          <div className="flex flex-col sm:flex-row gap-4">
             <button
               type="button"
               className="px-4 py-2 text-sm bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
             >
               Change Password
             </button>
-            
+
             <button
               type="button"
-              className="px-4 py-2 text-sm bg-red-100 text-red-800 rounded-lg hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 ml-4"
+              className="px-4 py-2 text-sm bg-red-100 text-red-800 rounded-lg hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
             >
               Deactivate Account
             </button>

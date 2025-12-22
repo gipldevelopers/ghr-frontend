@@ -84,131 +84,133 @@ export default function RecentPayrollRuns() {
 
   const SortIcon = ({ field }) => {
     if (sortField !== field) return null;
-    return sortDirection === 'asc' ? 
-      <ChevronUp className="ml-1 w-4 h-4 text-blue-500" /> : 
+    return sortDirection === 'asc' ?
+      <ChevronUp className="ml-1 w-4 h-4 text-blue-500" /> :
       <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />;
   };
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-0">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">
           Recent Payroll Runs
         </h2>
-        <button className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+        <button className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-full sm:w-auto justify-center">
           <Calendar size={16} />
           Process New Payroll
         </button>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-        <table className="w-full">
-          <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-            <tr className="border-b border-gray-200 dark:border-gray-700">
-              <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                onClick={() => handleSort('id')}
-              >
-                <div className="flex items-center">
-                  Payroll ID
-                  <SortIcon field="id" />
-                </div>
-              </th>
-              <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                onClick={() => handleSort('period')}
-              >
-                <div className="flex items-center">
-                  Period
-                  <SortIcon field="period" />
-                </div>
-              </th>
-              <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                onClick={() => handleSort('processedDate')}
-              >
-                <div className="flex items-center">
-                  Processed Date
-                  <SortIcon field="processedDate" />
-                </div>
-              </th>
-              <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                onClick={() => handleSort('totalAmount')}
-              >
-                <div className="flex items-center">
-                  Total Amount
-                  <SortIcon field="totalAmount" />
-                </div>
-              </th>
-              <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                onClick={() => handleSort('employees')}
-              >
-                <div className="flex items-center">
-                  Employees
-                  <SortIcon field="employees" />
-                </div>
-              </th>
-              <th 
-                className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
-                onClick={() => handleSort('status')}
-              >
-                <div className="flex items-center">
-                  Status
-                  <SortIcon field="status" />
-                </div>
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {sortedRuns.map((run) => (
-              <tr key={run.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600 dark:text-blue-400">
-                  {run.id}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                  {run.period}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                  {run.processedDate}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                  {run.totalAmount > 0 ? `$${run.totalAmount.toLocaleString()}` : '-'}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                  {run.employees}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap">
-                  <span className={`px-2.5 py-0.5 rounded-xs text-xs font-medium ${getStatusClass(run.status)}`}>
-                    {run.status}
-                  </span>
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm">
-                  <div className="flex items-center gap-2">
-                    <button 
-                      className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
-                      title="View Details"
-                    >
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    {run.status === 'Completed' && (
-                      <button 
-                        className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
-                        title="Download Reports"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                    )}
+        <div className="min-w-[1000px]">
+          <table className="w-full">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+              <tr className="border-b border-gray-200 dark:border-gray-700">
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                  onClick={() => handleSort('id')}
+                >
+                  <div className="flex items-center">
+                    Payroll ID
+                    <SortIcon field="id" />
                   </div>
-                </td>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                  onClick={() => handleSort('period')}
+                >
+                  <div className="flex items-center">
+                    Period
+                    <SortIcon field="period" />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                  onClick={() => handleSort('processedDate')}
+                >
+                  <div className="flex items-center">
+                    Processed Date
+                    <SortIcon field="processedDate" />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                  onClick={() => handleSort('totalAmount')}
+                >
+                  <div className="flex items-center">
+                    Total Amount
+                    <SortIcon field="totalAmount" />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                  onClick={() => handleSort('employees')}
+                >
+                  <div className="flex items-center">
+                    Employees
+                    <SortIcon field="employees" />
+                  </div>
+                </th>
+                <th
+                  className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider cursor-pointer dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-150"
+                  onClick={() => handleSort('status')}
+                >
+                  <div className="flex items-center">
+                    Status
+                    <SortIcon field="status" />
+                  </div>
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {sortedRuns.map((run) => (
+                <tr key={run.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-blue-600 dark:text-blue-400">
+                    {run.id}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                    {run.period}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                    {run.processedDate}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    {run.totalAmount > 0 ? `$${run.totalAmount.toLocaleString()}` : '-'}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                    {run.employees}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <span className={`px-2.5 py-0.5 rounded-xs text-xs font-medium ${getStatusClass(run.status)}`}>
+                      {run.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
+                        title="View Details"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {run.status === 'Completed' && (
+                        <button
+                          className="p-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50"
+                          title="Download Reports"
+                        >
+                          <Download className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <div className="mt-4 flex items-center justify-between">

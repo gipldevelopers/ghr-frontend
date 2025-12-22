@@ -43,11 +43,11 @@ export default function ReportRenderer({ reportType, dateRange, customDateRange,
 
   useEffect(() => {
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       let reportData;
-      
+
       switch (reportType) {
         case REPORT_TYPES.ATTENDANCE_TREND:
           reportData = mockAttendanceData();
@@ -70,7 +70,7 @@ export default function ReportRenderer({ reportType, dateRange, customDateRange,
         default:
           reportData = [];
       }
-      
+
       setData(reportData);
       setIsLoading(false);
     }, 1000);
@@ -88,8 +88,8 @@ export default function ReportRenderer({ reportType, dateRange, customDateRange,
     switch (reportType) {
       case REPORT_TYPES.ATTENDANCE_TREND:
         return (
-          <AttendanceTrendChart 
-            data={data} 
+          <AttendanceTrendChart
+            data={data}
             chartType={chartType}
             dateRange={dateRange}
             customDateRange={customDateRange}
@@ -120,23 +120,23 @@ export default function ReportRenderer({ reportType, dateRange, customDateRange,
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
           {reportType.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} Report
         </h2>
-        <div className="flex space-x-2">
-          <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
+        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+          <button className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600">
             Print
           </button>
-          <button className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+          <button className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
             Export CSV
           </button>
-          <button className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+          <button className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
             Export PDF
           </button>
         </div>
       </div>
-      
+
       {renderReport()}
     </div>
   );

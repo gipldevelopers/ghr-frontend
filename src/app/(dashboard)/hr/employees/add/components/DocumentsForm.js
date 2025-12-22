@@ -1,272 +1,3 @@
-// "use client";
-// import { Upload, FileText, User, X, Eye, Download, CheckCircle, IdCard, GraduationCap, Check } from 'lucide-react';
-// import { useState } from 'react';
-// import InputField from '@/components/form/input/InputField';
-// import Label from '@/components/form/Label';
-
-// export default function DocumentsForm({ formData, errors, onChange }) {
-//   const [uploadedFiles, setUploadedFiles] = useState({
-//     aadhaarDocument: null, // Changed from aadhaarFront/Back to match backend
-//     panDocument: null,
-//     photo: null,
-//     resume: null,
-//     educationCertificates: []
-//   });
-
-//   const handleFileUpload = (field, file) => {
-//     const reader = new FileReader();
-//     reader.onloadend = () => {
-//       setUploadedFiles(prev => ({
-//         ...prev,
-//         [field]: {
-//           file,
-//           preview: reader.result,
-//           name: file.name,
-//           size: file.size,
-//           type: file.type
-//         }
-//       }));
-//       // Don't send files to main form data - they'll be uploaded separately
-//     };
-//     reader.readAsDataURL(file);
-//   };
-
-//   const removeFile = (field) => {
-//     setUploadedFiles(prev => ({
-//       ...prev,
-//       [field]: null
-//     }));
-//   };
-
-//   const handleEducationCertificateUpload = (files) => {
-//     const newCertificates = Array.from(files).map(file => {
-//       const reader = new FileReader();
-//       reader.readAsDataURL(file);
-//       return {
-//         file,
-//         name: file.name,
-//         size: file.size,
-//         type: file.type
-//       };
-//     });
-
-//     setUploadedFiles(prev => ({
-//       ...prev,
-//       educationCertificates: [...prev.educationCertificates, ...newCertificates]
-//     }));
-//   };
-
-//   const removeEducationCertificate = (index) => {
-//     const updatedCertificates = uploadedFiles.educationCertificates.filter((_, i) => i !== index);
-//     setUploadedFiles(prev => ({
-//       ...prev,
-//       educationCertificates: updatedCertificates
-//     }));
-//   };
-
-//   const FileUploadField = ({ label, field, accept, required, description }) => (
-//     <div className="space-y-3">
-//       <Label htmlFor={field} required={required}>
-//         {label}
-//       </Label>
-      
-//       {uploadedFiles[field] ? (
-//         <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-//           <div className="flex items-center gap-3">
-//             <FileText className="w-5 h-5 text-green-600 dark:text-green-400" />
-//             <div>
-//               <p className="text-sm font-medium text-green-900 dark:text-green-100">
-//                 {uploadedFiles[field].name}
-//               </p>
-//               <p className="text-xs text-green-700 dark:text-green-300">
-//                 {(uploadedFiles[field].size / 1024 / 1024).toFixed(2)} MB
-//               </p>
-//             </div>
-//           </div>
-//           <div className="flex items-center gap-2">
-//             <button
-//               type="button"
-//               onClick={() => window.open(uploadedFiles[field].preview, '_blank')}
-//               className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-//             >
-//               <Eye className="w-4 h-4" />
-//             </button>
-//             <button
-//               type="button"
-//               onClick={() => removeFile(field)}
-//               className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-//             >
-//               <X className="w-4 h-4" />
-//             </button>
-//           </div>
-//         </div>
-//       ) : (
-//         <label className="flex flex-col items-center justify-center w-full p-6 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 dark:hover:border-blue-600 transition-colors">
-//           <Upload className="w-8 h-8 text-gray-400 mb-2" />
-//           <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-//             Click to upload or drag and drop
-//           </p>
-//           <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-//             {description || 'PDF, JPG, PNG up to 10MB'}
-//           </p>
-//           <input
-//             type="file"
-//             id={field}
-//             className="hidden"
-//             accept={accept}
-//             onChange={(e) => e.target.files[0] && handleFileUpload(field, e.target.files[0])}
-//           />
-//         </label>
-//       )}
-//     </div>
-//   );
-
-//   return (
-//     <div className="space-y-6">
-//       {/* Header */}
-//       <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
-//         <div className="flex items-center gap-3">
-//           <div className="p-2 bg-orange-100 dark:bg-orange-900/30 rounded-lg">
-//             <FileText className="w-6 h-6 text-orange-600 dark:text-orange-400" />
-//           </div>
-//           <div>
-//             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-//               Documents & Verification
-//             </h2>
-//             <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-//               Upload required documents for employee verification
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Government ID Documents */}
-//       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-//         <div className="flex items-center gap-2 mb-6">
-//           <IdCard className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-//           <h3 className="font-medium text-gray-900 dark:text-white">
-//             Government ID Documents
-//           </h3>
-//         </div>
-        
-//         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-//           {/* Aadhaar Number */}
-//           <div className="space-y-2">
-//             <Label htmlFor="aadhaarNumber" required>
-//               Aadhaar Number
-//             </Label>
-//             <InputField
-//               id="aadhaarNumber"
-//               name="aadhaarNumber"
-//               value={formData.aadhaarNumber}
-//               onChange={(e) => onChange('aadhaarNumber', e.target.value.replace(/\D/g, ''))}
-//               placeholder="Enter 12-digit Aadhaar number"
-//               error={errors.aadhaarNumber}
-//               maxLength={12}
-//             />
-//           </div>
-
-//           {/* PAN Number */}
-//           <div className="space-y-2">
-//             <Label htmlFor="panNumber" required>
-//               PAN Number
-//             </Label>
-//             <InputField
-//               id="panNumber"
-//               name="panNumber"
-//               value={formData.panNumber}
-//               onChange={(e) => onChange('panNumber', e.target.value.toUpperCase())}
-//               placeholder="Enter PAN number"
-//               error={errors.panNumber}
-//               maxLength={10}
-//               className="uppercase"
-//             />
-//           </div>
-
-//           {/* Passport Number */}
-//           <div className="space-y-2">
-//             <Label htmlFor="passportNumber">
-//               Passport Number
-//             </Label>
-//             <InputField
-//               id="passportNumber"
-//               name="passportNumber"
-//               value={formData.passportNumber}
-//               onChange={(e) => onChange('passportNumber', e.target.value.toUpperCase())}
-//               placeholder="Enter passport number"
-//               error={errors.passportNumber}
-//               className="uppercase"
-//             />
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Document Uploads */}
-//       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
-//         <div className="flex items-center gap-2 mb-6">
-//           <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-//           <h3 className="font-medium text-gray-900 dark:text-white">
-//             Document Uploads
-//           </h3>
-//         </div>
-        
-//         <div className="grid grid-cols-1 gap-6">
-//           {/* Aadhaar Card */}
-//           <FileUploadField
-//             label="Aadhaar Card"
-//             field="aadhaarDocument"
-//             accept=".pdf,.jpg,.jpeg,.png"
-//             description="Front or back side of Aadhaar card"
-//           />
-
-//           {/* PAN Card */}
-//           <FileUploadField
-//             label="PAN Card"
-//             field="panDocument"
-//             accept=".pdf,.jpg,.jpeg,.png"
-//           />
-
-//           {/* Passport Photo */}
-//           <FileUploadField
-//             label="Passport Photo"
-//             field="photo"
-//             accept=".jpg,.jpeg,.png"
-//             description="Recent passport size photo (2x2 inches)"
-//           />
-
-//           {/* Resume/CV */}
-//           <FileUploadField
-//             label="Resume/CV"
-//             field="resume"
-//             accept=".pdf,.doc,.docx"
-//             description="PDF or Word document"
-//           />
-//         </div>
-//       </div>
-
-//       {/* Info Card */}
-//       <div className="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-xl border border-orange-200 dark:border-orange-800">
-//         <div className="flex items-start gap-3">
-//           <div className="p-1.5 bg-orange-600 rounded-md flex-shrink-0 mt-0.5">
-//             <FileText className="w-4 h-4 text-white" />
-//           </div>
-//           <div>
-//             <p className="text-sm font-medium text-orange-900 dark:text-orange-100">
-//               Document Upload Guidelines
-//             </p>
-//             <ul className="text-xs text-orange-700 dark:text-orange-300 mt-1 space-y-1">
-//               <li>• Documents can be uploaded after employee creation</li>
-//               <li>• Maximum file size: 10MB per document</li>
-//               <li>• Accepted formats: PDF, JPG, JPEG, PNG</li>
-//               <li>• Ensure documents are clear and readable</li>
-//             </ul>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
 "use client";
 import { Upload, FileText, X, Eye, CheckCircle, User, FileCheck } from 'lucide-react';
 import { useState } from 'react';
@@ -328,10 +59,10 @@ export default function DocumentsForm({ formData, errors, onChange, employeeId }
       // This would call your employeeService.uploadDocument method
       // For now, we'll simulate the upload
       console.log('Uploading document:', { type, fileName: file.name });
-      
+
       // Simulate upload delay
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       toast.success(`${type} document uploaded successfully!`);
     } catch (error) {
       console.error('Error uploading document:', error);
@@ -367,7 +98,7 @@ export default function DocumentsForm({ formData, errors, onChange, employeeId }
           type: file.type,
           documentType: 'EDUCATION'
         };
-        
+
         setUploadedFiles(prev => ({
           ...prev,
           education: [...prev.education, educationFile]
@@ -392,7 +123,7 @@ export default function DocumentsForm({ formData, errors, onChange, employeeId }
       <Label htmlFor={field}>
         {label}
       </Label>
-      
+
       {uploadedFiles[field] ? (
         <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
           <div className="flex items-center gap-3">
@@ -481,14 +212,14 @@ export default function DocumentsForm({ formData, errors, onChange, employeeId }
       )}
 
       {/* Document Uploads */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 mb-6">
           <Upload className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <h3 className="font-medium text-gray-900 dark:text-white">
             Required Documents
           </h3>
         </div>
-        
+
         <div className="grid grid-cols-1 gap-6">
           {/* Aadhaar Card */}
           <FileUploadField
@@ -521,7 +252,7 @@ export default function DocumentsForm({ formData, errors, onChange, employeeId }
             <Label htmlFor="educationCertificates">
               Education Certificates (Max 5)
             </Label>
-            
+
             {uploadedFiles.education.length > 0 && (
               <div className="space-y-2">
                 {uploadedFiles.education.map((file, index) => (

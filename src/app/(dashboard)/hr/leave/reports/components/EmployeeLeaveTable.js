@@ -47,14 +47,14 @@ const EmployeeLeaveTable = ({ filters }) => {
     if (sortConfig.key !== columnKey) {
       return <div className="ml-1 flex flex-col"><ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" /><ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" /></div>;
     }
-    return sortConfig.direction === 'asc' ? 
-      <ChevronUp className="ml-1 w-4 h-4 text-blue-500" /> : 
+    return sortConfig.direction === 'asc' ?
+      <ChevronUp className="ml-1 w-4 h-4 text-blue-500" /> :
       <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />;
   };
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           Employee Leave Summary
         </h3>
@@ -86,7 +86,7 @@ const EmployeeLeaveTable = ({ filters }) => {
         <table className="w-full">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort('name')}
               >
@@ -95,7 +95,7 @@ const EmployeeLeaveTable = ({ filters }) => {
                   <SortIcon columnKey="name" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort('department')}
               >
@@ -104,7 +104,7 @@ const EmployeeLeaveTable = ({ filters }) => {
                   <SortIcon columnKey="department" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort('totalLeaves')}
               >
@@ -113,7 +113,7 @@ const EmployeeLeaveTable = ({ filters }) => {
                   <SortIcon columnKey="totalLeaves" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort('usedLeaves')}
               >
@@ -122,7 +122,7 @@ const EmployeeLeaveTable = ({ filters }) => {
                   <SortIcon columnKey="usedLeaves" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort('remainingLeaves')}
               >
@@ -131,7 +131,7 @@ const EmployeeLeaveTable = ({ filters }) => {
                   <SortIcon columnKey="remainingLeaves" />
                 </div>
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer"
                 onClick={() => handleSort('utilization')}
               >
@@ -161,13 +161,12 @@ const EmployeeLeaveTable = ({ filters }) => {
                   {employee.remainingLeaves}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    parseFloat(employee.utilization) > 80 
-                      ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' 
+                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${parseFloat(employee.utilization) > 80
+                      ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                       : parseFloat(employee.utilization) > 60
-                      ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                      : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                  }`}>
+                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                        : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                    }`}>
                     {employee.utilization}
                   </span>
                 </td>

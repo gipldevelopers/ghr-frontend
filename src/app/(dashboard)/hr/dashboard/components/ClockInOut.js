@@ -158,11 +158,10 @@ const ClockInOut = () => {
                 onSelect(opt);
                 setOpen(false);
               }}
-              className={`block w-full text-left px-4 py-2 text-xs ${
-                value === opt
+              className={`block w-full text-left px-4 py-2 text-xs ${value === opt
                   ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
                   : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600"
-              }`}
+                }`}
             >
               {opt}
             </button>
@@ -173,7 +172,7 @@ const ClockInOut = () => {
   );
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-4 sm:p-5 h-full w-full">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-5 h-full w-full">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 pb-4 mb-4 border-b border-gray-100 dark:border-gray-700">
         <h5 className="text-sm sm:text-base font-semibold text-gray-800 dark:text-white">

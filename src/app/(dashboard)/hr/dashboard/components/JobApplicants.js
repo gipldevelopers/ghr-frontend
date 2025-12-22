@@ -44,21 +44,19 @@ const JobApplicants = () => {
                         border border-gray-200 dark:border-gray-700">
           <button
             onClick={() => setActiveTab("openings")}
-            className={`py-1.5 text-xs sm:text-sm font-semibold transition ${
-              activeTab === "openings"
+            className={`py-1.5 text-xs sm:text-sm font-semibold transition ${activeTab === "openings"
                 ? "bg-primary text-white"
                 : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-            }`}
+              }`}
           >
             Openings
           </button>
           <button
             onClick={() => setActiveTab("applicants")}
-            className={`py-1.5 text-xs sm:text-sm font-semibold transition ${
-              activeTab === "applicants"
+            className={`py-1.5 text-xs sm:text-sm font-semibold transition ${activeTab === "applicants"
                 ? "bg-primary text-white"
                 : "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
-            }`}
+              }`}
           >
             Applicants
           </button>
@@ -111,20 +109,20 @@ const JobApplicants = () => {
             {applicants.map((applicant) => (
               <div
                 key={applicant.id}
-                className="flex items-center justify-between gap-3 p-2 
+                className="flex items-center justify-between gap-3 p-2
                            rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   <img
                     src={applicant.avatar}
                     alt={applicant.name}
-                    className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover flex-shrink-0"
                   />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-gray-800 dark:text-white truncate">
+                    <p className="text-xs sm:text-sm font-medium text-gray-800 dark:text-white truncate">
                       {applicant.name}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                    <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate">
                       Exp: {applicant.experience} • {applicant.location}
                     </p>
                   </div>

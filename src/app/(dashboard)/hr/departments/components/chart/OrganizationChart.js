@@ -124,7 +124,7 @@ export default function OrganizationChart() {
 
   const renderNode = (node, depth = 0) => {
     const isExpanded = expandedNodes.has(node.id);
-    
+
     return (
       <div key={node.id} className="flex flex-col items-center">
         <EmployeeNode
@@ -133,9 +133,9 @@ export default function OrganizationChart() {
           isExpanded={isExpanded}
           onToggle={() => toggleNode(node.id)}
         />
-        
+
         {isExpanded && node.reports && node.reports.length > 0 && (
-          <div className="flex justify-center space-x-8 mt-6">
+          <div className="flex justify-center space-x-4 md:space-x-8 mt-6">
             {node.reports.map(report => renderNode(report, depth + 1))}
           </div>
         )}

@@ -11,11 +11,11 @@ export default function AttendanceDashboard() {
 
   // Format date for display
   const formatDate = (date) => {
-    return date.toLocaleDateString('en-US', { 
-      weekday: 'long', 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
@@ -26,18 +26,18 @@ export default function AttendanceDashboard() {
         title="Attendance Dashboard"
         subtitle="Overview of today's attendance statistics and patterns"
         rightContent={
-          <BreadcrumbRightContent 
-            selectedDate={selectedDate} 
-            setSelectedDate={setSelectedDate} 
+          <BreadcrumbRightContent
+            selectedDate={selectedDate}
+            setSelectedDate={setSelectedDate}
           />
         }
       />
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Main Content */}
         <div className="lg:col-span-3 space-y-6">
           {/* Attendance Stats Cards */}
-          <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+          <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
             <AttendanceStatsCards selectedDate={selectedDate} />
           </div>
         </div>

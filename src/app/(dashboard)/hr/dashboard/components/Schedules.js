@@ -60,7 +60,7 @@ const Schedules = () => {
         {schedules.map((schedule) => (
           <div
             key={schedule.id}
-            className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg"
+            className="bg-gray-50 dark:bg-gray-700 p-2 sm:p-3 rounded-lg"
           >
             {/* Badge */}
             <span

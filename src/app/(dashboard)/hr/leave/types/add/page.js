@@ -10,7 +10,7 @@
 //   const handleSave = (formData) => {
 //     // Here you would typically send the data to your API
 //     console.log('Saving leave type:', formData);
-    
+
 //     // For now, just redirect back to the leave types page
 //     router.push('/hr/leave/types');
 //   };
@@ -29,7 +29,7 @@
 //           { name: 'Add Leave Type', href: '#' },
 //         ]}
 //       />
-      
+
 //       <div className="mt-6">
 //         <LeaveTypeForm 
 //           onSave={handleSave}
@@ -50,7 +50,7 @@
 //     <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
 //       {/* Breadcrumb */}
 //       <Breadcrumb rightContent={null} />
-      
+
 //       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
 //         <LeaveTypeForm />
 //       </div>
@@ -91,7 +91,7 @@ export default function AddLeaveType() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -100,9 +100,9 @@ export default function AddLeaveType() {
           { name: 'Add Leave Type', href: '#' },
         ]}
       />
-      
+
       <div className="mt-6">
-        <LeaveTypeForm 
+        <LeaveTypeForm
           onSave={handleSave}
           onCancel={handleCancel}
           isSubmitting={isSubmitting}

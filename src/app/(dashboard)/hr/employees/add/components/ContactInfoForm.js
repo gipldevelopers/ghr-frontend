@@ -50,14 +50,14 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
       </div>
 
       {/* Contact Details */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 mb-6">
           <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <h3 className="font-medium text-gray-900 dark:text-white">
             Contact Details
           </h3>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="phone">
@@ -92,14 +92,14 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
       </div>
 
       {/* Address Information */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 mb-6">
           <MapPin className="w-5 h-5 text-blue-600 dark:text-blue-400" />
           <h3 className="font-medium text-gray-900 dark:text-white">
             Address Information
           </h3>
         </div>
-        
+
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="permanentAddress">
@@ -210,14 +210,14 @@ export default function ContactInfoForm({ formData, errors, onChange }) {
       </div>
 
       {/* Emergency Contact */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-4 md:p-6 rounded-xl border border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2 mb-6">
           <PhoneCall className="w-5 h-5 text-red-600 dark:text-red-400" />
           <h3 className="font-medium text-gray-900 dark:text-white">
             Emergency Contact
           </h3>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="emergencyContactName">

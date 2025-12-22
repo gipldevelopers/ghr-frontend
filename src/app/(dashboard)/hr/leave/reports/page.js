@@ -21,7 +21,7 @@ export default function LeaveReports() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
         pages={[
           { name: 'HR', href: '/hr' },
@@ -31,7 +31,7 @@ export default function LeaveReports() {
       />
 
       <LeaveReportsHeader />
-      
+
       <div className="mt-6">
         <ReportFilters filters={filters} onFilterChange={handleFilterChange} />
       </div>

@@ -69,7 +69,7 @@ export default function DesignationView({ params }) {
   if (!designation) {
     return (
       <div className="w-full p-4 sm:p-6">
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 text-center">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             Designation Not Found
           </h2>
@@ -114,7 +114,7 @@ export default function DesignationView({ params }) {
       </div>
 
       {/* Designation Details */}
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           {/* Basic Information Card */}
           <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg">
@@ -137,11 +137,10 @@ export default function DesignationView({ params }) {
               </div>
               <div>
                 <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</span>
-                <span className={`px-2.5 py-0.5 rounded-xs text-xs font-medium ${
-                  designation.status === 'Active' 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                }`}>
+                <span className={`px-2.5 py-0.5 rounded-xs text-xs font-medium ${designation.status === 'Active'
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                  : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                  }`}>
                   {designation.status}
                 </span>
               </div>

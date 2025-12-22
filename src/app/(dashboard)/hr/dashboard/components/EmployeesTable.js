@@ -97,7 +97,7 @@ const EmployeesTable = () => {
             {employees.map((employee) => (
               <tr key={employee.id}>
                 {/* Name */}
-                <td className="px-4 py-3">
+                <td className="px-3 py-2 sm:px-4 sm:py-3">
                   <div className="flex items-center gap-3 min-w-0">
                     <img
                       src={employee.avatar}
@@ -116,7 +116,7 @@ const EmployeesTable = () => {
                 </td>
 
                 {/* Department */}
-                <td className="px-4 py-3">
+                <td className="px-3 py-2 sm:px-4 sm:py-3">
                   <span
                     className={`inline-flex px-2 py-1 text-[10px] font-semibold rounded-sm whitespace-nowrap ${employee.badgeColor}`}
                   >

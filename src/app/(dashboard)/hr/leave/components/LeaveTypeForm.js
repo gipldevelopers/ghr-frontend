@@ -326,7 +326,7 @@ const LeaveTypeForm = ({ initialData = null, onSave, onCancel, isSubmitting = fa
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <button
             onClick={onCancel}
@@ -347,7 +347,7 @@ const LeaveTypeForm = ({ initialData = null, onSave, onCancel, isSubmitting = fa
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Name */}
           <div className="col-span-2">
@@ -598,7 +598,7 @@ const LeaveTypeForm = ({ initialData = null, onSave, onCancel, isSubmitting = fa
             disabled={isSubmitting}
             className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {isSubmitting 
+            {isSubmitting
               ? (isEdit ? 'Saving...' : 'Creating...')
               : (isEdit ? 'Save Changes' : 'Create Leave Type')
             }

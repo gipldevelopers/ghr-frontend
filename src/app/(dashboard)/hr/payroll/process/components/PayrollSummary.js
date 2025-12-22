@@ -4,11 +4,11 @@ import { IndianRupee, Calendar, Users, CheckCircle, ArrowLeft } from 'lucide-rea
 
 export default function PayrollSummary({ payrollData, selectedEmployees, onProcess, onBack }) {
   const totalAmount = selectedEmployees.reduce((sum, emp) => sum + emp.total, 0);
-  
+
   return (
     <div>
       <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">Review Payroll</h2>
-      
+
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
@@ -24,7 +24,7 @@ export default function PayrollSummary({ payrollData, selectedEmployees, onProce
             </div>
           </div>
         </div>
-        
+
         <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 dark:bg-green-800/30 rounded-lg mr-4">
@@ -38,7 +38,7 @@ export default function PayrollSummary({ payrollData, selectedEmployees, onProce
             </div>
           </div>
         </div>
-        
+
         <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
           <div className="flex items-center">
             <div className="p-2 bg-purple-100 dark:bg-purple-800/30 rounded-lg mr-4">
@@ -53,7 +53,7 @@ export default function PayrollSummary({ payrollData, selectedEmployees, onProce
           </div>
         </div>
       </div>
-      
+
       {/* Employee List */}
       <div className="mb-8">
         <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4">Employees in this Payroll</h3>
@@ -76,7 +76,7 @@ export default function PayrollSummary({ payrollData, selectedEmployees, onProce
           </div>
         </div>
       </div>
-      
+
       {/* Notes */}
       {payrollData.notes && (
         <div className="mb-8">
@@ -86,19 +86,19 @@ export default function PayrollSummary({ payrollData, selectedEmployees, onProce
           </div>
         </div>
       )}
-      
+
       {/* Action Buttons */}
-      <div className="flex justify-between pt-4">
+      <div className="flex flex-col-reverse sm:flex-row justify-between pt-4 gap-3 sm:gap-0">
         <button
           onClick={onBack}
-          className="inline-flex items-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 text-gray-800 hover:bg-gray-300 transition dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-200 px-5 py-2.5 text-gray-800 hover:bg-gray-300 transition dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600 w-full sm:w-auto"
         >
           <ArrowLeft size={18} />
           Back
         </button>
         <button
           onClick={onProcess}
-          className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-white hover:bg-green-700 transition"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-5 py-2.5 text-white hover:bg-green-700 transition w-full sm:w-auto"
         >
           <CheckCircle size={18} />
           Process Payroll

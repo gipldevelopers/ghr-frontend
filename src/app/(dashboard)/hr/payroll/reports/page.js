@@ -30,7 +30,7 @@ export default function PayrollReports() {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       {/* Breadcrumb */}
       <Breadcrumb
         pageTitle="Payroll Reports"
@@ -53,7 +53,7 @@ export default function PayrollReports() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
               <div className="flex items-center">
                 <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg mr-4">
@@ -65,7 +65,7 @@ export default function PayrollReports() {
                 </div>
               </div>
             </div>
-            
+
             <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
               <div className="flex items-center">
                 <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-lg mr-4">
@@ -80,18 +80,18 @@ export default function PayrollReports() {
           </div>
 
           {/* Report Filters */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-            <div className="flex items-center justify-between mb-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4 sm:gap-0">
               <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Generate Report</h2>
-              <button 
+              <button
                 onClick={handleGenerateReport}
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition w-full sm:w-auto justify-center"
               >
                 <BarChart3 size={18} />
                 Generate Report
               </button>
             </div>
-            
+
             <ReportFilters
               selectedReportType={selectedReportType}
               setSelectedReportType={setSelectedReportType}
@@ -108,7 +108,7 @@ export default function PayrollReports() {
 
         {/* Charts and Visualizations */}
         <div className="space-y-6">
-          <ReportChart 
+          <ReportChart
             title="Payroll Distribution"
             type="doughnut"
             data={{
@@ -121,8 +121,8 @@ export default function PayrollReports() {
               }]
             }}
           />
-          
-          <ReportChart 
+
+          <ReportChart
             title="Monthly Payroll Trend"
             type="line"
             data={{

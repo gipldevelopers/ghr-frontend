@@ -182,14 +182,14 @@
 //                 <Clock className="w-4 h-4 mr-2" />
 //                 <span>{leaveType.limitDays} days per year</span>
 //               </div>
-              
+
 //               {leaveType.requireAttachment && (
 //                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
 //                   <FileText className="w-4 h-4 mr-2" />
 //                   <span>Documentation required</span>
 //                 </div>
 //               )}
-              
+
 //               {leaveType.isEncashable && (
 //                 <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
 //                   <IndianRupee className="w-4 h-4 mr-2" />
@@ -418,7 +418,7 @@ export default function LeaveTypes() {
 
   const confirmDelete = async () => {
     if (!selectedType) return;
-    
+
     setDeleting(true);
     try {
       await leaveTypeService.deleteLeaveType(selectedType.id);
@@ -456,7 +456,7 @@ export default function LeaveTypes() {
             </Link>
           }
         />
-        
+
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
@@ -465,7 +465,7 @@ export default function LeaveTypes() {
   }
 
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       {/* Breadcrumb with Add Leave Type button */}
       <Breadcrumb
         pages={[
@@ -524,22 +524,20 @@ export default function LeaveTypes() {
                     {leaveType.name}
                   </h3>
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  leaveType.isDeductible 
-                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${leaveType.isDeductible
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                }`}>
+                  }`}>
                   {leaveType.isDeductible ? 'Deductible' : 'Non-deductible'}
                 </span>
               </div>
 
               {/* Status Badge */}
               <div className="mb-4">
-                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  leaveType.isActive
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${leaveType.isActive
                     ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
                     : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-                }`}>
+                  }`}>
                   {leaveType.isActive ? 'Active' : 'Inactive'}
                 </span>
               </div>
@@ -550,14 +548,14 @@ export default function LeaveTypes() {
                   <Clock className="w-4 h-4 mr-2" />
                   <span>{leaveType.limitDays || 0} days per year</span>
                 </div>
-                
+
                 {leaveType.requiresAttachment && (
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <FileText className="w-4 h-4 mr-2" />
                     <span>Documentation required</span>
                   </div>
                 )}
-                
+
                 {leaveType.isEncashable && (
                   <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
                     <IndianRupee className="w-4 h-4 mr-2" />

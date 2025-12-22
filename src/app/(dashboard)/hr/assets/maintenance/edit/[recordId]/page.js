@@ -10,7 +10,7 @@ export default function EditMaintenanceRecord() {
   const router = useRouter();
   const params = useParams();
   const recordId = params.recordId;
-  
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [assets, setAssets] = useState([]);
@@ -35,7 +35,7 @@ export default function EditMaintenanceRecord() {
       { id: 'AST-005', name: 'MacBook Pro 16"', category: 'Laptop' },
       { id: 'AST-006', name: 'Dell Monitor 27"', category: 'Monitor' }
     ];
-    
+
     const mockRecord = {
       id: recordId,
       assetId: 'AST-001',
@@ -47,7 +47,7 @@ export default function EditMaintenanceRecord() {
       nextMaintenanceDate: '2024-03-05',
       status: 'scheduled'
     };
-    
+
     setAssets(mockAssets);
     setFormData(mockRecord);
     setLoading(false);
@@ -56,10 +56,10 @@ export default function EditMaintenanceRecord() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    
+
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     // In real app, submit to API
     console.log('Maintenance record updated:', formData);
     router.push('/hr/assets/maintenance');
@@ -101,7 +101,7 @@ export default function EditMaintenanceRecord() {
       />
 
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Maintenance Record</h1>
 
           <form onSubmit={handleSubmit} className="space-y-6">
