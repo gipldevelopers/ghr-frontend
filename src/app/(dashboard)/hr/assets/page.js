@@ -1,15 +1,17 @@
 // src/app/(dashboard)/hr/assets/page.js
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Download, MoreHorizontal, Eye, Edit, Trash2, QrCode } from 'lucide-react';
+import { Plus, Download } from 'lucide-react';
 import AssetTable from './components/AssetTable';
 import AssetStats from './components/AssetStats';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
+import { assetService } from '../../../../services/asset.service';
 
 export default function AssetInventory() {
   const [assets, setAssets] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
   const [filters, setFilters] = useState({
     status: 'all',
     category: 'all',
@@ -18,79 +20,59 @@ export default function AssetInventory() {
   });
 
   useEffect(() => {
-    // Mock data - in real app, fetch from API
-    const mockAssets = [
-      {
-        id: 'AST-001',
-        name: 'Dell Latitude 5420',
-        category: 'Laptop',
-        serialNumber: 'DL5420X12345',
-        model: 'Latitude 5420',
-        manufacturer: 'Dell',
-        purchaseDate: '2023-01-15',
-        purchaseCost: 1200,
-        currentValue: 850,
-        status: 'assigned',
-        condition: 'excellent',
-        location: 'New York Office',
-        assignedTo: 'Emp-010',
-        assignmentDate: '2023-01-20',
-        warrantyExpiry: '2025-01-14',
-        maintenanceSchedule: 'quarterly',
-        notes: '15.6" FHD Display, 16GB RAM, 512GB SSD',
-        createdAt: '2023-01-15',
-        updatedAt: '2023-01-20'
-      },
-      {
-        id: 'AST-002',
-        name: 'iPhone 13 Pro',
-        category: 'Mobile Phone',
-        serialNumber: 'IP13P67890',
-        model: 'iPhone 13 Pro',
-        manufacturer: 'Apple',
-        purchaseDate: '2023-02-10',
-        purchaseCost: 999,
-        currentValue: 750,
-        status: 'assigned',
-        condition: 'good',
-        location: 'New York Office',
-        assignedTo: 'Emp-011',
-        assignmentDate: '2023-02-15',
-        warrantyExpiry: '2024-02-09',
-        maintenanceSchedule: 'yearly',
-        notes: '128GB, Sierra Blue',
-        createdAt: '2023-02-10',
-        updatedAt: '2023-02-15'
-      },
-      {
-        id: 'AST-003',
-        name: 'Ergonomic Chair',
-        category: 'Furniture',
-        serialNumber: 'ERGCHAIR456',
-        model: 'ErgoComfort Pro',
-        manufacturer: 'Herman Miller',
-        purchaseDate: '2023-03-01',
-        purchaseCost: 450,
-        currentValue: 380,
-        status: 'available',
-        condition: 'excellent',
-        location: 'Warehouse',
-        warrantyExpiry: '2026-03-01',
-        maintenanceSchedule: 'yearly',
-        notes: 'Adjustable height and lumbar support',
-        createdAt: '2023-03-01',
-        updatedAt: '2023-03-01'
+    const fetchAssets = async () => {
+      setLoading(true);
+      try {
+        const response = await assetService.getAllAssets();
+
+        // backend → frontend mapping
+        const formattedAssets = response.data.assets.map(asset => ({
+          id: asset.id,
+          name: asset.name,
+          category: asset.category,
+          serialNumber: asset.serialNumber,
+          model: asset.model,
+          manufacturer: asset.manufacturer,
+          purchaseDate: asset.purchaseDate,
+          purchaseCost: asset.purchaseCost,
+          currentValue: asset.currentValue,
+          status: asset.status.toLowerCase(), // IMPORTANT
+          condition: asset.condition.toLowerCase(),
+          location: asset.location,
+          warrantyExpiry: asset.warrantyExpiry,
+          maintenanceSchedule: asset.maintenanceSchedule,
+          notes: asset.notes,
+          assignedTo: asset.assignedTo,
+          createdAt: asset.createdAt,
+          updatedAt: asset.updatedAt
+        }));
+
+        setAssets(formattedAssets);
+      } catch (error) {
+        console.error("Fetch assets error:", error.message);
+        alert(error.message);
+      } finally {
+        setLoading(false);
       }
-    ];
-    setAssets(mockAssets);
-    setLoading(false);
+    };
+
+    fetchAssets();
   }, []);
 
-  const handleDeleteAsset = (assetId) => {
-    if (confirm('Are you sure you want to delete this asset?')) {
-      setAssets(assets.filter(asset => asset.id !== assetId));
-    }
-  };
+
+  const handleDeleteAsset = async (assetId) => {
+  if (!confirm("Are you sure you want to delete this asset?")) return;
+
+  try {
+    setDeletingId(assetId);
+    await assetService.deleteAsset(assetId);
+    setAssets((prev) => prev.filter((a) => a.id !== assetId));
+  } catch (err) {
+    alert(err.message);
+  } finally {
+    setDeletingId(null);
+  }
+};
 
   const filteredAssets = assets.filter(asset => {
     if (filters.status !== 'all' && asset.status !== filters.status) return false;
@@ -118,13 +100,14 @@ export default function AssetInventory() {
         }
       />
 
-      <AssetStats assets={assets} />
+      <AssetStats />
       <AssetTable
         assets={filteredAssets}
         loading={loading}
         filters={filters}
         onFilterChange={setFilters}
         onDeleteAsset={handleDeleteAsset}
+        deletingId={deletingId}
       />
     </div>
   );

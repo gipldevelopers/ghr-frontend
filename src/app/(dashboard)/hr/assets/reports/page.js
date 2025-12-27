@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { Download, Filter, BarChart3, PieChart, TrendingUp, Calendar, DollarSign, Package } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import dynamic from 'next/dynamic';
+import { assetService } from '../../../../../services/asset.service';
+import { toast } from 'react-hot-toast';
 
 // Dynamically import chart components (to avoid SSR issues)
 const InventoryCharts = dynamic(() => import('./components/InventoryCharts'), { ssr: false });
@@ -19,113 +21,7 @@ export default function AssetReports() {
   const [activeReport, setActiveReport] = useState('inventory');
   const [dateRange, setDateRange] = useState([]);
   const [reportData, setReportData] = useState(null);
-
-  useEffect(() => {
-    // Simulate API call to fetch report data
-    const fetchReportData = async () => {
-      setLoading(true);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Mock data based on report type
-      const mockData = {
-        inventory: {
-          title: "Asset Inventory Report",
-          description: "Complete inventory of all company assets",
-          data: {
-            totalAssets: 245,
-            totalValue: 187500,
-            byCategory: [
-              { category: 'Laptops', count: 45, value: 67500 },
-              { category: 'Mobile Phones', count: 32, value: 24000 },
-              { category: 'Furniture', count: 120, value: 45000 },
-              { category: 'Monitors', count: 28, value: 28000 },
-              { category: 'Servers', count: 8, value: 16000 },
-              { category: 'Other', count: 12, value: 7000 }
-            ],
-            byStatus: [
-              { status: 'Assigned', count: 180, value: 135000 },
-              { status: 'Available', count: 45, value: 33750 },
-              { status: 'Maintenance', count: 15, value: 11250 },
-              { status: 'Retired', count: 5, value: 7500 }
-            ]
-          }
-        },
-        maintenance: {
-          title: "Maintenance Cost Report",
-          description: "Analysis of maintenance costs by category and time period",
-          data: {
-            totalCost: 5250,
-            averageCost: 175,
-            byCategory: [
-              { category: 'Laptops', cost: 2250, count: 15 },
-              { category: 'Mobile Phones', cost: 1200, count: 8 },
-              { category: 'Servers', cost: 1000, count: 2 },
-              { category: 'Other', cost: 800, count: 5 }
-            ],
-            byMonth: [
-              { month: 'Jan', cost: 850 },
-              { month: 'Feb', cost: 720 },
-              { month: 'Mar', cost: 630 },
-              { month: 'Apr', cost: 920 },
-              { month: 'May', cost: 780 },
-              { month: 'Jun', cost: 650 },
-              { month: 'Jul', cost: 800 }
-            ]
-          }
-        },
-        depreciation: {
-          title: "Asset Depreciation Report",
-          description: "Depreciation analysis of company assets",
-          data: {
-            totalDepreciation: 56250,
-            byCategory: [
-              { category: 'Laptops', depreciation: 20250, rate: 25 },
-              { category: 'Mobile Phones', depreciation: 9600, rate: 33.33 },
-              { category: 'Furniture', depreciation: 13500, rate: 10 },
-              { category: 'Servers', depreciation: 8000, rate: 20 },
-              { category: 'Other', depreciation: 4900, rate: 15 }
-            ],
-            forecast: [
-              { year: '2023', value: 187500 },
-              { year: '2024', value: 131250 },
-              { year: '2025', value: 91875 },
-              { year: '2026', value: 64313 }
-            ]
-          }
-        },
-        assignments: {
-          title: "Assignment History Report",
-          description: "Historical analysis of asset assignments and returns",
-          data: {
-            totalAssignments: 210,
-            activeAssignments: 180,
-            byDepartment: [
-              { department: 'Engineering', count: 65 },
-              { department: 'Sales', count: 42 },
-              { department: 'Marketing', count: 28 },
-              { department: 'HR', count: 25 },
-              { department: 'Finance', count: 20 },
-              { department: 'Operations', count: 30 }
-            ],
-            byMonth: [
-              { month: 'Jan', assignments: 25, returns: 18 },
-              { month: 'Feb', assignments: 32, returns: 22 },
-              { month: 'Mar', assignments: 28, returns: 25 },
-              { month: 'Apr', assignments: 35, returns: 28 },
-              { month: 'May', assignments: 40, returns: 32 },
-              { month: 'Jun', assignments: 30, returns: 25 },
-              { month: 'Jul', assignments: 20, returns: 15 }
-            ]
-          }
-        }
-      };
-
-      setReportData(mockData[activeReport]);
-      setLoading(false);
-    };
-
-    fetchReportData();
-  }, [activeReport]);
+  const [error, setError] = useState(null);
 
   const reports = [
     {
@@ -154,17 +50,142 @@ export default function AssetReports() {
     }
   ];
 
-  const handleGenerateReport = () => {
-    // In a real app, this would generate the report based on filters
-    console.log('Generating report with filters:', { activeReport, dateRange });
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1000);
+  // Function to fetch report data from API
+  const fetchReportData = async (type = activeReport, forceRefresh = false) => {
+    try {
+      if (!forceRefresh && reportData && reportData.title) {
+        return; // Don't fetch if we already have data for this report
+      }
+
+      setLoading(true);
+      setError(null);
+
+      const params = {};
+
+      // Add date range to params if available
+      if (dateRange.length === 2 && (type === 'maintenance' || type === 'assignments')) {
+        params.fromDate = dateRange[0].toISOString().split('T')[0];
+        params.toDate = dateRange[1].toISOString().split('T')[0];
+      }
+
+      let response;
+
+      switch (type) {
+        case 'inventory':
+          response = await assetService.getAssetInventoryReport(params);
+          break;
+        case 'maintenance':
+          response = await assetService.getMaintenanceCostReport(params);
+          break;
+        case 'depreciation':
+          response = await assetService.getAssetDepreciationReport(params);
+          break;
+        case 'assignments':
+          response = await assetService.getAssetInventoryAssignmentReport(params);
+          break;
+        default:
+          throw new Error(`Invalid report type: ${type}`);
+      }
+
+      if (response.success && response.data) {
+        setReportData(response.data);
+      } else {
+        setError(response.message || `Failed to fetch ${type} report`);
+        // Fallback to mock data if API fails
+        loadMockData(type);
+      }
+    } catch (err) {
+      console.error('Error fetching report:', err);
+      setError('Failed to fetch report data. Please try again.');
+      // Fallback to mock data
+      loadMockData(type);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleExport = (format) => {
-    // In a real app, this would export the report
-    console.log(`Exporting ${activeReport} report as ${format}`);
-    alert(`Exporting ${activeReport} report as ${format.toUpperCase()}`);
+  // Fallback mock data function
+  const loadMockData = (type) => {
+    const mockData = {
+      inventory: {
+        title: "Asset Inventory Report",
+        description: "Complete inventory of all company assets",
+        data: {
+          totalAssets: 0,
+          totalValue: 0,
+          byCategory: [],
+          byStatus: []
+        }
+      },
+      maintenance: {
+        title: "Maintenance Cost Report",
+        description: "Analysis of maintenance costs by category and time period",
+        data: {
+          totalCost: 0,
+          averageCost: 0,
+          byCategory: [],
+          byMonth: []
+        }
+      },
+      depreciation: {
+        title: "Asset Depreciation Report",
+        description: "Depreciation analysis of company assets",
+        data: {
+          totalDepreciation: 0,
+          currentValue: 0,
+          avgDepreciationRate: 0,
+          byCategory: [],
+          forecast: []
+        }
+      },
+      assignments: {
+        title: "Assignment History Report",
+        description: "Historical analysis of asset assignments and returns",
+        data: {
+          totalAssignments: 0,
+          activeAssignments: 0,
+          byDepartment: [],
+          byMonth: []
+        }
+      }
+    };
+
+    setReportData(mockData[type]);
+  };
+
+  useEffect(() => {
+    fetchReportData(activeReport, true);
+  }, [activeReport]);
+
+  const handleGenerateReport = async () => {
+    await fetchReportData(activeReport, true);
+    toast.success('Report generated successfully');
+  };
+
+  const handleExport = async (format) => {
+    try {
+      const params = {};
+
+      // Add date range to params if available
+      if (dateRange.length === 2 && (activeReport === 'maintenance' || activeReport === 'assignments')) {
+        params.fromDate = dateRange[0].toISOString().split('T')[0];
+        params.toDate = dateRange[1].toISOString().split('T')[0];
+      }
+
+      // In a real implementation, this would export the report
+      // For now, we'll show a toast and log to console
+      toast.success(`Exporting ${activeReport} report as ${format.toUpperCase()}`);
+      console.log(`Exporting ${activeReport} report as ${format}`, params);
+
+      // If you have an export API endpoint, you can call it here:
+      // const response = await assetService.exportReport(activeReport, format, params);
+      // if (response.success && response.data.downloadUrl) {
+      //   window.open(response.data.downloadUrl, '_blank');
+      // }
+    } catch (err) {
+      console.error('Error exporting report:', err);
+      toast.error('Failed to export report');
+    }
   };
 
   const renderCharts = () => {
@@ -186,11 +207,39 @@ export default function AssetReports() {
 
   // Add safe access functions
   const getSafeValue = (value) => {
-    return value ? value.toLocaleString() : '0';
+    if (value === undefined || value === null) return '0';
+    return value.toLocaleString('en-IN', {
+      maximumFractionDigits: 0
+    });
   };
 
   const getSafeNumber = (value) => {
     return value || 0;
+  };
+
+  const getCurrencyValue = (value) => {
+    if (value === undefined || value === null) return '$0';
+    return `$${value.toLocaleString('en-IN', {
+      maximumFractionDigits: 2
+    })}`;
+  };
+
+  // Calculate average value for inventory
+  const getAverageValue = () => {
+    if (!reportData?.data) return 0;
+    const totalAssets = getSafeNumber(reportData.data.totalAssets);
+    const totalValue = getSafeNumber(reportData.data.totalValue);
+    return totalAssets > 0 ? Math.round(totalValue / totalAssets) : 0;
+  };
+
+  // Calculate return rate for assignments
+  const getReturnRate = () => {
+    if (!reportData?.data) return 0;
+    const totalAssignments = getSafeNumber(reportData.data.totalAssignments);
+    const activeAssignments = getSafeNumber(reportData.data.activeAssignments);
+    return totalAssignments > 0
+      ? Math.round(((totalAssignments - activeAssignments) / totalAssignments) * 100)
+      : 0;
   };
 
   if (loading && !reportData) {
@@ -227,6 +276,21 @@ export default function AssetReports() {
         }
       />
 
+      {/* Error Message */}
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">
+          <div className="flex items-center">
+            <span>{error}</span>
+            <button
+              onClick={() => fetchReportData(activeReport, true)}
+              className="ml-auto text-sm font-medium hover:underline"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Report Selection Sidebar */}
         <div className="lg:col-span-1">
@@ -238,7 +302,10 @@ export default function AssetReports() {
                 return (
                   <button
                     key={report.id}
-                    onClick={() => setActiveReport(report.id)}
+                    onClick={() => {
+                      setActiveReport(report.id);
+                      setReportData(null); // Clear data to show loading for new report
+                    }}
                     className={`w-full text-left p-4 rounded-lg transition-colors ${activeReport === report.id
                       ? 'bg-blue-50 border border-blue-200 text-blue-700 dark:bg-blue-900/20 dark:border-blue-800 dark:text-blue-300'
                       : 'bg-gray-50 border border-gray-200 text-gray-700 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-600'
@@ -261,15 +328,15 @@ export default function AssetReports() {
         {/* Report Content */}
         <div className="lg:col-span-3">
           <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6">
-            {reportData && reportData.data && (
+            {reportData && (
               <>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0 mb-6">
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {reportData.title}
+                      {reportData.title || 'Asset Reports'}
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400">
-                      {reportData.description}
+                      {reportData.description || 'Select a report type to view details'}
                     </p>
                   </div>
                 </div>
@@ -278,19 +345,24 @@ export default function AssetReports() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      Date Range
+                      Date Range {['maintenance', 'assignments'].includes(activeReport) ? '(Optional)' : ''}
                     </label>
                     <DateRangePicker
                       value={dateRange}
                       onChange={setDateRange}
                       placeholder="Select date range for report"
                     />
+                    {!['maintenance', 'assignments'].includes(activeReport) && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        Date range is not applicable for this report type
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-end">
                     <button
                       onClick={handleGenerateReport}
                       disabled={loading}
-                      className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Filter className="w-4 h-4 mr-2" />
                       {loading ? 'Generating...' : 'Generate Report'}
@@ -307,19 +379,19 @@ export default function AssetReports() {
                         <div className="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
                           <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">Total Assets</h3>
                           <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                            {getSafeNumber(reportData.data.totalAssets)}
+                            {getSafeValue(reportData.data.totalAssets)}
                           </p>
                         </div>
                         <div className="bg-green-50 rounded-lg p-4 dark:bg-green-900/20">
                           <h3 className="text-sm font-medium text-green-800 dark:text-green-300">Total Value</h3>
                           <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                            ${getSafeValue(reportData.data.totalValue)}
+                            {getCurrencyValue(reportData.data.totalValue)}
                           </p>
                         </div>
                         <div className="bg-purple-50 rounded-lg p-4 dark:bg-purple-900/20">
                           <h3 className="text-sm font-medium text-purple-800 dark:text-purple-300">Avg. Value</h3>
                           <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                            ${getSafeValue(Math.round(reportData.data.totalValue / reportData.data.totalAssets))}
+                            {getCurrencyValue(getAverageValue())}
                           </p>
                         </div>
                       </>
@@ -329,19 +401,19 @@ export default function AssetReports() {
                         <div className="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
                           <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">Total Cost</h3>
                           <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                            ${getSafeValue(reportData.data.totalCost)}
+                            {getCurrencyValue(reportData.data.totalCost)}
                           </p>
                         </div>
                         <div className="bg-green-50 rounded-lg p-4 dark:bg-green-900/20">
                           <h3 className="text-sm font-medium text-green-800 dark:text-green-300">Average Cost</h3>
                           <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                            ${getSafeValue(reportData.data.averageCost)}
+                            {getCurrencyValue(reportData.data.averageCost)}
                           </p>
                         </div>
                         <div className="bg-purple-50 rounded-lg p-4 dark:bg-purple-900/20">
                           <h3 className="text-sm font-medium text-purple-800 dark:text-purple-300">Maintenance Events</h3>
                           <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                            {getSafeNumber(reportData.data.byCategory?.reduce((sum, item) => sum + item.count, 0))}
+                            {getSafeValue(reportData.data.maintenanceEvents)}
                           </p>
                         </div>
                       </>
@@ -351,19 +423,19 @@ export default function AssetReports() {
                         <div className="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
                           <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">Total Depreciation</h3>
                           <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                            ${getSafeValue(reportData.data.totalDepreciation)}
+                            {getCurrencyValue(reportData.data.totalDepreciation)}
                           </p>
                         </div>
                         <div className="bg-green-50 rounded-lg p-4 dark:bg-green-900/20">
                           <h3 className="text-sm font-medium text-green-800 dark:text-green-300">Current Value</h3>
                           <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                            ${getSafeValue(187500 - reportData.data.totalDepreciation)}
+                            {getCurrencyValue(reportData.data.currentValue)}
                           </p>
                         </div>
                         <div className="bg-purple-50 rounded-lg p-4 dark:bg-purple-900/20">
                           <h3 className="text-sm font-medium text-purple-800 dark:text-purple-300">Avg. Depreciation Rate</h3>
                           <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                            {Math.round(reportData.data.byCategory?.reduce((sum, item) => sum + item.rate, 0) / (reportData.data.byCategory?.length || 1)) || 0}%
+                            {getSafeNumber(reportData.data.avgDepreciationRate)}%
                           </p>
                         </div>
                       </>
@@ -373,26 +445,26 @@ export default function AssetReports() {
                         <div className="bg-blue-50 rounded-lg p-4 dark:bg-blue-900/20">
                           <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300">Total Assignments</h3>
                           <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">
-                            {getSafeNumber(reportData.data.totalAssignments)}
+                            {getSafeValue(reportData.data.totalAssignments)}
                           </p>
                         </div>
                         <div className="bg-green-50 rounded-lg p-4 dark:bg-green-900/20">
                           <h3 className="text-sm font-medium text-green-800 dark:text-green-300">Active Assignments</h3>
                           <p className="text-2xl font-bold text-green-900 dark:text-green-100">
-                            {getSafeNumber(reportData.data.activeAssignments)}
+                            {getSafeValue(reportData.data.activeAssignments)}
                           </p>
                         </div>
                         <div className="bg-purple-50 rounded-lg p-4 dark:bg-purple-900/20">
                           <h3 className="text-sm font-medium text-purple-800 dark:text-purple-300">Return Rate</h3>
                           <p className="text-2xl font-bold text-purple-900 dark:text-purple-100">
-                            {Math.round((getSafeNumber(reportData.data.totalAssignments) - getSafeNumber(reportData.data.activeAssignments)) / getSafeNumber(reportData.data.totalAssignments) * 100) || 0}%
+                            {getSafeNumber(reportData.data.returnRate)}%
                           </p>
                         </div>
                       </>
                     )}
                   </div>
 
-                  {/* Charts Section - Replaced placeholder with actual charts */}
+                  {/* Charts Section */}
                   {renderCharts()}
 
                   {/* Data Tables */}
@@ -409,13 +481,19 @@ export default function AssetReports() {
                         <thead>
                           <tr>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                              Category
+                              {activeReport === 'inventory' ? 'Category' :
+                                activeReport === 'maintenance' ? 'Category' :
+                                  activeReport === 'depreciation' ? 'Category' : 'Department'}
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                              {activeReport === 'inventory' ? 'Count' : activeReport === 'maintenance' ? 'Cost' : activeReport === 'depreciation' ? 'Depreciation' : 'Count'}
+                              {activeReport === 'inventory' ? 'Count' :
+                                activeReport === 'maintenance' ? 'Cost' :
+                                  activeReport === 'depreciation' ? 'Depreciation' : 'Count'}
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
-                              {activeReport === 'inventory' ? 'Value' : activeReport === 'maintenance' ? 'Events' : activeReport === 'depreciation' ? 'Rate' : 'Percentage'}
+                              {activeReport === 'inventory' ? 'Value' :
+                                activeReport === 'maintenance' ? 'Events' :
+                                  activeReport === 'depreciation' ? 'Rate' : 'Percentage'}
                             </th>
                             <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">
                               Percentage
@@ -427,26 +505,26 @@ export default function AssetReports() {
                             <tr key={index}>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.category}</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.count}</td>
-                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">${getSafeValue(item.value)}</td>
+                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{getCurrencyValue(item.value)}</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                {Math.round(item.count / getSafeNumber(reportData.data.totalAssets) * 100)}%
+                                {item.percentage || Math.round(item.count / getSafeNumber(reportData.data.totalAssets) * 100)}%
                               </td>
                             </tr>
                           ))}
                           {activeReport === 'maintenance' && reportData.data.byCategory?.map((item, index) => (
                             <tr key={index}>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.category}</td>
-                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">${getSafeValue(item.cost)}</td>
+                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{getCurrencyValue(item.cost)}</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.count}</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                {Math.round(item.cost / getSafeNumber(reportData.data.totalCost) * 100)}%
+                                {item.percentage || Math.round(item.cost / getSafeNumber(reportData.data.totalCost) * 100)}%
                               </td>
                             </tr>
                           ))}
                           {activeReport === 'depreciation' && reportData.data.byCategory?.map((item, index) => (
                             <tr key={index}>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.category}</td>
-                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">${getSafeValue(item.depreciation)}</td>
+                              <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{getCurrencyValue(item.depreciation)}</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.rate}%</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                 {Math.round(item.depreciation / getSafeNumber(reportData.data.totalDepreciation) * 100)}%
@@ -458,13 +536,15 @@ export default function AssetReports() {
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.department}</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">{item.count}</td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
-                                {Math.round(item.count / getSafeNumber(reportData.data.totalAssignments) * 100)}%
+                                {item.percentage || Math.round(item.count / getSafeNumber(reportData.data.totalAssignments) * 100)}%
                               </td>
                               <td className="px-4 py-3 text-sm text-gray-900 dark:text-white">
                                 <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-gray-700">
                                   <div
                                     className="bg-blue-600 h-2 rounded-full"
-                                    style={{ width: `${Math.round(item.count / getSafeNumber(reportData.data.totalAssignments) * 100)}%` }}
+                                    style={{
+                                      width: `${item.percentage || Math.round(item.count / getSafeNumber(reportData.data.totalAssignments) * 100)}%`
+                                    }}
                                   ></div>
                                 </div>
                               </td>
@@ -473,6 +553,16 @@ export default function AssetReports() {
                         </tbody>
                       </table>
                     </div>
+
+                    {/* Empty State */}
+                    {(activeReport === 'inventory' && (!reportData.data.byCategory || reportData.data.byCategory.length === 0)) ||
+                      (activeReport === 'maintenance' && (!reportData.data.byCategory || reportData.data.byCategory.length === 0)) ||
+                      (activeReport === 'depreciation' && (!reportData.data.byCategory || reportData.data.byCategory.length === 0)) ||
+                      (activeReport === 'assignments' && (!reportData.data.byDepartment || reportData.data.byDepartment.length === 0)) ? (
+                      <div className="text-center py-8">
+                        <p className="text-gray-500 dark:text-gray-400">No data available for this report</p>
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               </>

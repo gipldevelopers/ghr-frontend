@@ -1,6 +1,8 @@
 "use client";
-import { useState } from 'react';
-import { ArrowLeft, X, Calendar, Users, Clock, IndianRupee, FileText, CheckCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, X, Loader2 } from 'lucide-react';
+import leavePolicyService from '../../../../../../services/leavepolicies.service';
+import { toast } from 'sonner';
 
 const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
   const [formData, setFormData] = useState({
@@ -17,8 +19,48 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
     attachmentRequired: initialData?.attachmentRequired ?? false,
     minServicePeriod: initialData?.minServicePeriod || 0,
     maxConsecutiveDays: initialData?.maxConsecutiveDays || 0,
-    advanceNoticeDays: initialData?.advanceNoticeDays || 0
+    advanceNoticeDays: initialData?.advanceNoticeDays || 0,
+    autoApprove: initialData?.autoApprove ?? false,
+    approvalLevels: initialData?.approvalLevels || 1,
+    genderSpecific: initialData?.genderSpecific || 'all',
+    probationApplicable: initialData?.probationApplicable ?? true,
+    policyType: initialData?.policyType || 'leave',
+    leaveTypeIds: initialData?.leaveTypes?.map(lt => lt.id) || [],
+    departmentIds: initialData?.departments?.map(d => d.id) || [],
+    employeeIds: initialData?.employees?.map(e => e.id) || []
   });
+
+  const [loading, setLoading] = useState(false);
+  const [leaveTypes, setLeaveTypes] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [employees, setEmployees] = useState([]);
+
+  useEffect(() => {
+    fetchDropdownData();
+  }, []);
+
+  const fetchDropdownData = async () => {
+    try {
+      const [leaveTypesRes, departmentsRes, employeesRes] = await Promise.all([
+        leavePolicyService.getLeaveTypesDropdown(),
+        leavePolicyService.getDepartmentsDropdown(),
+        leavePolicyService.getEmployeesDropdown()
+      ]);
+
+      if (leaveTypesRes.success) {
+        setLeaveTypes(leaveTypesRes.data);
+      }
+      if (departmentsRes.success) {
+        setDepartments(departmentsRes.data);
+      }
+      if (employeesRes.success) {
+        setEmployees(employeesRes.data);
+      }
+    } catch (error) {
+      console.error('Error fetching dropdown data:', error);
+      toast.error('Failed to load form data');
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -28,9 +70,61 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleMultiSelect = (name, value, isChecked) => {
+    setFormData(prev => {
+      const currentValues = prev[name] || [];
+      let newValues;
+
+      if (isChecked) {
+        newValues = [...currentValues, parseInt(value)];
+      } else {
+        newValues = currentValues.filter(v => v !== parseInt(value));
+      }
+
+      return {
+        ...prev,
+        [name]: newValues
+      };
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSave(formData);
+    setLoading(true);
+
+    try {
+      // Prepare data for API
+      const submitData = {
+        ...formData,
+        maxAccrual: parseInt(formData.maxAccrual),
+        carryOverLimit: parseInt(formData.carryOverLimit),
+        minServicePeriod: parseInt(formData.minServicePeriod),
+        maxConsecutiveDays: formData.maxConsecutiveDays ? parseInt(formData.maxConsecutiveDays) : null,
+        advanceNoticeDays: formData.advanceNoticeDays ? parseInt(formData.advanceNoticeDays) : null,
+        approvalLevels: formData.approvalLevels ? parseInt(formData.approvalLevels) : 1
+      };
+
+      let result;
+      if (initialData) {
+        result = await leavePolicyService.updatePolicy(initialData.id, submitData);
+      } else {
+        result = await leavePolicyService.createPolicy(submitData);
+      }
+
+      if (result.success) {
+        toast.success(result.message);
+        if (onSave) {
+          onSave(result.data);
+        }
+      } else {
+        toast.error(result.message);
+      }
+    } catch (error) {
+      console.error('Error saving policy:', error);
+      toast.error('Failed to save policy');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const applicableToOptions = [
@@ -58,14 +152,22 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
     { value: 'archived', label: 'Archived' }
   ];
 
+  const genderOptions = [
+    { value: 'all', label: 'All Genders' },
+    { value: 'male', label: 'Male Only' },
+    { value: 'female', label: 'Female Only' }
+  ];
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       {/* Header */}
       <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
           <button
+            type="button"
             onClick={onCancel}
             className="mr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
+            disabled={loading}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
@@ -74,8 +176,10 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
           </h3>
         </div>
         <button
+          type="button"
           onClick={onCancel}
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          disabled={loading}
         >
           <X className="w-5 h-5" />
         </button>
@@ -100,6 +204,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -114,6 +219,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
+                disabled={loading}
               />
             </div>
           </div>
@@ -129,6 +235,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Describe the purpose and details of this policy"
+              disabled={loading}
             />
           </div>
 
@@ -141,6 +248,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
               value={formData.status}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              disabled={loading}
             >
               {statusOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -167,6 +275,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
+                disabled={loading}
               >
                 {applicableToOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -187,8 +296,44 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                disabled={loading}
               />
             </div>
+          </div>
+
+          <div className="mt-4">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Gender Specific
+            </label>
+            <select
+              name="genderSpecific"
+              value={formData.genderSpecific}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              disabled={loading}
+            >
+              {genderOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="mt-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="probationApplicable"
+                checked={formData.probationApplicable}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                disabled={loading}
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                Applies to Employees on Probation
+              </span>
+            </label>
           </div>
         </div>
 
@@ -208,6 +353,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
+                disabled={loading}
               >
                 {accrualMethodOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -229,6 +375,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
+                disabled={loading}
               />
             </div>
 
@@ -243,6 +390,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                disabled={loading}
               />
             </div>
           </div>
@@ -259,6 +407,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                disabled={loading}
               />
             </div>
 
@@ -273,8 +422,35 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                disabled={loading}
               />
             </div>
+          </div>
+        </div>
+
+        {/* Leave Types */}
+        <div>
+          <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+            Leave Types
+          </h4>
+          <div className="space-y-2">
+            {leaveTypes.map(leaveType => (
+              <label key={leaveType.id} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.leaveTypeIds.includes(leaveType.id)}
+                  onChange={(e) => handleMultiSelect('leaveTypeIds', leaveType.id, e.target.checked)}
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  disabled={loading}
+                />
+                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                  {leaveType.name}
+                  {leaveType.description && (
+                    <span className="text-gray-500 dark:text-gray-400 ml-1">- {leaveType.description}</span>
+                  )}
+                </span>
+              </label>
+            ))}
           </div>
         </div>
 
@@ -291,6 +467,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.encashment}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                disabled={loading}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Encashment Allowed</span>
             </label>
@@ -302,6 +479,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.requiresApproval}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                disabled={loading}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Requires Approval</span>
             </label>
@@ -313,9 +491,40 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.attachmentRequired}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                disabled={loading}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Attachment Required</span>
             </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="autoApprove"
+                checked={formData.autoApprove}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                disabled={loading}
+              />
+              <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Auto Approve Leave Requests</span>
+            </label>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Approval Levels
+              </label>
+              <input
+                type="number"
+                name="approvalLevels"
+                value={formData.approvalLevels}
+                onChange={handleChange}
+                min="1"
+                max="5"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                disabled={loading}
+              />
+            </div>
           </div>
         </div>
 
@@ -324,14 +533,17 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+            disabled={loading}
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            disabled={loading}
+            className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
+            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
             {initialData ? 'Update Policy' : 'Create Policy'}
           </button>
         </div>

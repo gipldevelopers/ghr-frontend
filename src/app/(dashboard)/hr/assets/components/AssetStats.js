@@ -1,44 +1,51 @@
 // src/app/(dashboard)/hr/assets/components/AssetStats.js
 "use client";
-import { Package, CheckCircle, AlertTriangle, Clock, DollarSign } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Package, CheckCircle, AlertTriangle, DollarSign } from "lucide-react";
+import { assetService } from "../../../../../services/asset.service";
 
-export default function AssetStats({ assets }) {
-  const stats = {
-    total: assets.length,
-    assigned: assets.filter(a => a.status === 'assigned').length,
-    available: assets.filter(a => a.status === 'available').length,
-    maintenance: assets.filter(a => a.status === 'maintenance').length,
-    totalValue: assets.reduce((sum, asset) => sum + asset.currentValue, 0)
-  };
+export default function AssetStats() {
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await assetService.getAssetsStats();
+        setStats(response.data);
+      } catch (error) {
+        console.error("Asset stats error:", error.message);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  if (!stats) return null;
 
   const cardData = [
     {
       title: "Total Assets",
-      value: stats.total,
+      value: stats.totalAssets,
       icon: Package,
-      color: "bg-blue-500",
-      trend: "+12%"
+      color: "bg-blue-500"
     },
     {
-      title: "Assigned Assets",
-      value: stats.assigned,
+      title: "Available Assets",
+      value: stats.byStatus?.available || 0,
       icon: CheckCircle,
-      color: "bg-green-500",
-      trend: "+8%"
+      color: "bg-green-500"
     },
     {
-      title: "Under Maintenance",
-      value: stats.maintenance,
+      title: "Maintenance Due",
+      value: stats.assetsDueForMaintenance,
       icon: AlertTriangle,
-      color: "bg-yellow-500",
-      trend: "+3%"
+      color: "bg-yellow-500"
     },
     {
-      title: "Total Value",
-      value: `$${stats.totalValue.toLocaleString()}`,
+      title: "Total Asset Value",
+      value: `₹${stats.totalValue.toLocaleString()}`,
       icon: DollarSign,
-      color: "bg-purple-500",
-      trend: "+15%"
+      color: "bg-purple-500"
     }
   ];
 
@@ -56,9 +63,6 @@ export default function AssetStats({ assets }) {
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
                   {card.value}
                 </p>
-                <span className="text-xs text-green-600 dark:text-green-400">
-                  {card.trend}
-                </span>
               </div>
               <div className={`${card.color} p-3 rounded-lg`}>
                 <Icon className="w-6 h-6 text-white" />

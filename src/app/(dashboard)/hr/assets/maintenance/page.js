@@ -1,107 +1,120 @@
 // src/app/(dashboard)/hr/assets/maintenance/page.js
 "use client";
 import { useState, useEffect } from 'react';
-import { Plus, Search, Filter, Download, Eye, Edit, Trash2, Calendar, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Plus, Search, Filter, Download, Eye, Edit, Trash2, Calendar, Clock, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
+import { assetService } from '../../../../../services/asset.service';
+import { format } from 'date-fns';
+import MaintenanceStatsCard from './components/MaintenanceStatsCard';
 
 export default function MaintenanceHistory() {
   const [maintenanceRecords, setMaintenanceRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    totalItems: 0,
+    itemsPerPage: 10
+  });
   const [filters, setFilters] = useState({
     status: 'all',
     type: 'all',
     search: ''
   });
 
-  useEffect(() => {
-    // Mock data - in real app, fetch from API
-    const mockRecords = [
-      {
-        id: 'MTN-001',
-        assetId: 'AST-001',
-        assetName: 'Dell Latitude 5420',
-        maintenanceDate: '2023-06-15',
-        maintenanceType: 'preventive',
-        cost: 120,
-        technician: 'Tech Solutions Inc.',
-        description: 'Routine hardware check and cleaning',
-        nextMaintenanceDate: '2023-09-15',
-        status: 'completed',
-        createdAt: '2023-06-15'
-      },
-      {
-        id: 'MTN-002',
-        assetId: 'AST-002',
-        assetName: 'iPhone 13 Pro',
-        maintenanceDate: '2023-07-20',
-        maintenanceType: 'corrective',
-        cost: 85,
-        technician: 'Mobile Repair Center',
-        description: 'Screen replacement',
-        nextMaintenanceDate: '2024-01-20',
-        status: 'completed',
-        createdAt: '2023-07-20'
-      },
-      {
-        id: 'MTN-003',
-        assetId: 'AST-005',
-        assetName: 'MacBook Pro 16"',
-        maintenanceDate: '2023-09-10',
-        maintenanceType: 'preventive',
-        cost: 150,
-        technician: 'Apple Authorized Service',
-        description: 'Battery replacement and system diagnostics',
-        nextMaintenanceDate: '2024-03-10',
-        status: 'completed',
-        createdAt: '2023-09-10'
-      },
-      {
-        id: 'MTN-004',
-        assetId: 'AST-001',
-        assetName: 'Dell Latitude 5420',
-        maintenanceDate: '2023-12-05',
-        maintenanceType: 'preventive',
-        cost: 0,
-        technician: 'Internal IT Team',
-        description: 'Scheduled software update and optimization',
-        nextMaintenanceDate: '2024-03-05',
-        status: 'scheduled',
-        createdAt: '2023-11-20'
+  const fetchMaintenanceRecords = async (page = 1) => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const params = {
+        page,
+        limit: 10,
+        ...(filters.status !== 'all' && { status: filters.status }),
+        ...(filters.type !== 'all' && { maintenanceType: filters.type }),
+        ...(filters.search && { search: filters.search })
+      };
+
+      const response = await assetService.getAllMaintenance(params);
+      
+      if (response.success && response.data) {
+        setMaintenanceRecords(response.data.maintenanceRecords || []);
+        setPagination(response.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalItems: response.data.maintenanceRecords?.length || 0,
+          itemsPerPage: 10
+        });
+      } else {
+        setError(response.message || 'Failed to fetch maintenance records');
       }
-    ];
-    setMaintenanceRecords(mockRecords);
-    setLoading(false);
+    } catch (err) {
+      setError(err.message || 'Failed to fetch maintenance records');
+      console.error('Error fetching maintenance records:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMaintenanceRecords();
   }, []);
 
-  const filteredRecords = maintenanceRecords.filter(record => {
-    if (filters.status !== 'all' && record.status !== filters.status) return false;
-    if (filters.type !== 'all' && record.maintenanceType !== filters.type) return false;
-    if (filters.search &&
-      !record.assetName.toLowerCase().includes(filters.search.toLowerCase()) &&
-      !record.technician.toLowerCase().includes(filters.search.toLowerCase())) return false;
-    return true;
-  });
+  useEffect(() => {
+    // Debounce search to avoid too many API calls
+    const timer = setTimeout(() => {
+      fetchMaintenanceRecords(1);
+    }, 500);
 
-  const handleDeleteRecord = (recordId) => {
-    if (confirm('Are you sure you want to delete this maintenance record?')) {
-      setMaintenanceRecords(maintenanceRecords.filter(record => record.id !== recordId));
+    return () => clearTimeout(timer);
+  }, [filters.search, filters.status, filters.type]);
+
+  const handleDeleteRecord = async (recordId) => {
+    if (!confirm('Are you sure you want to delete this maintenance record?')) {
+      return;
+    }
+
+    try {
+      await assetService.deleteMaintenance(recordId);
+      // Refresh the list after deletion
+      fetchMaintenanceRecords(pagination.currentPage);
+    } catch (err) {
+      alert(err.message || 'Failed to delete maintenance record');
+    }
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pagination.totalPages) {
+      fetchMaintenanceRecords(newPage);
     }
   };
 
   const statusColors = {
     completed: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
     scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-    cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    cancelled: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    in_progress: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
   };
 
   const typeColors = {
     preventive: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
     corrective: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
-    emergency: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+    emergency: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+    routine: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400'
   };
 
-  if (loading) {
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      return format(new Date(dateString), 'MMM dd, yyyy');
+    } catch {
+      return dateString;
+    }
+  };
+
+  if (loading && maintenanceRecords.length === 0) {
     return (
       <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
         <Breadcrumb />
@@ -132,6 +145,24 @@ export default function MaintenanceHistory() {
         }
       />
 
+      {/* Add the MaintenanceStatsCard here */}
+      <MaintenanceStatsCard />
+
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">
+          <div className="flex items-center">
+            <AlertTriangle className="w-5 h-5 mr-2" />
+            <span>{error}</span>
+            <button 
+              onClick={() => fetchMaintenanceRecords(pagination.currentPage)}
+              className="ml-auto text-sm font-medium hover:underline"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         {/* Filters */}
         <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
@@ -157,6 +188,7 @@ export default function MaintenanceHistory() {
                 <option value="all">All Status</option>
                 <option value="completed">Completed</option>
                 <option value="scheduled">Scheduled</option>
+                <option value="in_progress">In Progress</option>
                 <option value="cancelled">Cancelled</option>
               </select>
               <select
@@ -168,6 +200,7 @@ export default function MaintenanceHistory() {
                 <option value="preventive">Preventive</option>
                 <option value="corrective">Corrective</option>
                 <option value="emergency">Emergency</option>
+                <option value="routine">Routine</option>
               </select>
               <button className="w-full px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:bg-gray-600 flex items-center justify-center">
                 <Filter className="w-4 h-4" />
@@ -208,7 +241,7 @@ export default function MaintenanceHistory() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-              {filteredRecords.map((record) => (
+              {maintenanceRecords.map((record) => (
                 <tr key={record.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
@@ -216,37 +249,40 @@ export default function MaintenanceHistory() {
                         {record.assetName}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {record.assetId}
+                        {record.assetSerialNumber}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {record.maintenanceDate}
+                    {formatDate(record.maintenanceDate)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${typeColors[record.maintenanceType]}`}>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${typeColors[record.maintenanceType] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
                       {record.maintenanceType}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {record.technician}
+                    {record.technician || 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    ${record.cost}
+                    {record.cost ? `$${record.cost}` : 'N/A'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                    {record.nextMaintenanceDate}
+                    {formatDate(record.nextMaintenanceDate)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[record.status]}`}>
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[record.status] || 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'}`}>
                       {record.status}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center space-x-2">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+                      <Link
+                        href={`/hr/assets/maintenance/view/${record.id}`}
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
                         <Eye className="w-4 h-4" />
-                      </button>
+                      </Link>
                       <Link
                         href={`/hr/assets/maintenance/edit/${record.id}`}
                         className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
@@ -267,7 +303,16 @@ export default function MaintenanceHistory() {
           </table>
         </div>
 
-        {filteredRecords.length === 0 && (
+        {loading && maintenanceRecords.length > 0 && (
+          <div className="text-center py-4">
+            <div className="inline-flex items-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-sm text-gray-600 dark:text-gray-400">Loading...</span>
+            </div>
+          </div>
+        )}
+
+        {!loading && maintenanceRecords.length === 0 && (
           <div className="text-center py-12">
             <div className="text-gray-400 dark:text-gray-500 mb-4">
               <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -292,22 +337,52 @@ export default function MaintenanceHistory() {
         )}
 
         {/* Pagination */}
-        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-700 dark:text-gray-400">
-              Showing <span className="font-medium">1</span> to <span className="font-medium">{filteredRecords.length}</span> of{' '}
-              <span className="font-medium">{filteredRecords.length}</span> results
-            </div>
-            <div className="flex space-x-2">
-              <button className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                Previous
-              </button>
-              <button className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600">
-                Next
-              </button>
+        {pagination.totalItems > 0 && (
+          <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="text-sm text-gray-700 dark:text-gray-400">
+                Showing{' '}
+                <span className="font-medium">
+                  {(pagination.currentPage - 1) * pagination.itemsPerPage + 1}
+                </span>{' '}
+                to{' '}
+                <span className="font-medium">
+                  {Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)}
+                </span>{' '}
+                of{' '}
+                <span className="font-medium">{pagination.totalItems}</span> results
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={pagination.currentPage === 1}
+                  className={`px-3 py-1 border rounded-md text-sm font-medium ${
+                    pagination.currentPage === 1
+                      ? 'border-gray-300 text-gray-400 cursor-not-allowed dark:border-gray-600 dark:text-gray-500'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Previous
+                </button>
+                <div className="text-sm text-gray-700 dark:text-gray-400">
+                  Page <span className="font-medium">{pagination.currentPage}</span> of{' '}
+                  <span className="font-medium">{pagination.totalPages}</span>
+                </div>
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={pagination.currentPage === pagination.totalPages}
+                  className={`px-3 py-1 border rounded-md text-sm font-medium ${
+                    pagination.currentPage === pagination.totalPages
+                      ? 'border-gray-300 text-gray-400 cursor-not-allowed dark:border-gray-600 dark:text-gray-500'
+                      : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700'
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

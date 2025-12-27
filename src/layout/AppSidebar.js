@@ -240,7 +240,7 @@ const employeeNavItems = [
 const AppSidebar = () => {
   const { user } = useAuth();
   const userRole = user?.systemRole || 'EMPLOYEE';
-  
+
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, toggleMobileSidebar } = useSidebar();
   const pathname = usePathname();
 
@@ -441,14 +441,6 @@ const AppSidebar = () => {
 
   return (
     <>
-      {/* Mobile backdrop overlay */}
-      {isMobileOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={toggleMobileSidebar}
-        />
-      )}
-
       {/* Mobile header toggle button */}
       <button
         onClick={toggleMobileSidebar}

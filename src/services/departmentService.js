@@ -66,6 +66,28 @@ export const departmentService = {
       const errorMessage = error.response?.data?.message || 'Failed to fetch department employees';
       throw new Error(errorMessage);
     }
+  },
+
+  // get department stat's
+  getDepartmentStats: async () => {
+    try {
+      const response = await apiClient.get('/departments/stats');
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch department stats';
+      throw new Error(errorMessage);
+    }
+  },
+
+  // get org chart
+  getOrgChart: async () => {
+    try {
+      const response = await apiClient.get('/departments/get-org-chart');
+      return response.data;
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || 'Failed to fetch organizational chart';
+      throw new Error(errorMessage);
+    }
   }
 };
 

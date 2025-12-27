@@ -14,22 +14,25 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-     const companyId = localStorage.getItem('company_id');
+    const companyId = localStorage.getItem('company_id');
     // const subdomain = localStorage.getItem('company_subdomain');
+
+    // Check if it's a public auth route (no token/company context yet)
+    const publicAuthRoutes = ['/auth/login', '/auth/register', '/auth/company/', '/auth/verify-company'];
+    const isPublicAuthRoute = publicAuthRoutes.some(route => config.url?.includes(route));
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 
-     // Add company ID to EVERY request (except auth routes)
-    const isAuthRoute = config.url?.includes('/auth/');
-    if (companyId && !isAuthRoute) {
+    // Add company ID to requests except public auth routes
+    if (companyId && !isPublicAuthRoute) {
       config.headers['x-company-id'] = companyId;
     }
 
-     // Don't block auth routes without company ID
-     // Block non-auth routes without company context
-    if (!companyId && !isAuthRoute && token) {
+    // Don't block public auth routes without company context
+    // Block other routes without company context if a token is present
+    if (!companyId && !isPublicAuthRoute && token) {
       console.error('Company context missing! Redirecting to login.');
       localStorage.removeItem('token');
       localStorage.removeItem('hrms_user');
@@ -39,10 +42,10 @@ api.interceptors.request.use(
       return Promise.reject(new Error('Company context required'));
     }
 
-      if (config.data instanceof FormData) {
+    if (config.data instanceof FormData) {
       delete config.headers['Content-Type'];
     }
-    
+
     return config;
   },
   (error) => {
@@ -69,16 +72,16 @@ api.interceptors.response.use(
 export const apiClient = {
   // GET request
   get: (url, config = {}) => api.get(url, config),
-  
+
   // POST request  
   post: (url, data, config = {}) => api.post(url, data, config),
-  
+
   // PUT request
   put: (url, data, config = {}) => api.put(url, data, config),
-  
+
   // DELETE request
   delete: (url, config = {}) => api.delete(url, config),
-  
+
   // PATCH request
   patch: (url, data, config = {}) => api.patch(url, data, config),
 };

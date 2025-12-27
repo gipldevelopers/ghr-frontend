@@ -7,7 +7,7 @@ export const authService = {
     try {
       const response = await apiClient.post('/auth/login', credentials);
 
-         // Store company ID and subdomain for future requests
+      // Store company ID and subdomain for future requests
       if (response.data.success) {
         localStorage.setItem('company_id', response.data.data.user.company.id);
         localStorage.setItem('company_subdomain', response.data.data.user.company.subdomain);
@@ -15,17 +15,17 @@ export const authService = {
 
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Login failed');
+      throw new Error(error.response?.data?.message || error.message || 'Login failed');
     }
   },
 
-    // Get company by subdomain (NEW)
+  // Get company by subdomain (NEW)
   getCompanyBySubdomain: async (subdomain) => {
     try {
       const response = await apiClient.get(`/auth/company/${subdomain}`);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Company not found');
+      throw new Error(error.response?.data?.message || error.message || 'Company not found');
     }
   },
 
@@ -35,7 +35,7 @@ export const authService = {
       const response = await apiClient.get('/auth/me');
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Failed to fetch user');
+      throw new Error(error.response?.data?.message || error.message || 'Failed to fetch user');
     }
   },
 
@@ -45,7 +45,7 @@ export const authService = {
       const response = await apiClient.post('/auth/change-password', passwords);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Password change failed');
+      throw new Error(error.response?.data?.message || error.message || 'Password change failed');
     }
   },
 
@@ -55,17 +55,17 @@ export const authService = {
       const response = await apiClient.post('/auth/logout');
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Logout failed');
+      throw new Error(error.response?.data?.message || error.message || 'Logout failed');
     }
   },
 
-   // Verify company by subdomain
-    verifyCompany: async (subdomain) => {
+  // Verify company by subdomain
+  verifyCompany: async (subdomain) => {
     try {
       const response = await apiClient.get(`/auth/company/${subdomain}`);
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || 'Company verification failed');
+      throw new Error(error.response?.data?.message || error.message || 'Company verification failed');
     }
   }
 };

@@ -43,7 +43,8 @@ export default function InventoryCharts({ data }) {
     },
   };
 
-  const categorySeries = byCategory.map(item => item.count);
+  // In the categorySeries definition, update to use count instead of value:
+const categorySeries = byCategory.map(item => item.count);
 
   const statusOptions = {
     chart: {

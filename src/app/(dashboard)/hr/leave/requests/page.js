@@ -4,8 +4,16 @@ import LeaveRequestsTable from '../components/LeaveRequestsTable';
 import LeaveRequestsStatsCards from '../components/LeaveRequestsStatsCards';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
 export default function LeaveRequests() {
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+
+  // Function to refresh data
+  const refreshData = () => {
+    setRefreshTrigger(prev => prev + 1);
+  };
+
   return (
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       {/* Breadcrumb with Add Leave Request button */}
@@ -25,10 +33,10 @@ export default function LeaveRequests() {
         }
       />
 
-      <LeaveRequestsStatsCards />
+      <LeaveRequestsStatsCards key={`stats-${refreshTrigger}`} />
 
       <div className="bg-white rounded-lg shadow dark:bg-gray-800 mt-6">
-        <LeaveRequestsTable />
+        <LeaveRequestsTable key={`table-${refreshTrigger}`} onRefresh={refreshData} />
       </div>
     </div>
   );

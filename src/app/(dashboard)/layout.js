@@ -1,7 +1,6 @@
 // src/app/(dashboard)/layout.js
 "use client";
 import AuthGuard from "@/components/auth/AuthGuard";
-import ErrorBoundary from "@/components/ErrorBoundary";
 import { useAuth } from "@/context/AuthContext";
 import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";

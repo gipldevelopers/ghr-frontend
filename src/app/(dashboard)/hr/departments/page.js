@@ -4,6 +4,7 @@ import Breadcrumb from '@/components/common/Breadcrumb';
 import DepartmentTable from './components/DepartmentTable';
 import { PlusCircle } from 'lucide-react';
 import Link from 'next/link';
+import DepartmentMainStats from './components/DepartmentMainStats';
 
 export default function DepartmentPage() {
   return (
@@ -19,7 +20,10 @@ export default function DepartmentPage() {
           </Link>
         }
       />
-      
+
+      {/* Department Stats */}
+      <DepartmentMainStats />
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         <DepartmentTable />
       </div>

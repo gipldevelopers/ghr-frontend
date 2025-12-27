@@ -1,38 +1,51 @@
-// src/app/(dashboard)/hr/assets/categories/add/page.js
 "use client";
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Save, ArrowLeft } from 'lucide-react';
-import Breadcrumb from '@/components/common/Breadcrumb';
-import Link from 'next/link';
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Save, ArrowLeft } from "lucide-react";
+import Breadcrumb from "@/components/common/Breadcrumb";
+import Link from "next/link";
+import { assetService } from "@/services/asset.service";
 
 export default function AddCategory() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    depreciationRate: '',
-    usefulLife: ''
+    name: "",
+    description: "",
+    depreciationRate: "",
+    usefulLife: "",
   });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // In real app, submit to API
-    console.log('Category created:', formData);
-    router.push('/hr/assets/categories');
-  };
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+
+    try {
+      await assetService.createCategory({
+        name: formData.name.trim(),
+        description: formData.description?.trim(),
+        depreciationRate: Number(formData.depreciationRate),
+        usefulLife: Number(formData.usefulLife),
+        isActive: true,
+      });
+
+      router.push("/hr/assets/categories");
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,94 +63,72 @@ export default function AddCategory() {
 
       <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Add Asset Category</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+            Add Asset Category
+          </h1>
+
+          {error && (
+            <div className="mb-4 rounded-lg bg-red-100 px-4 py-2 text-red-700 text-sm">
+              {error}
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Category Name *
-              </label>
+            <input
+              type="text"
+              name="name"
+              placeholder="Category name"
+              required
+              value={formData.name}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+
+            <textarea
+              name="description"
+              placeholder="Description"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border rounded-lg"
+            />
+
+            <div className="grid grid-cols-2 gap-4">
               <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
+                type="number"
+                name="depreciationRate"
+                placeholder="Depreciation %"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="e.g., Laptops, Mobile Phones"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
+                value={formData.depreciationRate}
                 onChange={handleChange}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                placeholder="Describe this asset category"
+                className="w-full px-3 py-2 border rounded-lg"
+              />
+
+              <input
+                type="number"
+                name="usefulLife"
+                placeholder="Useful Life (years)"
+                required
+                value={formData.usefulLife}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border rounded-lg"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Depreciation Rate (%) *
-                </label>
-                <input
-                  type="number"
-                  name="depreciationRate"
-                  value={formData.depreciationRate}
-                  onChange={handleChange}
-                  min="0"
-                  max="100"
-                  step="0.01"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="e.g., 25"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Annual depreciation rate as a percentage
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Useful Life (Years) *
-                </label>
-                <input
-                  type="number"
-                  name="usefulLife"
-                  value={formData.usefulLife}
-                  onChange={handleChange}
-                  min="1"
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                  placeholder="e.g., 4"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  Expected useful life in years
-                </p>
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-end gap-3">
               <Link
                 href="/hr/assets/categories"
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                className="px-4 py-2 border rounded-lg"
               >
                 Cancel
               </Link>
+
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg"
               >
                 <Save className="w-4 h-4 mr-2" />
-                {loading ? 'Creating...' : 'Create Category'}
+                {loading ? "Creating..." : "Create Category"}
               </button>
             </div>
           </form>

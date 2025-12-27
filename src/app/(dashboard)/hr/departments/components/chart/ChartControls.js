@@ -1,21 +1,28 @@
 "use client";
 import { Search, Filter, Download, Printer, RefreshCw } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { departmentService } from '@/services/departmentService';
 
 export default function ChartControls() {
   const [viewMode, setViewMode] = useState('hierarchical');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [departments, setDepartments] = useState(['All Departments']);
 
-  const departments = [
-    'All Departments',
-    'Executive',
-    'Finance',
-    'Technology',
-    'Human Resources',
-    'Marketing',
-    'Sales'
-  ];
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await departmentService.getAllDepartments();
+        if (response.success) {
+          const deptNames = response.data.map(d => d.name);
+          setDepartments(['All Departments', ...deptNames]);
+        }
+      } catch (error) {
+        console.error('Error fetching departments for filter:', error);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   const handleExport = (format) => {
     console.log(`Exporting chart as ${format}`);
@@ -64,33 +71,6 @@ export default function ChartControls() {
               </option>
             ))}
           </select>
-
-          {/* Action Buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => handleExport('png')}
-              className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:hover:bg-gray-500"
-              title="Export as PNG"
-            >
-              <Download size={18} />
-            </button>
-            
-            <button
-              onClick={() => handleExport('pdf')}
-              className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:hover:bg-gray-500"
-              title="Export as PDF"
-            >
-              <Printer size={18} />
-            </button>
-            
-            <button
-              onClick={() => window.location.reload()}
-              className="p-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 dark:bg-gray-600 dark:border-gray-500 dark:hover:bg-gray-500"
-              title="Refresh"
-            >
-              <RefreshCw size={18} />
-            </button>
-          </div>
         </div>
       </div>
     </div>

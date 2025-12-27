@@ -7,8 +7,8 @@ export default function Backdrop() {
   if (!isMobileOpen) return null;
 
   return (
-    <div 
-      className="fixed inset-0 z-40 bg-gray-900/50 lg:hidden"
+    <div
+      className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden transition-opacity duration-300"
       onClick={toggleMobileSidebar}
     />
   );

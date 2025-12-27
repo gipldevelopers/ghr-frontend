@@ -247,60 +247,7 @@ export default function DocumentsForm({ formData, errors, onChange, employeeId }
             documentType="RESUME"
           />
 
-          {/* Education Certificates */}
-          <div className="space-y-3">
-            <Label htmlFor="educationCertificates">
-              Education Certificates (Max 5)
-            </Label>
-
-            {uploadedFiles.education.length > 0 && (
-              <div className="space-y-2">
-                {uploadedFiles.education.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <div>
-                        <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-blue-700 dark:text-blue-300">
-                          {(file.size / 1024 / 1024).toFixed(2)} MB
-                        </p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeEducationFile(index)}
-                      className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {uploadedFiles.education.length < 5 && (
-              <label className="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:border-blue-400 dark:hover:border-blue-600 transition-colors">
-                <Upload className="w-6 h-6 text-gray-400 mb-1" />
-                <p className="text-sm text-gray-600 dark:text-gray-400 text-center">
-                  Add education certificates
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                  PDF, JPG, PNG up to 10MB each
-                </p>
-                <input
-                  type="file"
-                  id="educationCertificates"
-                  className="hidden"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  multiple
-                  onChange={(e) => handleEducationUpload(e.target.files)}
-                  disabled={!employeeId || isUploading}
-                />
-              </label>
-            )}
-          </div>
+          
         </div>
       </div>
 

@@ -80,10 +80,11 @@ export default function MaintenanceCharts({ data }) {
     },
   };
 
+  // In the monthlyCostSeries, ensure we handle the byMonth data correctly:
   const monthlyCostSeries = [
     {
       name: 'Monthly Cost',
-      data: byMonth.map(item => item.cost),
+      data: byMonth.map(item => item.cost || 0),
     },
   ];
 

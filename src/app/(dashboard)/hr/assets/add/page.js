@@ -1,23 +1,27 @@
 // src/app/(dashboard)/hr/assets/add/page.js
 "use client";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, ArrowLeft, Camera, Barcode } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
+import { assetService } from '../../../../../services/asset.service';
 
 export default function AddAsset() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [categoryLoading, setCategoryLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     name: '',
-    category: '',
+    categoryId: '',
     serialNumber: '',
     model: '',
     manufacturer: '',
     purchaseDate: '',
     purchaseCost: '',
-    currentValue: '',
+
     status: 'available',
     condition: 'excellent',
     location: '',
@@ -26,16 +30,39 @@ export default function AddAsset() {
     notes: ''
   });
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      const payload = {
+        name: formData.name,
+        categoryId: Number(formData.categoryId),
+        serialNumber: formData.serialNumber,
+        model: formData.model || null,
+        manufacturer: formData.manufacturer || null,
+        purchaseDate: formData.purchaseDate,
+        purchaseCost: Number(formData.purchaseCost) || null,
+        status: formData.status,
+        condition: formData.condition,
+        location: formData.location || null,
+        warrantyExpiry: formData.warrantyExpiry || null,
+        maintenanceSchedule: formData.maintenanceSchedule,
+        notes: formData.notes || null
+      };
 
-    // In real app, submit to API
-    console.log('Asset created:', formData);
-    router.push('/hr/assets');
+      await assetService.createAsset(payload);
+
+      alert("Asset created successfully");
+      router.push("/hr/assets");
+
+    } catch (error) {
+      console.error("Create Asset Error:", error.message);
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -45,18 +72,26 @@ export default function AddAsset() {
     });
   };
 
-  const categories = [
-    'Laptop',
-    'Mobile Phone',
-    'Tablet',
-    'Monitor',
-    'Furniture',
-    'Accessory',
-    'Server',
-    'Network Equipment',
-    'Printer',
-    'Other'
-  ];
+  useEffect(() => {
+    const fetchCategories = async () => {
+      setCategoryLoading(true);
+      try {
+        const response = await assetService.getCategories();
+
+        // ✅ IMPORTANT FIX
+        setCategories(response.data?.categories || []);
+
+      } catch (error) {
+        console.error("Failed to fetch categories:", error.message);
+        alert(error.message);
+      } finally {
+        setCategoryLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
 
   return (
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
@@ -96,17 +131,27 @@ export default function AddAsset() {
                   Category *
                 </label>
                 <select
-                  name="category"
-                  value={formData.category}
+                  name="categoryId"
+                  value={formData.categoryId}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                  disabled={categoryLoading}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg
+             focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+             dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
-                  <option value="">Select Category</option>
-                  {categories.map(category => (
-                    <option key={category} value={category}>{category}</option>
+                  <option value="">
+                    {categoryLoading ? "Loading categories..." : "Select Category"}
+                  </option>
+
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
                   ))}
                 </select>
+
+
               </div>
 
               <div>
@@ -176,20 +221,6 @@ export default function AddAsset() {
                   type="number"
                   name="purchaseCost"
                   value={formData.purchaseCost}
-                  onChange={handleChange}
-                  step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Current Value ($)
-                </label>
-                <input
-                  type="number"
-                  name="currentValue"
-                  value={formData.currentValue}
                   onChange={handleChange}
                   step="0.01"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"

@@ -1,5 +1,6 @@
 // src/app/(dashboard)/hr/profile/components/ProfileHeader.js
 "use client";
+
 import { Camera, Mail, Phone, MapPin } from 'lucide-react';
 
 export default function ProfileHeader({ profileData }) {
@@ -17,7 +18,7 @@ export default function ProfileHeader({ profileData }) {
               <div className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 bg-gray-200 dark:bg-gray-700 overflow-hidden">
                 <img
                   src="/images/users/user-01.png"
-                  alt={profileData.firstName}
+                  alt={`${profileData.firstName} ${profileData.lastName}`}
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -31,21 +32,21 @@ export default function ProfileHeader({ profileData }) {
               <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                 {profileData.firstName} {profileData.lastName}
               </h1>
-              <p className="text-gray-600 dark:text-gray-400">{profileData.designation}</p>
+              <p className="text-gray-600 dark:text-gray-400">{profileData.email}</p>
 
               <div className="flex flex-wrap items-center justify-center sm:justify-start mt-3 gap-4">
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <Mail size={16} className="mr-1" />
-                  {profileData.email}
-                </div>
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <Phone size={16} className="mr-1" />
-                  {profileData.phone}
-                </div>
-                <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
-                  <MapPin size={16} className="mr-1" />
-                  {profileData.address.split(',')[2]}, {profileData.address.split(',')[3]}
-                </div>
+                {profileData.phone && (
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <Phone size={16} className="mr-1" />
+                    {profileData.phone}
+                  </div>
+                )}
+                {profileData.address && (
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                    <MapPin size={16} className="mr-1" />
+                    {profileData.address}
+                  </div>
+                )}
               </div>
             </div>
           </div>

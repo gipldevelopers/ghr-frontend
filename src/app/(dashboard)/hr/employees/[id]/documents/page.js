@@ -107,42 +107,62 @@ export default function EmployeeDocumentsPage() {
       return;
     }
 
+    // Check if there are any new files to upload
+    const hasNewFiles =
+      (uploadedFiles.aadhaar && !uploadedFiles.aadhaar.isExisting) ||
+      (uploadedFiles.pan && !uploadedFiles.pan.isExisting) ||
+      (uploadedFiles.resume && !uploadedFiles.resume.isExisting);
+
+    if (!hasNewFiles) {
+      toast.info('No new documents to upload');
+      return;
+    }
+
     setIsUploading(true);
     try {
-      const uploadPromises = [];
+      const formData = new FormData();
 
-      // Upload individual documents
+      // Add Aadhaar files and description
       if (uploadedFiles.aadhaar && !uploadedFiles.aadhaar.isExisting) {
-        uploadPromises.push(uploadDocument(uploadedFiles.aadhaar, 'AADHAAR'));
+        formData.append('aadhaar', uploadedFiles.aadhaar.file);
+        formData.append('aadhaarDescription', 'Aadhaar Card - Front and Back');
       }
+
+      // Add PAN file and description
       if (uploadedFiles.pan && !uploadedFiles.pan.isExisting) {
-        uploadPromises.push(uploadDocument(uploadedFiles.pan, 'PAN'));
+        formData.append('pan', uploadedFiles.pan.file);
+        formData.append('panDescription', 'PAN Card');
       }
+
+      // Add Resume file and description
       if (uploadedFiles.resume && !uploadedFiles.resume.isExisting) {
-        uploadPromises.push(uploadDocument(uploadedFiles.resume, 'RESUME'));
+        formData.append('resume', uploadedFiles.resume.file);
+        formData.append('resumeDescription', 'Professional Resume');
       }
 
-      // Upload education documents
-      uploadedFiles.education.forEach(edu => {
-        if (!edu.isExisting) {
-          uploadPromises.push(uploadDocument(edu, 'EDUCATION'));
-        }
-      });
+      // Call the new upload API
+      const response = await employeeService.uploadEmployeeDocuments(employeeId, formData);
 
-      await Promise.all(uploadPromises);
-      toast.success('All documents uploaded successfully!');
+      if (response.success) {
+        toast.success('All documents uploaded successfully!');
 
-      // Clear selected files after successful upload
-      setUploadedFiles(prev => ({
-        aadhaar: prev.aadhaar?.isExisting ? prev.aadhaar : null,
-        pan: prev.pan?.isExisting ? prev.pan : null,
-        resume: prev.resume?.isExisting ? prev.resume : null,
-        education: prev.education.filter(edu => edu.isExisting)
-      }));
+        // Reload existing documents
+        await loadExistingDocuments();
+
+        // Clear newly uploaded files (keep existing ones)
+        setUploadedFiles(prev => ({
+          aadhaar: prev.aadhaar?.isExisting ? prev.aadhaar : null,
+          pan: prev.pan?.isExisting ? prev.pan : null,
+          resume: prev.resume?.isExisting ? prev.resume : null,
+          education: prev.education.filter(edu => edu.isExisting)
+        }));
+      } else {
+        throw new Error(response.message || 'Upload failed');
+      }
 
     } catch (error) {
       console.error('Error uploading documents:', error);
-      toast.error('Failed to upload some documents');
+      toast.error(error.message || 'Failed to upload documents');
     } finally {
       setIsUploading(false);
     }
@@ -343,68 +363,7 @@ export default function EmployeeDocumentsPage() {
             documentType="RESUME"
           />
 
-          {/* Education Certificates */}
-          <div className="space-y-3">
-            <Label htmlFor="educationCertificates">
-              Education Certificates (Max 5)
-            </Label>
 
-            {uploadedFiles.education.map((file, index) => (
-              <div key={index} className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg gap-3">
-                <div className="flex items-center gap-3 w-full sm:w-auto">
-                  <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-blue-900 dark:text-blue-100 truncate">
-                      {file.name}
-                    </p>
-                    <p className="text-xs text-blue-700 dark:text-blue-300">
-                      {file.isExisting
-                        ? `Uploaded on ${new Date(file.uploadedAt).toLocaleDateString()}`
-                        : `${(file.size / 1024 / 1024).toFixed(2)} MB - Ready to upload`
-                      }
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 self-end sm:self-auto">
-                  {file.isExisting ? (
-                    <>
-                      <button
-                        onClick={() => downloadDocument(file.id, file.name)}
-                        className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
-                        title="Download"
-                      >
-                        <Download className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => deleteDocument(file.id, 'EDUCATION')}
-                        className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                        title="Delete"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </>
-                  ) : (
-                    <button
-                      onClick={() => removeFile('education', index)}
-                      className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              </div>
-            ))}
-
-            {uploadedFiles.education.length < 5 && (
-              <FileUploadField
-                label="Add Education Certificate"
-                field="education"
-                accept=".pdf,.jpg,.jpeg,.png"
-                documentType="EDUCATION"
-                multiple={true}
-              />
-            )}
-          </div>
         </div>
 
         {/* Upload Button */}
@@ -429,7 +388,7 @@ export default function EmployeeDocumentsPage() {
           Document Compliance Status
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {['AADHAAR', 'PAN', 'RESUME', 'EDUCATION'].map((type) => (
+          {['AADHAAR', 'PAN', 'RESUME'].map((type) => (
             <div key={type} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className={`p-1 rounded-full ${existingDocuments.some(doc => doc.type === type)
                 ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400'

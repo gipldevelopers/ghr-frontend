@@ -31,14 +31,14 @@ export default function PersonalInfoForm({ formData, errors, onChange, dropdownD
 
   const bloodGroupOptions = [
     { value: '', label: 'Select Blood Group' },
-    { value: 'A+', label: 'A+' },
-    { value: 'A-', label: 'A-' },
-    { value: 'B+', label: 'B+' },
-    { value: 'B-', label: 'B-' },
-    { value: 'O+', label: 'O+' },
-    { value: 'O-', label: 'O-' },
-    { value: 'AB+', label: 'AB+' },
-    { value: 'AB-', label: 'AB-' }
+    { value: 'A_POSITIVE', label: 'A+' },
+    { value: 'A_NEGATIVE', label: 'A-' },
+    { value: 'B_POSITIVE', label: 'B+' },
+    { value: 'B_NEGATIVE', label: 'B-' },
+    { value: 'O_POSITIVE', label: 'O+' },
+    { value: 'O_NEGATIVE', label: 'O-' },
+    { value: 'AB_POSITIVE', label: 'AB+' },
+    { value: 'AB_NEGATIVE', label: 'AB-' }
   ];
 
   // const physicalStatusOptions = [

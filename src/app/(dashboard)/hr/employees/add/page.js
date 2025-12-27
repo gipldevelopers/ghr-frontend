@@ -26,76 +26,6 @@ const STEPS = [
 
 const STORAGE_KEY = 'hrms_employee_form_data';
 
-// Default form data structure matching the new schema
-// const defaultFormData = {
-//   // Personal Information
-//   profileImage: null,
-//   firstName: '',
-//   lastName: '',
-//   dateOfBirth: '',
-//   gender: '',
-//   maritalStatus: '',
-//   bloodGroup: '',
-//   nationality: 'Indian',
-//   religion: '',
-//   personalEmail: '',
-//   birthPlace: '',
-//   height: '',
-//   weight: '',
-//   // physicalStatus: '',
-
-//   // Contact Information
-//   email: '',
-//   phone: '',
-//   permanentAddress: '',
-//   currentAddress: '',
-//   city: '',
-//   state: '',
-//   pincode: '',
-//   country: 'India',
-//   emergencyContactName: '',
-//   emergencyContactRelation: '',
-//   emergencyContactPhone: '',
-
-//   // Professional Information
-//   employeeId: '',
-//   departmentId: '',
-//   designationId: '',
-//   reportingManagerId: '',
-//   joiningDate: '',
-//   confirmationDate: '',
-//   employmentType: 'FULL_TIME',
-//   // employeeType: 'PERMANENT',
-//   workLocation: '',
-//   baseSalary: '',
-//   probationPeriod: '',
-//   workShift: '',
-//   weeklyHours: 40,
-//   overtimeEligible: false,
-
-//   // Banking Information
-//   bankName: '',
-//   accountNumber: '',
-//   ifscCode: '',
-//   accountHolderName: '',
-//   branchName: '',
-//   accountType: 'SAVINGS',
-//   paymentMethod: 'BANK_TRANSFER',
-//   paymentFrequency: 'MONTHLY',
-
-//   // Documents & Tax Information
-//   panNumber: '',
-//   aadhaarNumber: '',
-//   pfNumber: '',
-//   uanNumber: '',
-//   esiNumber: '',
-
-//   // Status
-//   status: 'ACTIVE',
-//   onboardingStatus: 'PENDING',
-//   createUser: true
-// };
-
 const defaultFormData = {
   // Personal Information
   profileImage: null,
@@ -317,61 +247,75 @@ export default function AddEmployeePage() {
     setIsSubmitting(true);
 
     try {
-      // Convert fields to appropriate types based on Prisma schema
-      const processedData = {
-        ...formData,
-        // Convert IDs from string to integer (handle empty values)
-        departmentId: formData.departmentId ? parseInt(formData.departmentId) : null,
-        designationId: formData.designationId ? parseInt(formData.designationId) : null,
-        reportingManagerId: formData.reportingManagerId ? parseInt(formData.reportingManagerId) : null,
+      const formDataToSend = new FormData();
 
-        // Convert numeric fields appropriately
-        baseSalary: formData.baseSalary ? parseFloat(formData.baseSalary) : null,
-        probationPeriod: formData.probationPeriod ? parseInt(formData.probationPeriod) : null,
-        weeklyHours: formData.weeklyHours ? parseInt(formData.weeklyHours) : null,
-        overtimeEligible: Boolean(formData.overtimeEligible),
+      // Append all fields to FormData
+      Object.keys(formData).forEach(key => {
+        if (key === 'profileImage') {
+          if (formData[key] instanceof File) {
+            formDataToSend.append('profileImage', formData[key]);
+          }
+        } else if (formData[key] !== null && formData[key] !== undefined) {
+          let value = formData[key];
 
-        // Convert height/weight to strings (as expected by Prisma)
-        height: formData.height ? formData.height.toString() : null,
-        weight: formData.weight ? formData.weight.toString() : null,
+          if (['dateOfBirth', 'joiningDate', 'confirmationDate'].includes(key) && value) {
+            // Ensure dates are in YYYY-MM-DD format
+            if (value instanceof Date) {
+              value = value.toISOString().split('T')[0];
+            }
+          }
 
-        // Convert dates to proper format
-        dateOfBirth: formData.dateOfBirth ? new Date(formData.dateOfBirth) : null,
-        joiningDate: formData.joiningDate ? new Date(formData.joiningDate) : null,
-        confirmationDate: formData.confirmationDate ? new Date(formData.confirmationDate) : null,
-      };
+          // Ensure boolean values are strings "true" or "false"
+          if (typeof value === 'boolean') {
+            value = value.toString();
+          }
 
-      // Remove profileImage from the main submission (handled separately)
-      const { profileImage, ...submitData } = processedData;
+          // Only skip empty strings for truly optional fields
+          const optionalFields = [
+            'religion', 'birthPlace', 'height', 'weight', 'personalEmail',
+            'maritalStatus', 'bloodGroup', 'reportingManagerId', 'confirmationDate',
+            'probationPeriod', 'workShift', 'baseSalary', 'workLocation',
+            'bankName', 'accountNumber', 'ifscCode', 'accountHolderName',
+            'panNumber', 'aadhaarNumber'
+          ];
 
-      const response = await employeeService.createEmployee(submitData);
-      const employeeId = response.data.id;
+          if (value === '' && optionalFields.includes(key)) {
+            // Skip empty optional fields
+            return;
+          }
 
-      // Upload profile photo if exists (optional)
-      if (formData.profileImage instanceof File) {
-        try {
-          const photoFormData = new FormData();
-          photoFormData.append('file', formData.profileImage);
-          photoFormData.append('name', 'Profile Photo');
-          photoFormData.append('type', 'PHOTO');
-
-          await employeeService.uploadDocument(employeeId, photoFormData);
-        } catch (uploadError) {
-          console.error('Profile photo upload failed:', uploadError);
-          // Don't fail the entire creation if photo upload fails
+          formDataToSend.append(key, value);
         }
+      });
+
+      // Add default onboardingStatus if missing
+      if (!formData.onboardingStatus) {
+        formDataToSend.append('onboardingStatus', 'PENDING');
       }
 
-      // Clear form data from storage
-      localStorage.removeItem(STORAGE_KEY);
+      // Debug: Log what we're sending
+      console.log('FormData entries:');
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+      }
 
-      // Redirect to employee profile with documents tab
-      toast.success('Employee created successfully! Redirecting to upload documents...');
+      const response = await employeeService.createEmployee(formDataToSend);
 
-      // Redirect to documents page after a brief delay
-      setTimeout(() => {
-        router.push(`/hr/employees/${employeeId}/documents?new=true`);
-      }, 1500);
+      if (response.success) {
+        const employeeId = response.data.id;
+
+        // Clear form data from storage
+        localStorage.removeItem(STORAGE_KEY);
+
+        toast.success('Employee created successfully! Redirecting...');
+
+        // Redirect to documents page after a brief delay
+        setTimeout(() => {
+          router.push(`/hr/employees/${employeeId}/documents?new=true`);
+        }, 1500);
+      } else {
+        throw new Error(response.message || 'Failed to create employee');
+      }
 
     } catch (error) {
       console.error('Error creating employee:', error);

@@ -8,12 +8,19 @@ import {
   Edit,
   Trash2,
   QrCode,
-  Download,
-  MoreHorizontal
 } from 'lucide-react';
+import { useRouter } from "next/navigation";
 
-export default function AssetTable({ assets, loading, filters, onFilterChange, onDeleteAsset }) {
-  const [selectedAssets, setSelectedAssets] = useState([]);
+export default function AssetTable({
+  assets,
+  loading,
+  filters,
+  onFilterChange,
+  onDeleteAsset,
+  deletingId,
+}) {
+
+  const router = useRouter();
 
   const handleFilterChange = (key, value) => {
     onFilterChange({ ...filters, [key]: value });
@@ -34,6 +41,7 @@ export default function AssetTable({ assets, loading, filters, onFilterChange, o
     maintenance: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
     retired: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
   };
+
 
   const conditionColors = {
     excellent: 'text-green-600 dark:text-green-400',
@@ -177,25 +185,31 @@ export default function AssetTable({ assets, loading, filters, onFilterChange, o
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                  ${asset.currentValue}
+                  {asset.currentValue}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div className="flex items-center space-x-2">
-                    <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
+
+                    <button
+                      onClick={() => router.push(`/hr/assets/view/${asset.id}`)}
+                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400"
+                    >
                       <Eye className="w-4 h-4" />
                     </button>
-                    <button className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300">
+                    <button
+                      onClick={() => router.push(`/hr/assets/edit/${asset.id}`)}
+                      className="text-green-600 hover:text-green-900"
+                    >
                       <Edit className="w-4 h-4" />
                     </button>
-                    <button className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300">
-                      <QrCode className="w-4 h-4" />
-                    </button>
                     <button
+                      disabled={deletingId === asset.id}
                       onClick={() => onDeleteAsset(asset.id)}
-                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                      className="disabled:opacity-50"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4 text-red-600" />
                     </button>
+
                   </div>
                 </td>
               </tr>

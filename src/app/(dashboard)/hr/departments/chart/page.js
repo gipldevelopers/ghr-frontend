@@ -37,9 +37,6 @@ export default function OrganizationChartPage() {
         <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mt-4 min-h-[600px]">
           <OrganizationChart />
         </div>
-
-        {/* Legend */}
-        <ChartLegend />
       </div>
     </div>
   );

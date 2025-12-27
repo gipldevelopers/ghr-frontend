@@ -2,9 +2,11 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Save, ArrowLeft, Calendar, DollarSign, User } from 'lucide-react';
+import { Save, ArrowLeft, Calendar, DollarSign, User, AlertTriangle } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
+import { assetService } from '../../../../../../../services/asset.service';
+import { toast } from 'react-hot-toast';
 
 export default function EditMaintenanceRecord() {
   const router = useRouter();
@@ -13,6 +15,7 @@ export default function EditMaintenanceRecord() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState(null);
   const [assets, setAssets] = useState([]);
   const [formData, setFormData] = useState({
     assetId: '',
@@ -25,44 +28,71 @@ export default function EditMaintenanceRecord() {
     status: 'completed'
   });
 
+  // Fetch maintenance record and assets
   useEffect(() => {
-    // Mock data - in real app, fetch from API
-    const mockAssets = [
-      { id: 'AST-001', name: 'Dell Latitude 5420', category: 'Laptop' },
-      { id: 'AST-002', name: 'iPhone 13 Pro', category: 'Mobile Phone' },
-      { id: 'AST-003', name: 'Ergonomic Chair', category: 'Furniture' },
-      { id: 'AST-004', name: 'iPad Pro', category: 'Tablet' },
-      { id: 'AST-005', name: 'MacBook Pro 16"', category: 'Laptop' },
-      { id: 'AST-006', name: 'Dell Monitor 27"', category: 'Monitor' }
-    ];
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch maintenance record details
+        const recordResponse = await assetService.getMaintenanceById(recordId);
+        
+        if (recordResponse.success && recordResponse.data) {
+          const record = recordResponse.data;
+          setFormData({
+            assetId: record.assetId || '',
+            maintenanceDate: record.maintenanceDate ? record.maintenanceDate.split('T')[0] : '',
+            maintenanceType: record.maintenanceType || 'preventive',
+            cost: record.cost || '',
+            technician: record.technician || '',
+            description: record.description || '',
+            nextMaintenanceDate: record.nextMaintenanceDate ? record.nextMaintenanceDate.split('T')[0] : '',
+            status: record.status || 'completed'
+          });
+        } else {
+          setError(recordResponse.message || 'Failed to fetch maintenance record');
+        }
 
-    const mockRecord = {
-      id: recordId,
-      assetId: 'AST-001',
-      maintenanceDate: '2023-12-05',
-      maintenanceType: 'preventive',
-      cost: 0,
-      technician: 'Internal IT Team',
-      description: 'Scheduled software update and optimization',
-      nextMaintenanceDate: '2024-03-05',
-      status: 'scheduled'
+        // Fetch assets list
+        const assetsResponse = await assetService.getAllAssets({ limit: 100, page: 1 });
+        if (assetsResponse.success && assetsResponse.data) {
+          setAssets(assetsResponse.data.assets || []);
+        }
+
+      } catch (err) {
+        setError(err.message || 'Failed to fetch data');
+        console.error('Error fetching data:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setAssets(mockAssets);
-    setFormData(mockRecord);
-    setLoading(false);
+    if (recordId) {
+      fetchData();
+    }
   }, [recordId]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-
-    // In real app, submit to API
-    console.log('Maintenance record updated:', formData);
-    router.push('/hr/assets/maintenance');
+    try {
+      const response = await assetService.updateMaintenance(recordId, formData);
+      
+      if (response.success) {
+        toast.success('Maintenance record updated successfully');
+        router.push('/hr/assets/maintenance');
+      } else {
+        setError(response.message || 'Failed to update maintenance record');
+      }
+    } catch (err) {
+      setError(err.message || 'Failed to update maintenance record');
+      console.error('Error updating maintenance record:', err);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleChange = (e) => {
@@ -85,8 +115,6 @@ export default function EditMaintenanceRecord() {
     );
   }
 
-  const selectedAsset = assets.find(asset => asset.id === formData.assetId);
-
   return (
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
       <Breadcrumb
@@ -101,6 +129,15 @@ export default function EditMaintenanceRecord() {
       />
 
       <div className="max-w-2xl mx-auto">
+        {error && (
+          <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">
+            <div className="flex items-center">
+              <AlertTriangle className="w-5 h-5 mr-2" />
+              <span>{error}</span>
+            </div>
+          </div>
+        )}
+
         <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">Edit Maintenance Record</h1>
 
@@ -119,7 +156,7 @@ export default function EditMaintenanceRecord() {
                 <option value="">Select Asset</option>
                 {assets.map(asset => (
                   <option key={asset.id} value={asset.id}>
-                    {asset.name} ({asset.category})
+                    {asset.name} ({asset.assetTag || asset.serialNumber})
                   </option>
                 ))}
               </select>
@@ -157,6 +194,7 @@ export default function EditMaintenanceRecord() {
                   <option value="preventive">Preventive</option>
                   <option value="corrective">Corrective</option>
                   <option value="emergency">Emergency</option>
+                  <option value="routine">Routine</option>
                 </select>
               </div>
 
@@ -228,6 +266,7 @@ export default function EditMaintenanceRecord() {
                   <option value="completed">Completed</option>
                   <option value="scheduled">Scheduled</option>
                   <option value="cancelled">Cancelled</option>
+                  <option value="in_progress">In Progress</option>
                 </select>
               </div>
             </div>
@@ -248,16 +287,13 @@ export default function EditMaintenanceRecord() {
             </div>
 
             <div className="flex justify-end space-x-3">
-              <Link
-                href="/hr/assets/maintenance"
+              <button
+                type="button"
+                onClick={() => router.push('/hr/assets/maintenance')}
                 className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                onClick={(e) => {
-                  e.preventDefault();
-                  router.back();
-                }}
               >
                 Cancel
-              </Link>
+              </button>
               <button
                 type="submit"
                 disabled={saving}

@@ -5,7 +5,7 @@ export const leaveRequestService = {
   // Get all leave requests
   getAllLeaveRequests: async (params = {}) => {
     try {
-      const response = await apiClient.get('/leave-requests', { params });
+      const response = await apiClient.get('/leave-requests/get-all-leave-requests', { params });
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch leave requests';
@@ -16,7 +16,7 @@ export const leaveRequestService = {
   // Get leave request by ID
   getLeaveRequestById: async (id) => {
     try {
-      const response = await apiClient.get(`/leave-requests/${id}`);
+      const response = await apiClient.get(`/leave-requests/get-leave-request/${id}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch leave request';
@@ -40,7 +40,7 @@ export const leaveRequestService = {
         }
       });
 
-      const response = await apiClient.post('/leave-requests', formData, {
+      const response = await apiClient.post('/leave-requests/create-leave-request', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -115,7 +115,7 @@ export const leaveRequestService = {
   // Get leave types for dropdown
   getLeaveTypesDropdown: async () => {
     try {
-      const response = await apiClient.get('/leave-types/dropdown');
+      const response = await apiClient.get('/leave-types/get-leave-types-dropdown');
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch leave types';
