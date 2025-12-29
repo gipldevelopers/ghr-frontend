@@ -1,25 +1,16 @@
 // src/services/leavePolicyService.js
-import api from '../lib/api';
+import api, { apiClient } from '../lib/api';
 
 const leavePolicyService = {
     // Get all leave policies with filtering and pagination
     getAllPolicies: async (params = {}) => {
         try {
-            const response = await api.get('/leave-policies/get-all-policies', {
-                params: {
-                    page: params.page || 1,
-                    limit: params.limit || 10,
-                    search: params.search || '',
-                    status: params.status || '',
-                    applicableTo: params.applicableTo || '',
-                    accrualMethod: params.accrualMethod || ''
-                }
-            });
+            const response = await apiClient.get('/leave-policies/get-all-policies', { params });
 
             if (response.data.success) {
                 return {
                     success: true,
-                    data: response.data.data.policies,
+                    data: response.data.data.policies || response.data.data,
                     pagination: response.data.data.pagination
                 };
             }
@@ -40,7 +31,7 @@ const leavePolicyService = {
     // Get policy by ID
     getPolicyById: async (policyId) => {
         try {
-            const response = await api.get(`/leave-policies/get-policy/${policyId}`);
+            const response = await apiClient.get(`/leave-policies/get-policy/${policyId}`);
 
             if (response.data.success) {
                 return {
@@ -65,7 +56,7 @@ const leavePolicyService = {
     // Create new policy
     createPolicy: async (policyData) => {
         try {
-            const response = await api.post('/leave-policies/create-policy', policyData);
+            const response = await apiClient.post('/leave-policies/create-policy', policyData);
 
             if (response.data.success) {
                 return {
@@ -91,7 +82,7 @@ const leavePolicyService = {
     // Update policy
     updatePolicy: async (policyId, policyData) => {
         try {
-            const response = await api.put(`/leave-policies/update-policy/${policyId}`, policyData);
+            const response = await apiClient.put(`/leave-policies/update-policy/${policyId}`, policyData);
 
             if (response.data.success) {
                 return {
@@ -117,7 +108,7 @@ const leavePolicyService = {
     // Delete policy
     deletePolicy: async (policyId) => {
         try {
-            const response = await api.delete(`/leave-policies/delete-policy/${policyId}`);
+            const response = await apiClient.delete(`/leave-policies/delete-policy/${policyId}`);
 
             if (response.data.success) {
                 return {
@@ -142,7 +133,7 @@ const leavePolicyService = {
     // Update policy status
     updatePolicyStatus: async (policyId, status) => {
         try {
-            const response = await api.patch(`/leave-policies/update-status/${policyId}`, { status });
+            const response = await apiClient.patch(`/leave-policies/update-status/${policyId}`, { status });
 
             if (response.data.success) {
                 return {
@@ -165,10 +156,11 @@ const leavePolicyService = {
         }
     },
 
+
     // Assign policy to departments
     assignPolicyToDepartments: async (policyId, departmentIds) => {
         try {
-            const response = await api.post(`/leave-policies/assign-departments/${policyId}`, {
+            const response = await apiClient.post(`/leave-policies/assign-departments/${policyId}`, {
                 departmentIds
             });
 
@@ -195,7 +187,7 @@ const leavePolicyService = {
     // Assign policy to employees
     assignPolicyToEmployees: async (policyId, employeeIds) => {
         try {
-            const response = await api.post(`/leave-policies/assign-employees/${policyId}`, {
+            const response = await apiClient.post(`/leave-policies/assign-employees/${policyId}`, {
                 employeeIds
             });
 
@@ -227,7 +219,7 @@ const leavePolicyService = {
                 url += `/${policyId}`;
             }
 
-            const response = await api.get(url);
+            const response = await apiClient.get(url);
 
             if (response.data.success) {
                 return {
@@ -252,7 +244,7 @@ const leavePolicyService = {
     // Get leave types for dropdown
     getLeaveTypesDropdown: async () => {
         try {
-            const response = await api.get('/leave-policies/leave-types/dropdown');
+            const response = await apiClient.get('/leave-policies/leave-types/dropdown');
 
             if (response.data.success) {
                 return {
@@ -277,7 +269,7 @@ const leavePolicyService = {
     // Get departments for dropdown
     getDepartmentsDropdown: async () => {
         try {
-            const response = await api.get('/leave-policies/departments/dropdown');
+            const response = await apiClient.get('/leave-policies/departments/dropdown');
 
             if (response.data.success) {
                 return {
@@ -302,7 +294,7 @@ const leavePolicyService = {
     // Get employees for dropdown
     getEmployeesDropdown: async () => {
         try {
-            const response = await api.get('/leave-policies/employees/dropdown');
+            const response = await apiClient.get('/leave-policies/employees/dropdown');
 
             if (response.data.success) {
                 return {

@@ -1,66 +1,75 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { ArrowLeft, X, Loader2 } from 'lucide-react';
-import leavePolicyService from '../../../../../../services/leavepolicies.service';
 import { toast } from 'sonner';
 
-const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
+const PolicyForm = ({
+  initialData = null,
+  onSave,
+  onCancel,
+  isSaving = false,
+  dropdownData = {
+    leaveTypes: [],
+    departments: [],
+    employees: []
+  }
+}) => {
   const [formData, setFormData] = useState({
-    name: initialData?.name || '',
-    description: initialData?.description || '',
-    effectiveDate: initialData?.effectiveDate || '',
-    status: initialData?.status || 'draft',
-    applicableTo: initialData?.applicableTo || 'all_employees',
-    accrualMethod: initialData?.accrualMethod || 'monthly',
-    maxAccrual: initialData?.maxAccrual || 0,
-    carryOverLimit: initialData?.carryOverLimit || 0,
-    encashment: initialData?.encashment ?? false,
-    requiresApproval: initialData?.requiresApproval ?? true,
-    attachmentRequired: initialData?.attachmentRequired ?? false,
-    minServicePeriod: initialData?.minServicePeriod || 0,
-    maxConsecutiveDays: initialData?.maxConsecutiveDays || 0,
-    advanceNoticeDays: initialData?.advanceNoticeDays || 0,
-    autoApprove: initialData?.autoApprove ?? false,
-    approvalLevels: initialData?.approvalLevels || 1,
-    genderSpecific: initialData?.genderSpecific || 'all',
-    probationApplicable: initialData?.probationApplicable ?? true,
-    policyType: initialData?.policyType || 'leave',
-    leaveTypeIds: initialData?.leaveTypes?.map(lt => lt.id) || [],
-    departmentIds: initialData?.departments?.map(d => d.id) || [],
-    employeeIds: initialData?.employees?.map(e => e.id) || []
+    name: '',
+    description: '',
+    effectiveDate: '',
+    status: 'draft',
+    applicableTo: 'all_employees',
+    accrualMethod: 'monthly',
+    maxAccrual: 0,
+    carryOverLimit: 0,
+    encashment: false,
+    requiresApproval: true,
+    attachmentRequired: false,
+    minServicePeriod: 0,
+    maxConsecutiveDays: 0,
+    advanceNoticeDays: 0,
+    autoApprove: false,
+    approvalLevels: 1,
+    genderSpecific: 'all',
+    probationApplicable: true,
+    policyType: 'leave',
+    leaveTypeIds: [],
+    departmentIds: [],
+    employeeIds: []
   });
 
   const [loading, setLoading] = useState(false);
-  const [leaveTypes, setLeaveTypes] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [employees, setEmployees] = useState([]);
 
+  // Initialize form with initialData when it's available
   useEffect(() => {
-    fetchDropdownData();
-  }, []);
-
-  const fetchDropdownData = async () => {
-    try {
-      const [leaveTypesRes, departmentsRes, employeesRes] = await Promise.all([
-        leavePolicyService.getLeaveTypesDropdown(),
-        leavePolicyService.getDepartmentsDropdown(),
-        leavePolicyService.getEmployeesDropdown()
-      ]);
-
-      if (leaveTypesRes.success) {
-        setLeaveTypes(leaveTypesRes.data);
-      }
-      if (departmentsRes.success) {
-        setDepartments(departmentsRes.data);
-      }
-      if (employeesRes.success) {
-        setEmployees(employeesRes.data);
-      }
-    } catch (error) {
-      console.error('Error fetching dropdown data:', error);
-      toast.error('Failed to load form data');
+    if (initialData) {
+      setFormData({
+        name: initialData.name || '',
+        description: initialData.description || '',
+        effectiveDate: initialData.effectiveDate ? initialData.effectiveDate.split('T')[0] : '',
+        status: initialData.status || 'draft',
+        applicableTo: initialData.applicableTo || 'all_employees',
+        accrualMethod: initialData.accrualMethod || 'monthly',
+        maxAccrual: initialData.maxAccrual || 0,
+        carryOverLimit: initialData.carryOverLimit || 0,
+        encashment: initialData.encashment || false,
+        requiresApproval: initialData.requiresApproval !== false,
+        attachmentRequired: initialData.attachmentRequired || false,
+        minServicePeriod: initialData.minServicePeriod || 0,
+        maxConsecutiveDays: initialData.maxConsecutiveDays || 0,
+        advanceNoticeDays: initialData.advanceNoticeDays || 0,
+        autoApprove: initialData.autoApprove || false,
+        approvalLevels: initialData.approvalLevels || 1,
+        genderSpecific: initialData.genderSpecific || 'all',
+        probationApplicable: initialData.probationApplicable !== false,
+        policyType: initialData.policyType || 'leave',
+        leaveTypeIds: initialData.leaveTypes?.map(lt => lt.id) || initialData.leaveTypeIds || [],
+        departmentIds: initialData.departments?.map(d => d.id) || initialData.departmentIds || [],
+        employeeIds: initialData.employees?.map(e => e.id) || initialData.employeeIds || []
+      });
     }
-  };
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -70,15 +79,23 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
     }));
   };
 
+  const handleNumberChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value === '' ? '' : Number(value)
+    }));
+  };
+
   const handleMultiSelect = (name, value, isChecked) => {
     setFormData(prev => {
       const currentValues = prev[name] || [];
       let newValues;
 
       if (isChecked) {
-        newValues = [...currentValues, parseInt(value)];
+        newValues = [...currentValues, value];
       } else {
-        newValues = currentValues.filter(v => v !== parseInt(value));
+        newValues = currentValues.filter(v => v !== value);
       }
 
       return {
@@ -90,40 +107,32 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    try {
-      // Prepare data for API
-      const submitData = {
-        ...formData,
-        maxAccrual: parseInt(formData.maxAccrual),
-        carryOverLimit: parseInt(formData.carryOverLimit),
-        minServicePeriod: parseInt(formData.minServicePeriod),
-        maxConsecutiveDays: formData.maxConsecutiveDays ? parseInt(formData.maxConsecutiveDays) : null,
-        advanceNoticeDays: formData.advanceNoticeDays ? parseInt(formData.advanceNoticeDays) : null,
-        approvalLevels: formData.approvalLevels ? parseInt(formData.approvalLevels) : 1
-      };
+    // Basic validation
+    if (!formData.name.trim()) {
+      toast.error('Policy name is required');
+      return;
+    }
 
-      let result;
-      if (initialData) {
-        result = await leavePolicyService.updatePolicy(initialData.id, submitData);
-      } else {
-        result = await leavePolicyService.createPolicy(submitData);
-      }
+    if (!formData.effectiveDate) {
+      toast.error('Effective date is required');
+      return;
+    }
 
-      if (result.success) {
-        toast.success(result.message);
-        if (onSave) {
-          onSave(result.data);
-        }
-      } else {
-        toast.error(result.message);
-      }
-    } catch (error) {
-      console.error('Error saving policy:', error);
-      toast.error('Failed to save policy');
-    } finally {
-      setLoading(false);
+    // Prepare data for submission
+    const submitData = {
+      ...formData,
+      maxAccrual: Number(formData.maxAccrual) || 0,
+      carryOverLimit: Number(formData.carryOverLimit) || 0,
+      minServicePeriod: Number(formData.minServicePeriod) || 0,
+      maxConsecutiveDays: formData.maxConsecutiveDays ? Number(formData.maxConsecutiveDays) : null,
+      advanceNoticeDays: formData.advanceNoticeDays ? Number(formData.advanceNoticeDays) : null,
+      approvalLevels: formData.approvalLevels ? Number(formData.approvalLevels) : 1
+    };
+
+    // Call parent's save handler
+    if (onSave) {
+      await onSave(submitData);
     }
   };
 
@@ -158,6 +167,8 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
     { value: 'female', label: 'Female Only' }
   ];
 
+  const isEditMode = !!initialData;
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow">
       {/* Header */}
@@ -167,19 +178,24 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
             type="button"
             onClick={onCancel}
             className="mr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-            disabled={loading}
+            disabled={isSaving}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-            {initialData ? 'Edit Leave Policy' : 'Create New Leave Policy'}
+            {isEditMode ? 'Edit Leave Policy' : 'Create New Leave Policy'}
           </h3>
+          {isEditMode && initialData.id && (
+            <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+              ID: {initialData.id}
+            </span>
+          )}
         </div>
         <button
           type="button"
           onClick={onCancel}
           className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          disabled={loading}
+          disabled={isSaving}
         >
           <X className="w-5 h-5" />
         </button>
@@ -204,7 +220,8 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
-                disabled={loading}
+                disabled={isSaving}
+                placeholder="Enter policy name"
               />
             </div>
 
@@ -219,7 +236,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
-                disabled={loading}
+                disabled={isSaving}
               />
             </div>
           </div>
@@ -235,7 +252,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
               rows={3}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
               placeholder="Describe the purpose and details of this policy"
-              disabled={loading}
+              disabled={isSaving}
             />
           </div>
 
@@ -248,7 +265,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
               value={formData.status}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              disabled={loading}
+              disabled={isSaving}
             >
               {statusOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -275,7 +292,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
-                disabled={loading}
+                disabled={isSaving}
               >
                 {applicableToOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -293,10 +310,10 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 type="number"
                 name="minServicePeriod"
                 value={formData.minServicePeriod}
-                onChange={handleChange}
+                onChange={handleNumberChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                disabled={loading}
+                disabled={isSaving}
               />
             </div>
           </div>
@@ -310,7 +327,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
               value={formData.genderSpecific}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-              disabled={loading}
+              disabled={isSaving}
             >
               {genderOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -328,7 +345,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.probationApplicable}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                disabled={loading}
+                disabled={isSaving}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
                 Applies to Employees on Probation
@@ -353,7 +370,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 onChange={handleChange}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
-                disabled={loading}
+                disabled={isSaving}
               >
                 {accrualMethodOptions.map(option => (
                   <option key={option.value} value={option.value}>
@@ -371,11 +388,11 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 type="number"
                 name="maxAccrual"
                 value={formData.maxAccrual}
-                onChange={handleChange}
+                onChange={handleNumberChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
                 required
-                disabled={loading}
+                disabled={isSaving}
               />
             </div>
 
@@ -387,10 +404,10 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 type="number"
                 name="carryOverLimit"
                 value={formData.carryOverLimit}
-                onChange={handleChange}
+                onChange={handleNumberChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                disabled={loading}
+                disabled={isSaving}
               />
             </div>
           </div>
@@ -404,10 +421,10 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 type="number"
                 name="maxConsecutiveDays"
                 value={formData.maxConsecutiveDays}
-                onChange={handleChange}
+                onChange={handleNumberChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                disabled={loading}
+                disabled={isSaving}
               />
             </div>
 
@@ -419,40 +436,46 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 type="number"
                 name="advanceNoticeDays"
                 value={formData.advanceNoticeDays}
-                onChange={handleChange}
+                onChange={handleNumberChange}
                 min="0"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                disabled={loading}
+                disabled={isSaving}
               />
             </div>
           </div>
         </div>
 
         {/* Leave Types */}
-        <div>
-          <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-            Leave Types
-          </h4>
-          <div className="space-y-2">
-            {leaveTypes.map(leaveType => (
-              <label key={leaveType.id} className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={formData.leaveTypeIds.includes(leaveType.id)}
-                  onChange={(e) => handleMultiSelect('leaveTypeIds', leaveType.id, e.target.checked)}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  disabled={loading}
-                />
-                <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                  {leaveType.name}
-                  {leaveType.description && (
-                    <span className="text-gray-500 dark:text-gray-400 ml-1">- {leaveType.description}</span>
-                  )}
-                </span>
-              </label>
-            ))}
+        {dropdownData.leaveTypes.length > 0 && (
+          <div>
+            <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              Leave Types
+            </h4>
+            <div className="space-y-2 max-h-48 overflow-y-auto p-2 border border-gray-200 dark:border-gray-700 rounded-lg">
+              {dropdownData.leaveTypes.map(leaveType => (
+                <label key={leaveType.id} className="flex items-start p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded">
+                  <input
+                    type="checkbox"
+                    checked={formData.leaveTypeIds.includes(leaveType.id)}
+                    onChange={(e) => handleMultiSelect('leaveTypeIds', leaveType.id, e.target.checked)}
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                    disabled={isSaving}
+                  />
+                  <div className="ml-2">
+                    <span className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      {leaveType.name}
+                    </span>
+                    {leaveType.description && (
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                        {leaveType.description}
+                      </p>
+                    )}
+                  </div>
+                </label>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Policy Settings */}
         <div>
@@ -467,7 +490,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.encashment}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                disabled={loading}
+                disabled={isSaving}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Encashment Allowed</span>
             </label>
@@ -479,7 +502,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.requiresApproval}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                disabled={loading}
+                disabled={isSaving}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Requires Approval</span>
             </label>
@@ -491,7 +514,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.attachmentRequired}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                disabled={loading}
+                disabled={isSaving}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Attachment Required</span>
             </label>
@@ -505,7 +528,7 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 checked={formData.autoApprove}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                disabled={loading}
+                disabled={isSaving}
               />
               <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">Auto Approve Leave Requests</span>
             </label>
@@ -518,11 +541,11 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
                 type="number"
                 name="approvalLevels"
                 value={formData.approvalLevels}
-                onChange={handleChange}
+                onChange={handleNumberChange}
                 min="1"
                 max="5"
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                disabled={loading}
+                disabled={isSaving}
               />
             </div>
           </div>
@@ -533,18 +556,18 @@ const PolicyForm = ({ initialData = null, onSave, onCancel }) => {
           <button
             type="button"
             onClick={onCancel}
-            disabled={loading}
+            disabled={isSaving}
             className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             type="submit"
-            disabled={loading}
+            disabled={isSaving}
             className="flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-            {initialData ? 'Update Policy' : 'Create Policy'}
+            {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            {isEditMode ? 'Update Policy' : 'Create Policy'}
           </button>
         </div>
       </form>

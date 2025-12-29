@@ -1,11 +1,15 @@
+"use client";
 import { Search, Filter } from 'lucide-react';
 
 const PoliciesHeader = ({ 
   searchTerm, 
   onSearchChange, 
   statusFilter, 
-  onStatusFilterChange, 
-  totalPolicies 
+  onStatusFilterChange,
+  applicableToFilter,
+  onApplicableToFilterChange,
+  accrualMethodFilter,
+  onAccrualMethodFilterChange
 }) => {
   const statusOptions = [
     { value: 'all', label: 'All Statuses' },
@@ -13,6 +17,26 @@ const PoliciesHeader = ({
     { value: 'draft', label: 'Draft' },
     { value: 'pending', label: 'Pending' },
     { value: 'archived', label: 'Archived' }
+  ];
+
+  const applicableToOptions = [
+    { value: 'all', label: 'All Types' },
+    { value: 'all_employees', label: 'All Employees' },
+    { value: 'full_time', label: 'Full-time Only' },
+    { value: 'part_time', label: 'Part-time Only' },
+    { value: 'male_employees', label: 'Male Employees' },
+    { value: 'female_employees', label: 'Female Employees' },
+    { value: 'permanent', label: 'Permanent Staff' },
+    { value: 'contract', label: 'Contract Staff' }
+  ];
+
+  const accrualMethodOptions = [
+    { value: 'all', label: 'All Methods' },
+    { value: 'monthly', label: 'Monthly' },
+    { value: 'yearly', label: 'Yearly' },
+    { value: 'quarterly', label: 'Quarterly' },
+    { value: 'one_time', label: 'One-time' },
+    { value: 'hourly', label: 'Hourly' }
   ];
 
   return (
@@ -23,9 +47,6 @@ const PoliciesHeader = ({
           <p className="text-gray-600 dark:text-gray-400 mt-1">
             Manage and configure leave policies for your organization
           </p>
-        </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400 mt-2 sm:mt-0">
-          {totalPolicies} {totalPolicies === 1 ? 'policy' : 'policies'} found
         </div>
       </div>
 
@@ -41,19 +62,49 @@ const PoliciesHeader = ({
           />
         </div>
         
-        <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-gray-400" />
-          <select
-            value={statusFilter}
-            onChange={(e) => onStatusFilterChange(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-          >
-            {statusOptions.map(option => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+        <div className="flex flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-400" />
+            <select
+              value={statusFilter}
+              onChange={(e) => onStatusFilterChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            >
+              {statusOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={applicableToFilter}
+              onChange={(e) => onApplicableToFilterChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            >
+              {applicableToOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <select
+              value={accrualMethodFilter}
+              onChange={(e) => onAccrualMethodFilterChange(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+            >
+              {accrualMethodOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
     </div>
