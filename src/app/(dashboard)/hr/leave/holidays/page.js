@@ -6,7 +6,7 @@ import HolidaysHeader from './components/HolidaysHeader';
 import HolidaysCalendar from './components/HolidaysCalendar';
 import HolidaysList from './components/HolidaysList';
 import Link from 'next/link';
-import { holidayService } from '../../../../../services/leave-holiday-calender.service';
+import { holidayService } from '../../../../../services/hr-services/leave-holiday-calender.service';
 import { toast } from 'react-hot-toast';
 
 export default function Holidays() {

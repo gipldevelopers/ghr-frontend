@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import ProfileHeader from './components/ProfileHeader';
 import ProfileTabs from './components/ProfileTabs';
-import userService from '@/services/user.service';
+import userService from '@/services/user-services/user.service';
 import { toast } from 'react-hot-toast';
 
 // Define allowed fields for update

@@ -1,5 +1,5 @@
 // src/services/leavePolicyService.js
-import api, { apiClient } from '../lib/api';
+import api, { apiClient } from '../../lib/api';
 
 const leavePolicyService = {
     // Get all leave policies with filtering and pagination

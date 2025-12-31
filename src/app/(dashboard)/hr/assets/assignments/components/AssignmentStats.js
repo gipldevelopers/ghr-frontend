@@ -1,7 +1,7 @@
 "use client";
 import { PackageCheck, UserCheck, RotateCcw } from "lucide-react";
 import { useState, useEffect } from "react";
-import { assetService } from "../../../../../../services/asset.service";
+import { assetService } from "../../../../../../services/hr-services/asset.service";
 
 export default function AssignmentStats() {
   const [stats, setStats] = useState({

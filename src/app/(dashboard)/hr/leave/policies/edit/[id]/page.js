@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import PolicyForm from '../../comopnents/PolicyForm';
-import leavePolicyService from '../../../../../../../services/leavepolicies.service';
+import leavePolicyService from '../../../../../../../services/hr-services/leavepolicies.service';
 import { toast } from 'sonner';
 
 export default function EditPolicy() {

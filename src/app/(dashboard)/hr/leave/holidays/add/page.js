@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import HolidayForm from '../components/HolidayForm';
-import { holidayService } from '../../../../../../services/leave-holiday-calender.service';
+import { holidayService } from '../../../../../../services/hr-services/leave-holiday-calender.service';
 import { toast } from 'react-hot-toast';
 
 export default function AddHolidayPage() {

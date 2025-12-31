@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import LeaveRequestForm from '../../components/LeaveRequestForm';
-import { leaveRequestService } from '@/services/leaveRequestService';
+import { leaveRequestService } from '@/services/hr-services/leaveRequestService';
 import { toast } from 'sonner';
 
 export default function AddLeaveRequest() {

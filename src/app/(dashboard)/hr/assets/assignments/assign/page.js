@@ -6,8 +6,8 @@ import { Save, ArrowLeft, Calendar, User, Package } from "lucide-react";
 import Breadcrumb from "@/components/common/Breadcrumb";
 import Link from "next/link";
 
-import { assetService } from "../../../../../../services/asset.service";
-import { employeeService } from "../../../../../../services/employeeService";
+import { assetService } from "../../../../../../services/hr-services/asset.service";
+import { employeeService } from "../../../../../../services/hr-services/employeeService";
 
 export default function AssignAsset() {
   const router = useRouter();

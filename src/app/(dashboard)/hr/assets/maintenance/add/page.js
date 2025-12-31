@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Save, ArrowLeft, Calendar, DollarSign, User, AlertCircle } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
-import { assetService } from '../../../../../../services/asset.service';
+import { assetService } from '../../../../../../services/hr-services/asset.service';
 
 export default function AddMaintenanceRecord() {
   const router = useRouter();

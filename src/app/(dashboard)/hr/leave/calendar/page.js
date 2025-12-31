@@ -6,7 +6,7 @@ import FullPageCalendar from './components/FullPageCalendar';
 import CalendarFilters from './components/CalendarFilters';
 import LeaveDetailsModal from './components/LeaveDetailsModal';
 import QuickStats from './components/QuickStats';
-import { leaveCalendarService } from '../../../../../services/leave-calender.service';
+import { leaveCalendarService } from '../../../../../services/hr-services/leave-calender.service';
 import { toast } from 'react-hot-toast';
 
 export default function LeaveCalendar() {

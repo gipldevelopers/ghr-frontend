@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, ArrowLeft, Building2 } from 'lucide-react';
-import { departmentService } from '@/services/departmentService';
+import { departmentService } from '@/services/hr-services/departmentService';
 import { toast } from 'sonner';
 
 export default function DepartmentForm({ department = null, isEdit = false }) {

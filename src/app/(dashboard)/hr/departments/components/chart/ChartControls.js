@@ -1,7 +1,7 @@
 "use client";
 import { Search, Filter, Download, Printer, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { departmentService } from '@/services/departmentService';
+import { departmentService } from '@/services/hr-services/departmentService';
 
 export default function ChartControls() {
   const [viewMode, setViewMode] = useState('hierarchical');

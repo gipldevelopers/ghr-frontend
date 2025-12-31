@@ -4,7 +4,7 @@ import AttendanceStatsCards from './components/AttendanceStatsCards';
 import { useState, useEffect } from 'react';
 import AttendanceTable from './components/AttendanceTable';
 import BreadcrumbRightContent from './components/BreadcrumbRightContent';
-import { attendanceService } from '../../../../services/attendace.service';
+import { attendanceService } from '../../../../services/hr-services/attendace.service';
 import { toast } from 'react-hot-toast';
 
 export default function AttendanceDashboard() {

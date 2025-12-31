@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Label from '@/components/form/Label';
 import { toast } from 'sonner';
 import { useParams } from 'next/navigation';
-import employeeService from '@/services/employeeService';
+import employeeService from '@/services/hr-services/employeeService';
 import Button from '@/components/ui/button/Button';
 
 export default function EmployeeDocumentsPage() {

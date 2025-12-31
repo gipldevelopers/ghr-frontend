@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Download, Filter, BarChart3, PieChart, TrendingUp, Calendar, DollarSign, Package } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import dynamic from 'next/dynamic';
-import { assetService } from '../../../../../services/asset.service';
+import { assetService } from '../../../../../services/hr-services/asset.service';
 import { toast } from 'react-hot-toast';
 
 // Dynamically import chart components (to avoid SSR issues)

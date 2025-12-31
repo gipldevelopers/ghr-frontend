@@ -1,5 +1,5 @@
 // src/services/leaveReports.service.js
-import { apiClient } from '../lib/api';
+import { apiClient } from '../../lib/api';
 
 const leaveReportsService = {
     // Get leave statistics

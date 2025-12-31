@@ -2,7 +2,7 @@
 
 import { Users, UserCheck, UserX, UserPlus, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
-import employeeService from "@/services/employeeService"; // adjust path if needed
+import employeeService from "@/services/hr-services/employeeService"; // adjust path if needed
 
 export default function EmployeeStatsCards() {
   const [statsData, setStatsData] = useState({

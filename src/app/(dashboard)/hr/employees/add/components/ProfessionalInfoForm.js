@@ -4,9 +4,9 @@ import InputField from '@/components/form/input/InputField';
 import SelectField from './SelectField';
 import Label from '@/components/form/Label';
 import { useEffect, useState } from 'react';
-import employeeService from '@/services/employeeService';
-import { departmentService } from '@/services/departmentService';
-import { designationService } from '@/services/designationService';
+import employeeService from '@/services/hr-services/employeeService';
+import { departmentService } from '@/services/hr-services/departmentService';
+import { designationService } from '@/services/hr-services/designationService';
 
 export default function ProfessionalInfoForm({ formData, errors, onChange, dropdownData }) {
   const [isGeneratingId, setIsGeneratingId] = useState(false);

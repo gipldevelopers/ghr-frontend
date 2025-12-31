@@ -13,7 +13,7 @@ import DocumentsForm from './components/DocumentsForm';
 import FormNavigation from './components/FormNavigation';
 import FormRecoveryModal from '@/components/form/FormRecoveryModal';
 import { toast } from 'sonner';
-import employeeService from '@/services/employeeService';
+import employeeService from '@/services/hr-services/employeeService';
 import { validateEmployeeForm } from '@/utils/validation';
 
 const STEPS = [

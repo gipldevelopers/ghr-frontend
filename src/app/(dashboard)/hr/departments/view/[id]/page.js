@@ -9,7 +9,7 @@ import DepartmentInfoCard from '../../components/view/DepartmentInfoCard';
 import RecentActivityCard from '../../components/view/RecentActivityCard';
 import TeamSizeCard from '../../components/view/TeamSizeCard';
 import QuickActionsCard from '../../components/view/QuickActionsCard';
-import { departmentService } from '@/services/departmentService';
+import { departmentService } from '@/services/hr-services/departmentService';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 

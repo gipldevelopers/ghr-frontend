@@ -12,7 +12,7 @@ import { ChevronUp, ChevronDown, Edit, Clock, MoreVertical, RefreshCw } from 'lu
 import Pagination from '@/components/common/Pagination';
 import EditAttendanceModal from './EditAttendanceModal';
 import AttendanceFilters from './AttendanceFilters';
-import { attendanceService } from '../../../../../services/attendace.service';
+import { attendanceService } from '../../../../../services/hr-services/attendace.service';
 import { toast } from 'react-hot-toast';
 
 export default function AttendanceTable({ selectedDate }) {

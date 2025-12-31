@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Plus, Search, Filter, Download, Eye, Edit, Trash2, Calendar, Clock, AlertTriangle, CheckCircle, RefreshCw } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
-import { assetService } from '../../../../../services/asset.service';
+import { assetService } from '../../../../../services/hr-services/asset.service';
 import { format } from 'date-fns';
 import MaintenanceStatsCard from './components/MaintenanceStatsCard';
 

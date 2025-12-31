@@ -13,7 +13,7 @@ import Pagination from '@/components/common/Pagination';
 import LeaveRequestsFilters from './LeaveRequestsFilters';
 import EditLeaveModal from './EditLeaveModal';
 import { useRouter } from 'next/navigation';
-import { leaveRequestService } from '@/services/leaveRequestService';
+import { leaveRequestService } from '@/services/hr-services/leaveRequestService';
 import { toast } from 'react-hot-toast';
 
 export default function LeaveRequestsTable() {
