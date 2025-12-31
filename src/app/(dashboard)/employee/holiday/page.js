@@ -1,25 +1,58 @@
-import React from "react";
+"use client";
+import React, { useEffect, useState } from "react";
 import Breadcrumb from "@/components/common/Breadcrumb";
-
-const holidays = [
-  { date: "14-Jan-2025", name: "Makar Sankranti" },
-  { date: "15-Jan-2025", name: "Makar Sankranti" },
-  { date: "26-Feb-2025", name: "Maha Shivaratri" },
-  { date: "14-Mar-2025", name: "Holi" },
-  { date: "27-Jun-2025", name: "Rath Yatra" },
-  { date: "15-Aug-2025", name: "Independence Day / Janmastami" },
-  { date: "27-Aug-2025", name: "Ganesh Chaturthi" },
-  { date: "02-Oct-2025", name: "Gandhi Jayanti / Dussehra" },
-  { date: "20-Oct-2025", name: "Diwali" },
-  { date: "21-Oct-2025", name: "Diwali" },
-];
+import { employeeHolidayService } from "@/services/employee/holiday.service";
 
 export default function HolidayPage() {
+  const [holidays, setHolidays] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+
+    const params = {
+      year: new Date().getFullYear()
+    }
+    const fetchHolidays = async () => {
+      try {
+        setLoading(true);
+
+        const response = await employeeHolidayService.getEmployeeHolidays(params);
+        setHolidays(response?.data || response || []);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHolidays();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="p-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+          <div className="h-64 bg-gray-200 rounded"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 text-red-500">
+        Error loading holidays: {error}
+      </div>
+    );
+  }
+
   return (
     <div className="">
       <Breadcrumb
         title="Holiday"
-        subtitle="Check upcoming holidays for 2025"
+        subtitle={`Check upcoming holidays for ${new Date().getFullYear()}`}
       />
 
       {/* Table Card */}
@@ -32,7 +65,7 @@ export default function HolidayPage() {
                 colSpan={2}
                 className="px-6 py-4 text-lg font-semibold text-gray-900 dark:text-gray-100 text-left border-b border-gray-300 dark:border-gray-600"
               >
-                Holiday List – 2025
+                Holiday List – {new Date().getFullYear()}
               </th>
             </tr>
             <tr className="bg-gray-50 dark:bg-gray-700">
@@ -45,19 +78,29 @@ export default function HolidayPage() {
             </tr>
           </thead>
           <tbody>
-            {holidays.map((holiday, index) => (
-              <tr
-                key={index}
-                className="hover:bg-gray-50 dark:hover:bg-gray-700"
-              >
-                <td className="px-6 py-3 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600">
-                  {holiday.date}
-                </td>
-                <td className="px-6 py-3 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600">
-                  {holiday.name}
+            {holidays.length > 0 ? (
+              holidays.map((holiday, index) => (
+                <tr
+                  key={index}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  <td className="px-6 py-3 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600">
+                    {/* Access properties based on API response. Usually it might be holiday_date or date */}
+                    {holiday.date ? new Date(holiday.date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }).replace(/ /g, '-') : "N/A"}
+                  </td>
+                  <td className="px-6 py-3 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600">
+                    {/* Access properties based on API response. Usually it might be holiday_name or name or title */}
+                    {holiday.name || holiday.title || "N/A"}
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={2} className="px-6 py-3 text-center text-gray-500 dark:text-gray-400 border border-gray-300 dark:border-gray-600">
+                  No holidays found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

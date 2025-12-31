@@ -191,7 +191,6 @@ const employeeNavItems = [
       { name: "Request Leave", path: "/employee/leave/request-leave" },
       { name: "Leave Balance", path: "/employee/leave/leave-balance" },
       { name: "Leave History", path: "/employee/leave/leave-history" },
-      { name: "Holiday Calendar", path: "/employee/leave/team-calendar" },
     ],
   },
   {

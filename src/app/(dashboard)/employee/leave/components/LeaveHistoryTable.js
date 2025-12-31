@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -9,165 +9,31 @@ import {
   getFilteredRowModel,
   flexRender,
 } from "@tanstack/react-table";
-
-// Mock leave history data
-const defaultData = [
-  {
-    id: "L-001",
-    submitted: "01 Sep 2025",
-    type: "Sick Leave",
-    startDate: "03 Sep 2025",
-    endDate: "04 Sep 2025",
-    days: 2,
-    status: "Approved",
-    reason: "Fever",
-  },
-  {
-    id: "L-002",
-    submitted: "05 Sep 2025",
-    type: "Vacation",
-    startDate: "10 Sep 2025",
-    endDate: "12 Sep 2025",
-    days: 3,
-    status: "Pending",
-    reason: "Family trip",
-  },
-  {
-    id: "L-003",
-    submitted: "10 Sep 2025",
-    type: "Personal Time",
-    startDate: "15 Sep 2025",
-    endDate: "15 Sep 2025",
-    days: 1,
-    status: "Rejected",
-    reason: "Appointment",
-  },
-  {
-    id: "L-004",
-    submitted: "12 Sep 2025",
-    type: "Sick Leave",
-    startDate: "14 Sep 2025",
-    endDate: "14 Sep 2025",
-    days: 1,
-    status: "Approved",
-    reason: "Cold",
-  },
-  {
-    id: "L-005",
-    submitted: "13 Sep 2025",
-    type: "Vacation",
-    startDate: "20 Sep 2025",
-    endDate: "22 Sep 2025",
-    days: 3,
-    status: "Approved",
-    reason: "Wedding",
-  },
-  {
-    id: "L-006",
-    submitted: "14 Sep 2025",
-    type: "Sick Leave",
-    startDate: "16 Sep 2025",
-    endDate: "17 Sep 2025",
-    days: 2,
-    status: "Pending",
-    reason: "Migraine",
-  },
-  {
-    id: "L-007",
-    submitted: "15 Sep 2025",
-    type: "Personal Time",
-    startDate: "18 Sep 2025",
-    endDate: "18 Sep 2025",
-    days: 1,
-    status: "Approved",
-    reason: "Bank visit",
-  },
-  {
-    id: "L-008",
-    submitted: "16 Sep 2025",
-    type: "Vacation",
-    startDate: "25 Sep 2025",
-    endDate: "28 Sep 2025",
-    days: 4,
-    status: "Rejected",
-    reason: "Trip canceled",
-  },
-  {
-    id: "L-009",
-    submitted: "17 Sep 2025",
-    type: "Sick Leave",
-    startDate: "19 Sep 2025",
-    endDate: "19 Sep 2025",
-    days: 1,
-    status: "Approved",
-    reason: "Flu",
-  },
-  {
-    id: "L-010",
-    submitted: "18 Sep 2025",
-    type: "Vacation",
-    startDate: "30 Sep 2025",
-    endDate: "03 Oct 2025",
-    days: 4,
-    status: "Pending",
-    reason: "Family event",
-  },
-  {
-    id: "L-011",
-    submitted: "19 Sep 2025",
-    type: "Personal Time",
-    startDate: "21 Sep 2025",
-    endDate: "21 Sep 2025",
-    days: 1,
-    status: "Rejected",
-    reason: "Urgent task",
-  },
-  {
-    id: "L-012",
-    submitted: "20 Sep 2025",
-    type: "Sick Leave",
-    startDate: "23 Sep 2025",
-    endDate: "24 Sep 2025",
-    days: 2,
-    status: "Approved",
-    reason: "High fever",
-  },
-  {
-    id: "L-013",
-    submitted: "21 Sep 2025",
-    type: "Vacation",
-    startDate: "28 Sep 2025",
-    endDate: "30 Sep 2025",
-    days: 3,
-    status: "Approved",
-    reason: "Holiday",
-  },
-  {
-    id: "L-014",
-    submitted: "22 Sep 2025",
-    type: "Personal Time",
-    startDate: "26 Sep 2025",
-    endDate: "26 Sep 2025",
-    days: 1,
-    status: "Pending",
-    reason: "Appointment",
-  },
-  {
-    id: "L-015",
-    submitted: "23 Sep 2025",
-    type: "Sick Leave",
-    startDate: "27 Sep 2025",
-    endDate: "27 Sep 2025",
-    days: 1,
-    status: "Rejected",
-    reason: "Headache",
-  },
-];
+import EmployeeLeaveService from "@/services/employee/leave.service";
+import { format } from "date-fns";
 
 export default function LeaveHistoryTable() {
   const [globalFilter, setGlobalFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchLeaveHistory();
+  }, []);
+
+  const fetchLeaveHistory = async () => {
+    try {
+      setLoading(true);
+      const response = await EmployeeLeaveService.getLeaveHistory();
+      setData(response.data || response || []);
+    } catch (error) {
+      console.error("Failed to fetch leave history", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const statuses = useMemo(
     () => ["all", "Approved", "Pending", "Rejected"],
@@ -175,43 +41,69 @@ export default function LeaveHistoryTable() {
   );
 
   const filteredData = useMemo(() => {
-    let result = [...defaultData];
+    let result = [...data];
     if (globalFilter) {
       const term = globalFilter.toLowerCase();
       result = result.filter(
         (d) =>
-          d.type.toLowerCase().includes(term) ||
-          d.reason.toLowerCase().includes(term) ||
-          d.status.toLowerCase().includes(term)
+          d.leaveType?.toLowerCase().includes(term) ||
+          d.reason?.toLowerCase().includes(term) ||
+          d.status?.toLowerCase().includes(term)
       );
     }
     if (statusFilter !== "all") {
       result = result.filter((d) => d.status === statusFilter);
     }
     return result;
-  }, [globalFilter, statusFilter]);
+  }, [globalFilter, statusFilter, data]);
 
   const columns = useMemo(
     () => [
-      { accessorKey: "submitted", header: "Submitted" },
-      { accessorKey: "type", header: "Leave Type" },
-      { accessorKey: "startDate", header: "Start Date" },
-      { accessorKey: "endDate", header: "End Date" },
-      { accessorKey: "days", header: "Days" },
+      {
+        accessorKey: "createdAt",
+        header: "Submitted",
+        cell: (info) => info.getValue() ? format(new Date(info.getValue()), "dd MMM yyyy") : "-"
+      },
+      { accessorKey: "leaveType.name", header: "Leave Type", cell: info => info.getValue() || info.row.original.leaveType },
+      {
+        accessorKey: "startDate",
+        header: "Start Date",
+        cell: (info) => info.getValue() ? format(new Date(info.getValue()), "dd MMM yyyy") : "-"
+      },
+      {
+        accessorKey: "endDate",
+        header: "End Date",
+        cell: (info) => info.getValue() ? format(new Date(info.getValue()), "dd MMM yyyy") : "-"
+      },
+      {
+        accessorKey: "days", header: "Days", cell: (info) => {
+          // Calculate days if not provided, or use 'duration'
+          if (info.row.original.duration) return info.row.original.duration;
+
+          if (info.row.original.startDate && info.row.original.endDate) {
+            const start = new Date(info.row.original.startDate);
+            const end = new Date(info.row.original.endDate);
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            return diffDays;
+          }
+          return "-";
+        }
+      },
       {
         accessorKey: "status",
         header: "Status",
         cell: (info) => {
           const status = info.getValue();
           const statusClass =
-            status === "Approved"
+            status === "APPROVED" || status === "Approved"
               ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-              : status === "Pending"
-              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
-              : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
+              : status === "PENDING" || status === "Pending"
+                ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400"
+                : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400";
           return (
             <span
-              className={`px-3 py-1 rounded-full text-sm font-semibold ${statusClass}`}
+              className={`px-3 py-1 rounded-full text-sm font-semibold uppercase ${statusClass}`}
             >
               {status}
             </span>
@@ -235,45 +127,55 @@ export default function LeaveHistoryTable() {
     pageCount: Math.ceil(filteredData.length / pagination.pageSize),
   });
 
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
+        <div className="animate-pulse space-y-4">
+          <div className="h-10 bg-gray-200 rounded w-full"></div>
+          <div className="h-64 bg-gray-200 rounded w-full"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700">
       {/* Filters */}
-      {/* Filters */}
-<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-  <div className="flex flex-col sm:flex-row gap-3 sm:items-center w-full sm:w-auto">
-    <input
-      type="text"
-      placeholder="Search by type, reason, or status..."
-      value={globalFilter}
-      onChange={(e) => setGlobalFilter(e.target.value)}
-      className="w-full sm:w-72 p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-    />
-    <select
-      value={statusFilter}
-      onChange={(e) => setStatusFilter(e.target.value)}
-      className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
-    >
-      {statuses.map((s) => (
-        <option key={s} value={s}>
-          {s === "all" ? "All Status" : s}
-        </option>
-      ))}
-    </select>
-  </div>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center w-full sm:w-auto">
+          <input
+            type="text"
+            placeholder="Search by type, reason, or status..."
+            value={globalFilter}
+            onChange={(e) => setGlobalFilter(e.target.value)}
+            className="w-full sm:w-72 p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="p-3 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
+          >
+            {statuses.map((s) => (
+              <option key={s} value={s}>
+                {s === "all" ? "All Status" : s}
+              </option>
+            ))}
+          </select>
+        </div>
 
-  {(globalFilter || statusFilter !== "all") && (
-    <button
-      onClick={() => {
-        setGlobalFilter("");
-        setStatusFilter("all");
-        setPagination({ pageIndex: 0, pageSize: 5 });
-      }}
-      className="text-red-600 hover:text-red-800 dark:text-red-400 font-medium transition sm:mt-0 mt-2"
-    >
-      Clear
-    </button>
-  )}
-</div>
+        {(globalFilter || statusFilter !== "all") && (
+          <button
+            onClick={() => {
+              setGlobalFilter("");
+              setStatusFilter("all");
+              setPagination({ pageIndex: 0, pageSize: 5 });
+            }}
+            className="text-red-600 hover:text-red-800 dark:text-red-400 font-medium transition sm:mt-0 mt-2"
+          >
+            Clear
+          </button>
+        )}
+      </div>
 
 
       {/* Table */}
@@ -299,8 +201,8 @@ export default function LeaveHistoryTable() {
                           {sorted === "asc"
                             ? "▲"
                             : sorted === "desc"
-                            ? "▼"
-                            : "⇅"}
+                              ? "▼"
+                              : "⇅"}
                         </span>
                       </div>
                     </th>
