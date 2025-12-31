@@ -100,16 +100,16 @@ const hrNavItems = [
       { name: "Dashboard", path: "/hr/attendance" },
     ],
   },
-  {
-    icon: <PieChart size={20} />,
-    name: "Reports & Analytics",
-    subItems: [
-      { name: "Attendance Reports", path: "/hr/attendance/reports" },
-      { name: "Employee Reports", path: "/hr/reports/employees" },
-      { name: "Leave Reports", path: "/hr/reports/leave" },
-      { name: "Department Reports", path: "/hr/reports/departments" },
-    ],
-  },
+  // {
+  //   icon: <PieChart size={20} />,
+  //   name: "Reports & Analytics",
+  //   subItems: [
+  //     { name: "Attendance Reports", path: "/hr/attendance/reports" },
+  //     { name: "Employee Reports", path: "/hr/reports/employees" },
+  //     { name: "Leave Reports", path: "/hr/reports/leave" },
+  //     { name: "Department Reports", path: "/hr/reports/departments" },
+  //   ],
+  // },
   {
     icon: <Calendar size={20} />,
     name: "Leave Management",

@@ -1,13 +1,36 @@
-// src/app/(dashboard)/hr/employees/page.js
 "use client";
 import Breadcrumb from '@/components/common/Breadcrumb';
 import AttendanceStatsCards from './components/AttendanceStatsCards';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AttendanceTable from './components/AttendanceTable';
 import BreadcrumbRightContent from './components/BreadcrumbRightContent';
+import { attendanceService } from '../../../../services/attendace.service';
+import { toast } from 'react-hot-toast';
 
 export default function AttendanceDashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [statsData, setStatsData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch statistics when date changes
+  useEffect(() => {
+    fetchDashboardStats();
+  }, [selectedDate]);
+
+  const fetchDashboardStats = async () => {
+    setLoading(true);
+    try {
+      const dateStr = selectedDate.toISOString().split('T')[0];
+      const response = await attendanceService.getDashboardStats({ date: dateStr });
+      setStatsData(response.data);
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+      toast.error(error.message || 'Failed to fetch dashboard statistics');
+      setStatsData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Format date for display
   const formatDate = (date) => {
@@ -38,15 +61,19 @@ export default function AttendanceDashboard() {
         <div className="lg:col-span-3 space-y-6">
           {/* Attendance Stats Cards */}
           <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-4 sm:p-6">
-            <AttendanceStatsCards selectedDate={selectedDate} />
+            <AttendanceStatsCards
+              selectedDate={selectedDate}
+              statsData={statsData}
+              loading={loading}
+            />
           </div>
         </div>
       </div>
 
       {/* Attendance Table */}
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
-        <AttendanceTable />
+        <AttendanceTable selectedDate={selectedDate} />
       </div>
     </div>
   );
-}
+};
