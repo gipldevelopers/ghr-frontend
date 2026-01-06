@@ -1,4 +1,4 @@
-// src/components/auth/AuthGuard.js - CORRECTED VERSION
+// src\components\auth\AuthGuard.js
 "use client";
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';

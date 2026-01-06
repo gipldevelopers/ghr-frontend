@@ -1,4 +1,4 @@
-
+// src\app\(dashboard)\hr\employees\add\components\BankingInfoForm.js
 "use client";
 import { CreditCard, Building, User, Scan, Banknote, MapPin } from 'lucide-react';
 import InputField from '@/components/form/input/InputField';

@@ -1,240 +1,4 @@
-// // src/app/(dashboard)/super-admin/roles-permissions/components/RoleForm.js
-// "use client";
-// import { useState, useEffect } from 'react';
-// import { useRouter } from 'next/navigation';
-// import { Save, ArrowLeft, Shield } from 'lucide-react';
-
-// export default function RoleForm({ role = null, isEdit = false }) {
-//   const router = useRouter();
-//   const [isSubmitting, setIsSubmitting] = useState(false);
-//   const [errors, setErrors] = useState({});
-//   const [formData, setFormData] = useState({
-//     name: "",
-//     description: "",
-//     status: "Active" // Add status field
-//   });
-
-//   useEffect(() => {
-//     if (role) {
-//       setFormData({
-//         name: role.name || "",
-//         description: role.description || "",
-//         status: role.status || "Active"
-//       });
-//     }
-//   }, [role]);
-
-//   const handleInputChange = (e) => {
-//     const { name, value } = e.target;
-//     setFormData(prev => ({
-//       ...prev,
-//       [name]: value
-//     }));
-//   };
-
-//   const validateForm = () => {
-//     const newErrors = {};
-
-//     if (!formData.name.trim()) {
-//       newErrors.name = "Role name is required";
-//     }
-
-//     if (!formData.description.trim()) {
-//       newErrors.description = "Description is required";
-//     }
-
-//     setErrors(newErrors);
-//     return Object.keys(newErrors).length === 0;
-//   };
-
-// //   const handleSubmit = async (e) => {
-// //   e.preventDefault();
-  
-// //   if (!validateForm()) return;
-  
-// //   setIsSubmitting(true);
-  
-// //   try {
-// //     // Simulate API call
-// //     const response = await new Promise(resolve => setTimeout(() => {
-// //       resolve({
-// //         success: true,
-// //         data: {
-// //           id: Math.floor(Math.random() * 1000), // Temporary ID for development
-// //           ...formData
-// //         }
-// //       });
-// //     }, 1000));
-    
-// //     if (response.success) {
-// //       console.log(isEdit ? 'Updating role:' : 'Adding role:', formData);
-      
-// //       if (isEdit) {
-// //         router.push('/super-admin/roles-permissions');
-// //         router.refresh();
-// //       } else {
-// //         // Use the temporary ID for navigation
-// //         router.push(`/super-admin/roles-permissions/${response.data.id}/permissions`);
-// //       }
-// //     }
-// //   } catch (error) {
-// //     console.error('Error saving role:', error);
-// //   } finally {
-// //     setIsSubmitting(false);
-// //   }
-// // };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-    
-//     if (!validateForm()) return;
-    
-//     setIsSubmitting(true);
-    
-//     try {
-//       // Simulate API call
-//       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-//       console.log(isEdit ? 'Updating role:' : 'Adding role:', formData);
-      
-//       if (isEdit) {
-//         // For edit, redirect to role details
-//         router.push(`/super-admin/roles-permissions/${role.id}`);
-//         router.refresh();
-//       } else {
-//         // For new roles, redirect to permission assignment
-//         const tempRoleId = Math.floor(Math.random() * 1000); // Temporary ID
-//         router.push(`/super-admin/roles-permissions/${tempRoleId}/permissions`);
-//       }
-//     } catch (error) {
-//       console.error('Error saving role:', error);
-//     } finally {
-//       setIsSubmitting(false);
-//     }
-//   };
-
-//   return (
-//     <div className="w-full p-4 sm:p-6">
-//       {/* Header with title and back button */}
-//       <div className="flex items-center mb-6">
-//         <button
-//           onClick={() => router.push('/super-admin/roles-permissions')}
-//           className="flex items-center text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white mr-4 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-//           aria-label="Go back"
-//         >
-//           <ArrowLeft size={20} />
-//         </button>
-//         <div className="flex items-center">
-//           <div className="p-2 rounded-lg bg-blue-100 dark:bg-blue-900/30 mr-3">
-//             <Shield className="text-blue-600 dark:text-blue-400" size={24} />
-//           </div>
-//           <div>
-//             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-//               {isEdit ? 'Edit Role' : 'Add New Role'}
-//             </h1>
-//             <p className="text-sm text-gray-500 dark:text-gray-400">
-//               {isEdit ? 'Update role information' : 'Create a new role with basic information'}
-//             </p>
-//           </div>
-//         </div>
-//       </div>
-
-//       {/* Form */}
-//       <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-//         <form onSubmit={handleSubmit} className="space-y-6">
-//           {/* Basic Information */}
-//           <div className="space-y-4">
-//             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
-//               Basic Information
-//             </h3>
-
-//             <div className="grid grid-cols-1 gap-4">
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                   Role Name *
-//                 </label>
-//                 <input
-//                   type="text"
-//                   name="name"
-//                   value={formData.name}
-//                   onChange={handleInputChange}
-//                   className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${
-//                     errors.name ? "border-red-500" : "border-gray-300"
-//                   }`}
-//                   placeholder="Enter role name"
-//                 />
-//                 {errors.name && (
-//                   <p className="text-red-500 text-sm mt-1">{errors.name}</p>
-//                 )}
-//               </div>
-
-//               <div>
-//                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                   Description *
-//                 </label>
-//                 <textarea
-//                   name="description"
-//                   value={formData.description}
-//                   onChange={handleInputChange}
-//                   rows={3}
-//                   className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${
-//                     errors.description ? "border-red-500" : "border-gray-300"
-//                   }`}
-//                   placeholder="Describe the role's purpose and responsibilities"
-//                 />
-//                 {errors.description && (
-//                   <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-//                 )}
-//               </div>
-
-//               {isEdit && (
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                     Status
-//                   </label>
-//                   <select
-//                     name="status"
-//                     value={formData.status}
-//                     onChange={handleInputChange}
-//                     className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-//                   >
-//                     <option value="Active">Active</option>
-//                     <option value="Inactive">Inactive</option>
-//                   </select>
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-
-//           {/* Form Actions */}
-//           <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200 dark:border-gray-700">
-//             <button
-//               type="button"
-//               onClick={() => router.push('/super-admin/roles-permissions')}
-//               className="px-6 py-3 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 text-center"
-//               disabled={isSubmitting}
-//             >
-//               Cancel
-//             </button>
-//             <button
-//               type="submit"
-//               disabled={isSubmitting}
-//               className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
-//             >
-//               <Save size={18} />
-//               {isSubmitting 
-//                 ? (isEdit ? 'Updating...' : 'Creating...')
-//                 : (isEdit ? 'Update Role' : 'Create Role')
-//               }
-//             </button>
-//           </div>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-
-// src/app/(dashboard)/super-admin/roles-permissions/components/RoleForm.js
+// src\app\(dashboard)\super-admin\roles-permissions\components\RoleForm.js
 "use client";
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -277,90 +41,175 @@ export default function RoleForm({ role = null, isEdit = false }) {
     }
   };
 
+  // const validateForm = () => {
+  //   const newErrors = {};
+
+  //   // if (!formData.name.trim()) {
+  //   //   newErrors.name = "Role name is required";
+  //   // } else if (formData.name.trim().length < 2) {
+  //   //   newErrors.name = "Role name must be at least 2 characters";
+  //   // }
+  //   if (!formData.displayName?.trim()) {
+  //     newErrors.displayName = "Role name is required";
+  //   } else if (formData.displayName.trim().length < 2) {
+  //     newErrors.displayName = "Role name must be at least 2 characters";
+  //   } else {
+  //      // Validate that the auto-generated name will be valid
+  //     const generatedName = formData.displayName.trim()
+  //       .toUpperCase()
+  //       .replace(/\s+/g, '_')
+  //       .replace(/[^A-Z0-9_]/g, '');
+      
+  //     if (generatedName.length < 2) {
+  //       newErrors.displayName = "Role name contains invalid characters";
+  //     }
+  //   }
+
+  //   if (!formData.description.trim()) {
+  //     newErrors.description = "Description is required";
+  //   } else if (formData.description.trim().length < 10) {
+  //     newErrors.description = "Description must be at least 10 characters";
+  //   }
+
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
   const validateForm = () => {
-    const newErrors = {};
+  const newErrors = {};
 
-    // if (!formData.name.trim()) {
-    //   newErrors.name = "Role name is required";
-    // } else if (formData.name.trim().length < 2) {
-    //   newErrors.name = "Role name must be at least 2 characters";
-    // }
-    if (!formData.displayName?.trim()) {
-      newErrors.displayName = "Role name is required";
-    } else if (formData.displayName.trim().length < 2) {
-      newErrors.displayName = "Role name must be at least 2 characters";
-    } else {
-       // Validate that the auto-generated name will be valid
-      const generatedName = formData.displayName.trim()
-        .toUpperCase()
-        .replace(/\s+/g, '_')
-        .replace(/[^A-Z0-9_]/g, '');
+  if (!formData.displayName?.trim()) {
+    newErrors.displayName = "Role name is required";
+  } else if (formData.displayName.trim().length < 2) {
+    newErrors.displayName = "Role name must be at least 2 characters";
+  } else {
+    // Validate that the auto-generated name will be valid
+    const generatedName = formData.displayName.trim()
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, '');
+    
+    if (generatedName.length < 2) {
+      newErrors.displayName = "Role name contains invalid characters";
+    } else if (generatedName.length > 50) {
+      newErrors.displayName = "Role name is too long (max 50 characters after conversion)";
+    }
+  }
+
+  if (!formData.description.trim()) {
+    newErrors.description = "Description is required";
+  } else if (formData.description.trim().length < 10) {
+    newErrors.description = "Description must be at least 10 characters";
+  }
+
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+    
+  //   if (!validateForm()) return;
+    
+  //   setIsSubmitting(true);
+    
+  //   try {
+
+  //     // Prepare data for API (convert status to uppercase)
+  //     const apiData = {
+  //       displayName: formData.displayName.trim(), // Keep the user-friendly name
+  //       description: formData.description.trim(),
+  //       isDefault: false,
+  //       status: formData.status.toUpperCase() // Convert to ACTIVE/INACTIVE
+  //     };
+
+  //     console.log('Submitting:', apiData);
+
+  //     let response;
       
-      if (generatedName.length < 2) {
-        newErrors.displayName = "Role name contains invalid characters";
-      }
-    }
-
-    if (!formData.description.trim()) {
-      newErrors.description = "Description is required";
-    } else if (formData.description.trim().length < 10) {
-      newErrors.description = "Description must be at least 10 characters";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
+  //     if (isEdit) {
+  //       response = await roleService.updateRole(role.id, apiData);
+  //       toast.success('Role updated successfully');
+  //       // router.push(`/super-admin/roles-permissions/${role.id}`);
+  //        router.push('/super-admin/roles-permissions');
+  //     } else {
+  //       response = await roleService.createRole(apiData);
+  //       toast.success('Role created successfully');
+  //       // Redirect to permissions page with the new role ID
+  //       router.push(`/super-admin/roles-permissions/${response.data.id}/permissions`);
+  //     }
+      
+  //     router.refresh();
+  //   } catch (error) {
+  //     console.error('Error saving role:', error);
+      
+  //     // Handle specific error cases
+  //     if (error.message.includes('already exists')) {
+  //       toast.error('Role name already exists');
+  //       setErrors(prev => ({ ...prev, displayName: 'This role name is already taken' }));
+  //     } else if (error.message.includes('System roles')) {
+  //       toast.error('Cannot modify system roles');
+  //     } else {
+  //       toast.error(error.message || 'Failed to save role');
+  //     }
+  //   } finally {
+  //     setIsSubmitting(false);
+  //   }
+  // };
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
-    
-    setIsSubmitting(true);
-    
-    try {
+  e.preventDefault();
+  
+  if (!validateForm()) return;
+  
+  setIsSubmitting(true);
+  
+  try {
+    // Generate the internal name from displayName
+    const name = formData.displayName.trim()
+      .toUpperCase()
+      .replace(/\s+/g, '_')
+      .replace(/[^A-Z0-9_]/g, '');
 
-      // Prepare data for API (convert status to uppercase)
-      const apiData = {
-        displayName: formData.displayName.trim(), // Keep the user-friendly name
-        description: formData.description.trim(),
-        isDefault: false,
-        status: formData.status.toUpperCase() // Convert to ACTIVE/INACTIVE
-      };
+    // Prepare data for API (convert status to uppercase)
+    const apiData = {
+      name: name, // ADD THIS - the internal name for validation
+      displayName: formData.displayName.trim(), // Keep the user-friendly name
+      description: formData.description.trim(),
+      isDefault: false,
+      status: formData.status.toUpperCase() // Convert to ACTIVE/INACTIVE
+    };
 
-      console.log('Submitting:', apiData);
+    console.log('Submitting:', apiData);
 
-      let response;
-      
-      if (isEdit) {
-        response = await roleService.updateRole(role.id, apiData);
-        toast.success('Role updated successfully');
-        // router.push(`/super-admin/roles-permissions/${role.id}`);
-         router.push('/super-admin/roles-permissions');
-      } else {
-        response = await roleService.createRole(apiData);
-        toast.success('Role created successfully');
-        // Redirect to permissions page with the new role ID
-        router.push(`/super-admin/roles-permissions/${response.data.id}/permissions`);
-      }
-      
-      router.refresh();
-    } catch (error) {
-      console.error('Error saving role:', error);
-      
-      // Handle specific error cases
-      if (error.message.includes('already exists')) {
-        toast.error('Role name already exists');
-        setErrors(prev => ({ ...prev, displayName: 'This role name is already taken' }));
-      } else if (error.message.includes('System roles')) {
-        toast.error('Cannot modify system roles');
-      } else {
-        toast.error(error.message || 'Failed to save role');
-      }
-    } finally {
-      setIsSubmitting(false);
+    let response;
+    
+    if (isEdit) {
+      response = await roleService.updateRole(role.id, apiData);
+      toast.success('Role updated successfully');
+      router.push('/super-admin/roles-permissions');
+    } else {
+      response = await roleService.createRole(apiData);
+      toast.success('Role created successfully');
+      // Redirect to permissions page with the new role ID
+      router.push(`/super-admin/roles-permissions/${response.data.id}/permissions`);
     }
-  };
+    
+    router.refresh();
+  } catch (error) {
+    console.error('Error saving role:', error);
+    
+    // Handle specific error cases
+    if (error.message.includes('already exists')) {
+      toast.error('Role name already exists');
+      setErrors(prev => ({ ...prev, displayName: 'This role name is already taken' }));
+    } else if (error.message.includes('System roles')) {
+      toast.error('Cannot modify system roles');
+    } else {
+      toast.error(error.message || 'Failed to save role');
+    }
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="w-full p-4 sm:p-6">

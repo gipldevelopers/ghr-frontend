@@ -1,3 +1,4 @@
+// src\app\(dashboard)\hr\employees\components\EmployeeStatsCards.js
 "use client";
 
 import { Users, UserCheck, UserX, UserPlus, TrendingUp } from "lucide-react";

@@ -1,50 +1,24 @@
-// src\app\(dashboard)\hr\employees\components\EmployeeFilters.js
+// src/app/(dashboard)/super-admin/users/components/UserFilters.js
 "use client";
 import { useState } from 'react';
-import { Search, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { Search, Filter, X, ChevronDown, ChevronUp, User, Shield } from 'lucide-react';
 
-const EmployeeFilters = ({
+const UserFilters = ({
   globalFilter,
   setGlobalFilter,
   statusFilter,
   setStatusFilter,
-  designationFilter,
-  setDesignationFilter,
-  //   departmentFilter,
-  //   setDepartmentFilter,
+  roleFilter,
+  setRoleFilter,
   statuses,
-  designations,
-  //   departments,
+  roles,
   onClearFilters
 }) => {
   const [isFiltersOpen, setIsFiltersOpen] = useState(false);
 
   const hasActiveFilters = statusFilter !== 'all' ||
-    designationFilter !== 'all' ||
-    //   departmentFilter !== 'all' || 
+    roleFilter !== 'all' ||
     globalFilter;
-
-  // Function to get unique values with indexes to ensure unique keys
-  const getUniqueOptions = (items) => {
-    const uniqueItems = [];
-    const seen = new Set();
-
-    items.filter(item => item !== 'all').forEach((item, index) => {
-      if (!seen.has(item)) {
-        seen.add(item);
-        uniqueItems.push({ value: item, key: `${item}-${index}` });
-      } else {
-        // If duplicate, add index to make it unique
-        uniqueItems.push({ value: item, key: `${item}-${index}` });
-      }
-    });
-
-    return uniqueItems;
-  };
-
-  const uniqueStatuses = getUniqueOptions(statuses);
-  const uniqueDesignations = getUniqueOptions(designations);
-  //   const uniqueDepartments = getUniqueOptions(departments);
 
   return (
     <div className="space-y-4">
@@ -52,7 +26,7 @@ const EmployeeFilters = ({
       <div className="relative">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <input
-          placeholder="Search employees by name, email, ID..."
+          placeholder="Search users by name, email, employee ID..."
           value={globalFilter}
           onChange={e => setGlobalFilter(e.target.value)}
           className="w-full pl-10 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -78,7 +52,9 @@ const EmployeeFilters = ({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           {/* Status Filter */}
           <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Status</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center">
+              <User className="w-3 h-3 mr-1" /> Status
+            </label>
             <div className="relative">
               <select
                 value={statusFilter}
@@ -86,8 +62,8 @@ const EmployeeFilters = ({
                 className="w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none"
               >
                 <option value="all">All Status</option>
-                {uniqueStatuses.map(({ value, key }) => (
-                  <option key={key} value={value}>{value}</option>
+                {statuses.filter(s => s !== 'all').map(status => (
+                  <option key={status} value={status}>{status}</option>
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -96,18 +72,20 @@ const EmployeeFilters = ({
             </div>
           </div>
 
-          {/* Designation Filter */}
+          {/* Role Filter */}
           <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Designation</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300 flex items-center">
+              <Shield className="w-3 h-3 mr-1" /> Role
+            </label>
             <div className="relative">
               <select
-                value={designationFilter}
-                onChange={e => setDesignationFilter(e.target.value)}
+                value={roleFilter}
+                onChange={e => setRoleFilter(e.target.value)}
                 className="w-full pl-3 pr-8 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none"
               >
-                <option value="all">All Designations</option>
-                {uniqueDesignations.map(({ value, key }) => (
-                  <option key={key} value={value}>{value}</option>
+                <option value="all">All Roles</option>
+                {roles.filter(r => r !== 'all').map(role => (
+                  <option key={role} value={role}>{role}</option>
                 ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
@@ -149,10 +127,10 @@ const EmployeeFilters = ({
               </button>
             </span>
           )}
-          {designationFilter !== 'all' && (
+          {roleFilter !== 'all' && (
             <span className="inline-flex items-center px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full dark:bg-purple-900/30 dark:text-purple-400">
-              Designation: {designationFilter}
-              <button onClick={() => setDesignationFilter('all')} className="ml-1">
+              Role: {roleFilter}
+              <button onClick={() => setRoleFilter('all')} className="ml-1">
                 <X className="w-3 h-3" />
               </button>
             </span>
@@ -163,4 +141,4 @@ const EmployeeFilters = ({
   );
 };
 
-export default EmployeeFilters;
+export default UserFilters;

@@ -1,3 +1,4 @@
+// src\app\(dashboard)\hr\employees\add\components\ProfessionalInfoForm.js
 "use client";
 import { Briefcase, Calendar, User, IndianRupee, Clock, Building, Users, FileText, Loader2 } from 'lucide-react';
 import InputField from '@/components/form/input/InputField';

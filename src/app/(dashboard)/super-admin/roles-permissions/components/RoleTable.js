@@ -47,6 +47,20 @@ export default function RoleTable() {
       
       if (response.success) {
         // Transform API data to match frontend format
+        // const transformedData = response.data.map(role => ({
+        //   id: role.id,
+        //   name: role.name,
+        //   displayName: role.displayName || role.name.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        //   createdDate: new Date(role.createdAt).toLocaleDateString('en-GB', {
+        //     day: '2-digit',
+        //     month: 'short',
+        //     year: 'numeric'
+        //   }),
+        //   status: role.status.charAt(0) + role.status.slice(1).toLowerCase(),
+        //   userCount: role._count?.users || 0,
+        //   description: role.description || '',
+        //   isSystem: role.isSystem || false
+        // }));
         const transformedData = response.data.map(role => ({
           id: role.id,
           name: role.name,
@@ -56,7 +70,10 @@ export default function RoleTable() {
             month: 'short',
             year: 'numeric'
           }),
-          status: role.status.charAt(0) + role.status.slice(1).toLowerCase(),
+          // FIX: Handle both system and company roles
+          status: role.isSystem ? 
+            (role.isEditable === false ? 'System' : 'Active') : 
+            (role.isActive ? 'Active' : 'Inactive'),
           userCount: role._count?.users || 0,
           description: role.description || '',
           isSystem: role.isSystem || false
