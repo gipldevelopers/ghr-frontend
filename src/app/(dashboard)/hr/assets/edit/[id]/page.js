@@ -336,8 +336,7 @@ export default function EditAsset() {
                   <option value="weekly">Weekly</option>
                   <option value="monthly">Monthly</option>
                   <option value="quarterly">Quarterly</option>
-                  <option value="annual">Annual</option>
-                  <option value="daily">Daily</option>
+                  <option value="yearly">Yearly</option>
                 </select>
               </div>
             </div>
