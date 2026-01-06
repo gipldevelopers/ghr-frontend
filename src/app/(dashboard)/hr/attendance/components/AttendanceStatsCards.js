@@ -3,82 +3,55 @@
 import { Users, UserCheck, UserX, Clock, TrendingUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export default function AttendanceStatsCards({ selectedDate }) {
-  // Mock data - in a real app, this would come from props or API
-  const [statsData, setStatsData] = useState({
+export default function AttendanceStatsCards({ selectedDate, statsData, loading = false }) {
+  // Default stats
+  const defaultStats = {
     totalEmployees: 0,
     presentEmployees: 0,
     absentEmployees: 0,
     lateEmployees: 0,
     attendanceRate: 0
-  });
+  };
 
-  // Simulate data loading based on selected date
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      // Mock data that changes based on the selected date
-      const dayOfWeek = selectedDate.getDay(); // 0 = Sunday, 1 = Monday, etc.
-      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-      
-      const baseData = {
-        totalEmployees: 1007,
-        presentEmployees: isWeekend ? 120 : 854, // Fewer people on weekends
-        absentEmployees: isWeekend ? 887 : 153,
-        lateEmployees: isWeekend ? 15 : 67,
-        attendanceRate: isWeekend ? 12.1 : 84.8
-      };
-
-      setStatsData(baseData);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, [selectedDate]);
+  const currentStats = statsData || defaultStats;
 
   const cards = [
     {
       title: "Total Employees",
-      value: statsData.totalEmployees,
+      value: currentStats.totalEmployees,
       icon: Users,
       iconBg: "bg-gradient-to-r from-gray-800 to-gray-600",
       iconColor: "text-white",
-      growth: 2.5, // Overall growth rate
-      growthColor: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400",
       cardBg: "bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900",
       hoverEffect: "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
       description: "Total workforce count"
     },
     {
       title: "Present Today",
-      value: statsData.presentEmployees,
+      value: currentStats.presentEmployees,
       icon: UserCheck,
       iconBg: "bg-gradient-to-r from-green-500 to-green-400",
       iconColor: "text-white",
-      growth: statsData.attendanceRate,
-      growthColor: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
       cardBg: "bg-gradient-to-br from-white to-green-50 dark:from-gray-800 dark:to-gray-900",
       hoverEffect: "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
       description: "Employees marked present"
     },
     {
       title: "Absent Today",
-      value: statsData.absentEmployees,
+      value: currentStats.absentEmployees,
       icon: UserX,
       iconBg: "bg-gradient-to-r from-red-500 to-red-400",
       iconColor: "text-white",
-      growth: (100 - statsData.attendanceRate),
-      growthColor: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
       cardBg: "bg-gradient-to-br from-white to-red-50 dark:from-gray-800 dark:to-gray-900",
       hoverEffect: "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
       description: "Employees not present"
     },
     {
       title: "Late Arrivals",
-      value: statsData.lateEmployees,
+      value: currentStats.lateEmployees,
       icon: Clock,
       iconBg: "bg-gradient-to-r from-yellow-500 to-yellow-400",
       iconColor: "text-white",
-      growth: 8.3, // Late arrival rate
-      growthColor: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400",
       cardBg: "bg-gradient-to-br from-white to-yellow-50 dark:from-gray-800 dark:to-gray-900",
       hoverEffect: "hover:shadow-lg hover:-translate-y-1 transition-all duration-300",
       description: "Employees arrived late"
@@ -93,6 +66,33 @@ export default function AttendanceStatsCards({ selectedDate }) {
       day: 'numeric' 
     });
   };
+
+  if (loading) {
+    return (
+      <div className="mb-8">
+        <div className="mb-6">
+          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2 animate-pulse"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4 animate-pulse"></div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4 md:p-6 animate-pulse">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center overflow-hidden">
+                  <div className="rounded-lg sm:rounded-xl p-2 sm:p-3 mr-3 sm:mr-4 bg-gray-200 dark:bg-gray-700 w-10 h-10"></div>
+                  <div className="overflow-hidden">
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-20 mb-2"></div>
+                    <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-16 mb-1"></div>
+                    <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-24"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-8">
@@ -133,40 +133,9 @@ export default function AttendanceStatsCards({ selectedDate }) {
                 </div>
               </div>
             </div>
-            {/* <div className="flex items-center mt-2 sm:mt-4">
-              <span className={`${card.growthColor} text-[10px] xs:text-xs font-medium px-2 py-0.5 xs:px-2.5 xs:py-1 rounded-full flex items-center`}>
-                <TrendingUp className="h-2.5 w-2.5 xs:h-3 xs:w-3 mr-0.5 xs:mr-1" />
-                {card.growth}%
-              </span>
-              <span className="text-[10px] xs:text-xs text-gray-500 dark:text-gray-400 ml-1 xs:ml-2 truncate">
-                {index === 0 ? "from last month" : "of total"}
-              </span>
-            </div> */}
           </div>
         ))}
       </div>
-
-      {/* Summary Row */}
-      {/* <div className="mt-6 p-4 bg-blue-50 rounded-lg dark:bg-blue-900/20">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-blue-800 dark:text-blue-300">
-              Overall Attendance Rate
-            </p>
-            <p className="text-2xl font-bold text-blue-900 dark:text-blue-200">
-              {statsData.attendanceRate}%
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-blue-700 dark:text-blue-400">
-              {selectedDate.toLocaleDateString('en-US', { weekday: 'long' })}
-            </p>
-            <p className="text-xs text-blue-600 dark:text-blue-500">
-              {statsData.presentEmployees} / {statsData.totalEmployees} employees
-            </p>
-          </div>
-        </div>
-      </div> */}
     </div>
   );
 }

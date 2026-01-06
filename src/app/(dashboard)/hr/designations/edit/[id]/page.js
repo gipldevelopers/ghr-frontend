@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import DesignationForm from '../../components/DesignationForm';
-import { designationService } from '@/services/designationService';
+import { designationService } from '@/services/hr-services/designationService';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 

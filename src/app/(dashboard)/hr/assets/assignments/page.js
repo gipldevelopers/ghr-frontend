@@ -14,7 +14,7 @@ import Breadcrumb from "@/components/common/Breadcrumb";
 import Link from "next/link";
 import ReturnAssetModal from "./components/ReturnAssetModal";
 import AssignmentStats from "./components/AssignmentStats";
-import { assetService } from "../../../../../services/asset.service";
+import { assetService } from "../../../../../services/hr-services/asset.service";
 
 export default function AssetAssignments() {
   const [assignments, setAssignments] = useState([]);

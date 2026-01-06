@@ -2,7 +2,7 @@
 
 import { Calendar, UserCheck, Clock, AlertCircle, TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { leaveRequestService } from '@/services/leaveRequestService';
+import { leaveRequestService } from '@/services/hr-services/leaveRequestService';
 
 export default function LeaveRequestsStatsCards() {
   const [statsData, setStatsData] = useState(null);

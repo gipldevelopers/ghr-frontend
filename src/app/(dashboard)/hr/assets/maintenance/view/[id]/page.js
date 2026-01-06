@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, DollarSign, User, Clock, FileText, AlertTriangle, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
-import { assetService } from '../../../../../../../services/asset.service';
+import { assetService } from '../../../../../../../services/hr-services/asset.service';
 import { format } from 'date-fns';
 
 export default function ViewMaintenanceRecord() {

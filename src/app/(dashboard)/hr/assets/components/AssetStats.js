@@ -2,7 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { Package, CheckCircle, AlertTriangle, DollarSign } from "lucide-react";
-import { assetService } from "../../../../../services/asset.service";
+import { assetService } from "../../../../../services/hr-services/asset.service";
 
 export default function AssetStats() {
   const [stats, setStats] = useState(null);

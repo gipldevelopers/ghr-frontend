@@ -7,7 +7,7 @@ import {
     Briefcase, ArrowLeft, Save, Loader2, Info
 } from "lucide-react";
 import Breadcrumb from "@/components/common/Breadcrumb";
-import employeeService from "@/services/employeeService";
+import employeeService from "@/services/hr-services/employeeService";
 import { toast } from "sonner";
 import InputField from "@/components/form/input/InputField";
 import SelectField from "../../add/components/SelectField";

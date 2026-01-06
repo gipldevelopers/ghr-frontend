@@ -4,7 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import DepartmentForm from '../../components/DepartmentForm';
-import { departmentService } from '@/services/departmentService';
+import { departmentService } from '@/services/hr-services/departmentService';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 

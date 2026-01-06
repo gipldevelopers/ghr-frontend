@@ -13,7 +13,7 @@ import {
 import { ChevronUp, ChevronDown, Eye, Edit, Trash2, Loader2 } from 'lucide-react';
 import Pagination from '@/components/common/Pagination';
 import DepartmentFilters from './DepartmentFilters';
-import { departmentService } from '@/services/departmentService';
+import { departmentService } from '@/services/hr-services/departmentService';
 import { toast } from 'sonner';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 

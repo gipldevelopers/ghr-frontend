@@ -1,7 +1,7 @@
 "use client";
 import { Wrench, CheckCircle, DollarSign } from "lucide-react";
 import { useState, useEffect } from "react";
-import { assetService } from "../../../../../../services/asset.service";
+import { assetService } from "../../../../../../services/hr-services/asset.service";
 
 export default function MaintenanceStatsCard() {
   const [stats, setStats] = useState({

@@ -2,7 +2,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Search, Filter, X } from 'lucide-react';
-import { departmentService } from '@/services/departmentService';
+import { departmentService } from '@/services/hr-services/departmentService';
 
 export default function DesignationFilters({
   globalFilter,

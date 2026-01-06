@@ -1,11 +1,12 @@
 import { Filter, Users, Calendar, CheckCircle, Clock, XCircle } from 'lucide-react';
 
-const CalendarFilters = ({ filters, onFilterChange, leaves }) => {
-  // Get unique values for filters
-  const departments = ['all', ...new Set(leaves.map(leave => leave.department))];
-  const statuses = ['all', 'approved', 'pending', 'rejected'];
-  const leaveTypes = ['all', ...new Set(leaves.map(leave => leave.leaveType))];
-
+const CalendarFilters = ({ 
+  filters, 
+  onFilterChange, 
+  departments = [], 
+  leaveTypes = [], 
+  statuses = ['all', 'approved', 'pending', 'rejected'] 
+}) => {
   const handleFilterChange = (key, value) => {
     onFilterChange({
       ...filters,
@@ -41,9 +42,10 @@ const CalendarFilters = ({ filters, onFilterChange, leaves }) => {
             onChange={(e) => handleFilterChange('department', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           >
+            <option value="all">All Departments</option>
             {departments.map(dept => (
               <option key={dept} value={dept}>
-                {dept === 'all' ? 'All Departments' : dept}
+                {dept}
               </option>
             ))}
           </select>
@@ -78,9 +80,10 @@ const CalendarFilters = ({ filters, onFilterChange, leaves }) => {
             onChange={(e) => handleFilterChange('leaveType', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           >
+            <option value="all">All Leave Types</option>
             {leaveTypes.map(type => (
               <option key={type} value={type}>
-                {type === 'all' ? 'All Leave Types' : type}
+                {type}
               </option>
             ))}
           </select>

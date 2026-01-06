@@ -8,7 +8,7 @@ import {
     FileText, CreditCard,
 } from "lucide-react";
 import Breadcrumb from "@/components/common/Breadcrumb";
-import employeeService from "@/services/employeeService";
+import employeeService from "@/services/hr-services/employeeService";
 import { toast } from "sonner";
 
 export default function EmployeeProfilePage() {

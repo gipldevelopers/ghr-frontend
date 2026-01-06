@@ -1,45 +1,61 @@
 "use client";
-import { useParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import HolidayForm from '../../components/HolidayForm';
-
-// Mock data - replace with actual API call
-const getHolidayData = (id) => {
-  const holidays = [
-    {
-      id: 1,
-      name: "New Year's Day",
-      date: "2025-01-01",
-      type: "national",
-      description: "Celebration of the new year",
-      isRecurring: true,
-      applicableTo: "all",
-      country: "India",
-      state: "All",
-      image: "/images/holidays/new-year.jpg",
-      color: "#3b82f6"
-    },
-    {
-      id: 2,
-      name: "Republic Day",
-      date: "2025-01-26",
-      type: "national",
-      description: "Celebration of India's constitution",
-      isRecurring: true,
-      applicableTo: "all",
-      country: "India",
-      state: "All",
-      image: "/images/holidays/republic-day.jpg",
-      color: "#ff9933"
-    },
-    // ... other holidays
-  ];
-  return holidays.find(holiday => holiday.id === parseInt(id));
-};
+import { holidayService } from '../../../../../../../services/hr-services/leave-holiday-calender.service';
+import { toast } from 'react-hot-toast';
 
 export default function EditHolidayPage() {
   const params = useParams();
-  const holiday = getHolidayData(params.id);
+  const router = useRouter();
+  const [holiday, setHoliday] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetchHolidayData();
+  }, [params.id]);
+
+  const fetchHolidayData = async () => {
+    setLoading(true);
+    try {
+      const response = await holidayService.getHolidayById(params.id);
+      setHoliday(response.data);
+    } catch (error) {
+      console.error('Error fetching holiday:', error);
+      toast.error(error.message || 'Failed to fetch holiday');
+      router.push('/hr/leave/holidays');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (formData) => {
+    setIsSubmitting(true);
+    try {
+      const response = await holidayService.updateHoliday(params.id, formData);
+      toast.success('Holiday updated successfully');
+      router.push('/hr/leave/holidays');
+      router.refresh();
+    } catch (error) {
+      console.error('Error updating holiday:', error);
+      toast.error(error.message || 'Failed to update holiday');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-6">
+        <div className="bg-white rounded-lg shadow dark:bg-gray-800 p-6 text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading holiday...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!holiday) {
     return (
@@ -64,7 +80,12 @@ export default function EditHolidayPage() {
       />
 
       <div className="bg-white rounded-lg shadow dark:bg-gray-800 mt-6">
-        <HolidayForm holiday={holiday} isEdit={true} />
+        <HolidayForm 
+          holiday={holiday}
+          onSubmit={handleSubmit}
+          isSubmitting={isSubmitting}
+          isEdit={true}
+        />
       </div>
     </div>
   );

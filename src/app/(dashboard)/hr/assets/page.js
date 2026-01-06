@@ -6,7 +6,7 @@ import AssetTable from './components/AssetTable';
 import AssetStats from './components/AssetStats';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import Link from 'next/link';
-import { assetService } from '../../../../services/asset.service';
+import { assetService } from '../../../../services/hr-services/asset.service';
 
 export default function AssetInventory() {
   const [assets, setAssets] = useState([]);

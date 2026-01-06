@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import PolicyStatusBadge from './PolicyStatusBadge';
 import Link from 'next/link';
-import leavePolicyService from '../../../../../../services/leavepolicies.service';
+import leavePolicyService from '../../../../../../services/hr-services/leavepolicies.service';
 import { toast } from 'sonner';
 
 // Create a portal for the dropdown to render outside the table

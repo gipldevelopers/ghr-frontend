@@ -13,7 +13,7 @@ import {
 import { ChevronUp, ChevronDown, Eye, Edit, Trash2 } from "lucide-react";
 import Pagination from "@/components/common/Pagination";
 import EmployeeFilters from "./EmployeeFilters";
-import employeeService from "@/services/employeeService"; // adjust path
+import employeeService from "@/services/hr-services/employeeService"; // adjust path
 
 export default function EmployeeTable() {
   const router = useRouter();

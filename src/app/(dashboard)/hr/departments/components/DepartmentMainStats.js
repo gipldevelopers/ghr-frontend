@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Building2, CheckCircle2, XCircle, Users } from 'lucide-react';
-import { departmentService } from '@/services/departmentService';
+import { departmentService } from '@/services/hr-services/departmentService';
 import { toast } from 'sonner';
 
 const DepartmentMainStats = () => {

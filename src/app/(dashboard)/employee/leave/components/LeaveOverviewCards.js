@@ -2,26 +2,39 @@
 
 import { Calendar, CheckCircle, Clock, XCircle } from "lucide-react";
 import { useState, useEffect } from "react";
+import EmployeeLeaveService from "@/services/employee/leave.service";
 
 export default function LeaveOverviewCards({ selectedMonth }) {
   const [statsData, setStatsData] = useState({
-    totalLeaves: 20,
-    leavesTaken: 5,
-    remainingLeaves: 15,
-    pendingLeaves: 2
+    totalLeaves: 0,
+    leavesTaken: 0,
+    remainingLeaves: 0,
+    pendingLeaves: 0
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStatsData({
-        totalLeaves: 20,
-        leavesTaken: Math.floor(Math.random() * 10),
-        remainingLeaves: Math.floor(Math.random() * 10) + 5,
-        pendingLeaves: Math.floor(Math.random() * 5)
-      });
-    }, 500);
-    return () => clearTimeout(timer);
+    fetchStats();
   }, [selectedMonth]);
+
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const data = await EmployeeLeaveService.getDashboardStats();
+      // Assuming the API returns these fields or mapping is needed.
+      // For now using the data as is or providing defaults
+      setStatsData({
+        totalLeaves: data.totalLeaves || 0,
+        leavesTaken: data.leavesTaken || 0,
+        remainingLeaves: data.remainingLeaves || 0,
+        pendingLeaves: data.pendingLeaves || 0
+      });
+    } catch (error) {
+      console.error("Failed to fetch leave stats", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const cards = [
     { title: "Total Leaves", value: statsData.totalLeaves, icon: Calendar, iconBg: "bg-gradient-to-r from-gray-800 to-gray-600", cardBg: "bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900", description: "Total leave entitlement" },
@@ -29,6 +42,16 @@ export default function LeaveOverviewCards({ selectedMonth }) {
     { title: "Remaining Leaves", value: statsData.remainingLeaves, icon: Clock, iconBg: "bg-gradient-to-r from-yellow-500 to-yellow-400", cardBg: "bg-gradient-to-br from-white to-yellow-50 dark:from-gray-800 dark:to-gray-900", description: "Leaves still available" },
     { title: "Pending Leaves", value: statsData.pendingLeaves, icon: XCircle, iconBg: "bg-gradient-to-r from-red-500 to-red-400", cardBg: "bg-gradient-to-br from-white to-red-50 dark:from-gray-800 dark:to-gray-900", description: "Leaves awaiting approval" },
   ];
+
+  if (loading) {
+    return (
+      <div className="mb-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map(i => (
+          <div key={i} className="h-32 bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse"></div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="mb-8">

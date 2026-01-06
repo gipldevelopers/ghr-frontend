@@ -2,9 +2,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Calendar, User, FileText, Paperclip, Download, Trash2, ArrowLeft, Users, Search, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { leaveRequestService } from '../../../../../services/leaveRequestService';
-import { userService } from '../../../../../services/user.service';
-import { employeeService } from '../../../../../services/employeeService';
+import { leaveRequestService } from '../../../../../services/hr-services/leaveRequestService';
+import { userService } from '../../../../../services/user-services/user.service';
+import { employeeService } from '../../../../../services/hr-services/employeeService';
 import { toast } from 'sonner';
 
 const LeaveRequestForm = ({ isEditMode = false, initialData = null, onSave, onCancel }) => {

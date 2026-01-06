@@ -7,7 +7,7 @@ import Breadcrumb from '@/components/common/Breadcrumb';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 import LeaveTypeDetail from '../components/LeaveTypeDetail';
 import Link from 'next/link';
-import { leaveTypeService } from '@/services/leaveTypeService';
+import { leaveTypeService } from '@/services/hr-services/leaveTypeService';
 import { toast } from 'sonner';
 
 export default function LeaveTypes() {

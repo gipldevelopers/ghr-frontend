@@ -1,8 +1,35 @@
 "use client";
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { leaveReportsService } from '@/services/hr-services/leaveReports.service';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const LeaveTrendChart = ({ filters }) => {
+  const [trendData, setTrendData] = useState({ categories: [], series: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchTrends = async () => {
+      try {
+        setLoading(true);
+        const response = await leaveReportsService.getLeaveTrends(filters);
+        setTrendData({
+          categories: response.data?.categories || [],
+          series: response.data?.series || []
+        });
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching leave trends:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrends();
+  }, [filters]);
+
   // Chart options
   const chartOptions = {
     chart: {
@@ -33,7 +60,7 @@ const LeaveTrendChart = ({ filters }) => {
       size: 5
     },
     xaxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      categories: trendData.categories,
       labels: {
         style: {
           colors: '#6b7280',
@@ -70,33 +97,30 @@ const LeaveTrendChart = ({ filters }) => {
     }
   };
 
-  // Chart series data
-  const chartSeries = [
-    {
-      name: 'Total Leaves',
-      data: [45, 52, 48, 61, 55, 67, 72, 65, 58, 63, 59, 71]
-    },
-    {
-      name: 'Approved',
-      data: [38, 42, 40, 52, 47, 58, 63, 56, 50, 55, 51, 62]
-    },
-    {
-      name: 'Pending',
-      data: [7, 10, 8, 9, 8, 9, 9, 9, 8, 8, 8, 9]
-    }
-  ];
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 animate-pulse">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
+        <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded w-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Leave Trends Over Time
       </h3>
-      <Chart
-        options={chartOptions}
-        series={chartSeries}
-        type="line"
-        height={350}
-      />
+      {error ? (
+        <div className="text-red-600 dark:text-red-400 p-4">Error loading trends: {error}</div>
+      ) : (
+        <Chart
+          options={chartOptions}
+          series={trendData.series}
+          type="line"
+          height={350}
+        />
+      )}
     </div>
   );
 };

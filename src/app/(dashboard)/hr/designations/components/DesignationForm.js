@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, ArrowLeft, Briefcase, Loader2 } from 'lucide-react';
-import { designationService } from '@/services/designationService';
-import { departmentService } from '@/services/departmentService';
+import { designationService } from '@/services/hr-services/designationService';
+import { departmentService } from '@/services/hr-services/departmentService';
 import { toast } from 'sonner';
 
 export default function DesignationForm({ designation = null, isEdit = false }) {
