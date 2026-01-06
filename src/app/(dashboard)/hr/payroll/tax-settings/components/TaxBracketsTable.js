@@ -15,7 +15,8 @@ const TaxBracketsTable = ({ taxSettingId }) => {
       try {
         setLoading(true);
         const response = await payrollService.getTaxBrackets({ taxSettingId });
-        setBrackets(response.data || []);
+        const data = response.data || response;
+        setBrackets(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         setError(err.message);

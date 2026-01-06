@@ -1,10 +1,12 @@
 // src/app/(dashboard)/hr/payroll/components/RecentPayrollRuns.js
 "use client";
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Eye, Download, Calendar, ChevronUp, ChevronDown } from 'lucide-react';
 import { payrollService } from '../../../../../services/hr-services/payroll.service';
 
 export default function RecentPayrollRuns() {
+  const router = useRouter();
   const [sortField, setSortField] = useState('processedDate');
   const [sortDirection, setSortDirection] = useState('desc');
   const [payrollRuns, setPayrollRuns] = useState([]);
@@ -82,9 +84,7 @@ export default function RecentPayrollRuns() {
   };
 
   const handleViewDetails = (run) => {
-    console.log('View payroll run details:', run);
-    // Navigate to payroll run details page
-    // router.push(`/hr/payroll/runs/${run.id}`);
+    router.push(`/hr/payroll/history?runId=${run.id}`);
   };
 
   const handleDownloadReports = async (run) => {
@@ -136,10 +136,7 @@ export default function RecentPayrollRuns() {
         </h2>
         <button
           className="flex items-center gap-2 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition w-full sm:w-auto justify-center"
-          onClick={() => {
-            // Navigate to process payroll page
-            // router.push('/hr/payroll/process');
-          }}
+          onClick={() => router.push('/hr/payroll/process')}
         >
           <Calendar size={16} />
           Process New Payroll

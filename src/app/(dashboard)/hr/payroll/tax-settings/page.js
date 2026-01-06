@@ -19,8 +19,31 @@ export default function TaxSettings() {
       try {
         setLoading(true);
         const response = await payrollService.getTaxSettings();
-        setTaxConfig(response.data);
-        setError(null);
+        // Handle different response structures: { success, data: {...} } or {...}
+        let data = response.data || response;
+
+        // If it's an array, take the first one (most common setting)
+        if (Array.isArray(data)) {
+          data = data[0];
+        }
+
+        if (data) {
+          setTaxConfig(data);
+          setError(null);
+        } else {
+          // Initialize with defaults if no settings exist
+          setTaxConfig({
+            taxYear: new Date().getFullYear().toString(),
+            taxMethod: 'PROGRESSIVE',
+            defaultAllowance: 0,
+            socialSecurityRate: 0,
+            medicareRate: 0,
+            additionalMedicareRate: 0,
+            additionalMedicareThreshold: 0,
+            stateTaxRate: 0,
+            unemploymentInsuranceRate: 0
+          });
+        }
       } catch (err) {
         setError(err.message);
         console.error('Error fetching tax settings:', err);

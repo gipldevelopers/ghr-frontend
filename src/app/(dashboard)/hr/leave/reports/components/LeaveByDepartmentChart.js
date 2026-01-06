@@ -1,8 +1,35 @@
 "use client";
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { leaveReportsService } from '@/services/hr-services/leaveReports.service';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const LeaveByDepartmentChart = ({ filters }) => {
+  const [deptData, setDeptData] = useState({ categories: [], series: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchDeptData = async () => {
+      try {
+        setLoading(true);
+        const response = await leaveReportsService.getLeaveByDepartment(filters);
+        setDeptData({
+          categories: response.data?.categories || [],
+          series: response.data?.series || []
+        });
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching leave by department:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDeptData();
+  }, [filters]);
+
   // Chart options
   const chartOptions = {
     chart: {
@@ -39,7 +66,7 @@ const LeaveByDepartmentChart = ({ filters }) => {
       colors: ['transparent']
     },
     xaxis: {
-      categories: ['Engineering', 'Sales', 'Marketing', 'HR', 'Finance', 'Operations'],
+      categories: deptData.categories,
       labels: {
         style: {
           colors: '#6b7280',
@@ -82,36 +109,37 @@ const LeaveByDepartmentChart = ({ filters }) => {
           if (seriesIndex === 0) {
             return val + ' leaves';
           } else {
-            return val + ' utilization';
+            return val + '% utilization';
           }
         }
       }
     }
   };
 
-  // Chart series data
-  const chartSeries = [
-    {
-      name: 'Total Leaves',
-      data: [78, 64, 52, 45, 38, 56]
-    },
-    {
-      name: 'Utilization Rate',
-      data: [72, 68, 65, 60, 55, 63]
-    }
-  ];
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 animate-pulse">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
+        <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded w-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Leave by Department
       </h3>
-      <Chart
-        options={chartOptions}
-        series={chartSeries}
-        type="bar"
-        height={350}
-      />
+      {error ? (
+        <div className="text-red-600 dark:text-red-400 p-4">Error loading data: {error}</div>
+      ) : (
+        <Chart
+          options={chartOptions}
+          series={deptData.series}
+          type="bar"
+          height={350}
+        />
+      )}
     </div>
   );
 };

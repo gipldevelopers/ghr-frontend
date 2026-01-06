@@ -1,8 +1,35 @@
 "use client";
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { leaveReportsService } from '@/services/hr-services/leaveReports.service';
 const Chart = dynamic(() => import('react-apexcharts'), { ssr: false });
 
 const LeaveByTypeChart = ({ filters }) => {
+  const [leaveData, setLeaveData] = useState({ labels: [], series: [] });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchLeaveByType = async () => {
+      try {
+        setLoading(true);
+        const response = await leaveReportsService.getLeaveByType(filters);
+        setLeaveData({
+          labels: response.data?.labels || [],
+          series: response.data?.series || []
+        });
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching leave by type:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchLeaveByType();
+  }, [filters]);
+
   // Chart options
   const chartOptions = {
     chart: {
@@ -10,7 +37,7 @@ const LeaveByTypeChart = ({ filters }) => {
       height: 350
     },
     colors: ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444'],
-    labels: ['Annual Leave', 'Sick Leave', 'Maternity', 'Emergency', 'Unpaid'],
+    labels: leaveData.labels,
     plotOptions: {
       pie: {
         donut: {
@@ -52,20 +79,30 @@ const LeaveByTypeChart = ({ filters }) => {
     }
   };
 
-  // Chart series data
-  const chartSeries = [45, 30, 12, 8, 5];
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6 animate-pulse">
+        <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-6"></div>
+        <div className="h-64 bg-gray-100 dark:bg-gray-700 rounded w-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 sm:p-6">
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
         Leave Distribution by Type
       </h3>
-      <Chart
-        options={chartOptions}
-        series={chartSeries}
-        type="donut"
-        height={350}
-      />
+      {error ? (
+        <div className="text-red-600 dark:text-red-400 p-4">Error loading data: {error}</div>
+      ) : (
+        <Chart
+          options={chartOptions}
+          series={leaveData.series}
+          type="donut"
+          height={350}
+        />
+      )}
     </div>
   );
 };

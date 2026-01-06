@@ -1,6 +1,7 @@
 // src/app/(dashboard)/hr/payroll/salary-structure/components/SalaryStructureTable.js
 "use client";
 import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   useReactTable,
   getCoreRowModel,
@@ -12,6 +13,7 @@ import { ChevronUp, ChevronDown, Eye, Edit, Trash2, IndianRupee } from 'lucide-r
 import Pagination from '@/components/common/Pagination';
 import SalaryStructureFilters from './SalaryStructureFilters';
 import { payrollService } from '../../../../../../services/hr-services/payroll.service';
+import { departmentService } from '../../../../../../services/hr-services/departmentService';
 
 export default function SalaryStructureTable() {
   const [data, setData] = useState([]);
@@ -22,10 +24,26 @@ export default function SalaryStructureTable() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [departmentFilter, setDepartmentFilter] = useState('all');
   const [totalItems, setTotalItems] = useState(0);
+  const [departments, setDepartments] = useState(['all']);
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
   });
+
+  useEffect(() => {
+    const fetchDepartments = async () => {
+      try {
+        const response = await departmentService.getAllDepartments();
+        if (response.data) {
+          const names = response.data.map(d => d.name);
+          setDepartments(['all', ...names]);
+        }
+      } catch (err) {
+        console.error('Error fetching departments:', err);
+      }
+    };
+    fetchDepartments();
+  }, []);
 
   useEffect(() => {
     const fetchSalaryStructures = async () => {
@@ -189,7 +207,8 @@ export default function SalaryStructureTable() {
   });
 
   const statuses = ['all', 'ACTIVE', 'INACTIVE'];
-  const departments = ['all']; // Should be fetched from API if needed
+
+  const router = useRouter();
 
   const clearFilters = () => {
     setStatusFilter('all');
@@ -198,11 +217,11 @@ export default function SalaryStructureTable() {
   };
 
   const handleView = (structure) => {
-    console.log('View salary structure:', structure);
+    router.push(`/hr/payroll/salary-structure/edit/${structure.id}`); // For now, view is edit
   };
 
   const handleEdit = (structure) => {
-    console.log('Edit salary structure:', structure);
+    router.push(`/hr/payroll/salary-structure/edit/${structure.id}`);
   };
 
   const handleDelete = async (structure) => {

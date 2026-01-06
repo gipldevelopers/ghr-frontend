@@ -1,6 +1,9 @@
 // src/app/(dashboard)/hr/payroll/reports/components/ReportFilters.js
 "use client";
+import { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
+import { departmentService } from '../../../../../../services/hr-services/departmentService';
+import { employeeService } from '../../../../../../services/hr-services/employeeService';
 
 const ReportFilters = ({
   selectedReportType,
@@ -8,6 +11,32 @@ const ReportFilters = ({
   dateRange,
   setDateRange
 }) => {
+  const [departments, setDepartments] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState({ deps: false, emps: false });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (selectedReportType === 'department-wise') {
+          setLoading(prev => ({ ...prev, deps: true }));
+          const response = await departmentService.getAllDepartments();
+          setDepartments(response.data || []);
+        } else if (selectedReportType === 'employee-wise') {
+          setLoading(prev => ({ ...prev, emps: true }));
+          const response = await employeeService.getAllEmployees();
+          setEmployees(response.data.employees || []);
+        }
+      } catch (err) {
+        console.error('Error fetching filter data:', err);
+      } finally {
+        setLoading({ deps: false, emps: false });
+      }
+    };
+
+    fetchData();
+  }, [selectedReportType]);
+
   const reportTypes = [
     { id: 'all', name: 'All Reports' },
     { id: 'payroll-summary', name: 'Payroll Summary' },
@@ -35,7 +64,7 @@ const ReportFilters = ({
           <select
             value={selectedReportType}
             onChange={(e) => setSelectedReportType(e.target.value)}
-            className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none"
+            className="w-full pl-3 pr-10 py-2 text-base border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white appearance-none"
           >
             {reportTypes.map(report => (
               <option key={report.id} value={report.id}>{report.name}</option>
@@ -61,7 +90,7 @@ const ReportFilters = ({
               name="startDate"
               value={dateRange.startDate}
               onChange={handleDateChange}
-              className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full pl-3 pr-10 py-2 text-base border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <Calendar className="w-4 h-4 text-gray-400" />
@@ -73,7 +102,7 @@ const ReportFilters = ({
               name="endDate"
               value={dateRange.endDate}
               onChange={handleDateChange}
-              className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="w-full pl-3 pr-10 py-2 text-base border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
               <Calendar className="w-4 h-4 text-gray-400" />
@@ -88,12 +117,14 @@ const ReportFilters = ({
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Department
           </label>
-          <select className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            <option value="">All Departments</option>
-            <option value="finance">Finance</option>
-            <option value="it">IT</option>
-            <option value="hr">HR</option>
-            <option value="marketing">Marketing</option>
+          <select
+            disabled={loading.deps}
+            className="w-full pl-3 pr-10 py-2 text-base border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">{loading.deps ? 'Loading...' : 'All Departments'}</option>
+            {departments.map(dep => (
+              <option key={dep.id} value={dep.id}>{dep.name}</option>
+            ))}
           </select>
         </div>
       )}
@@ -103,11 +134,14 @@ const ReportFilters = ({
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             Employee
           </label>
-          <select className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
-            <option value="">All Employees</option>
-            <option value="emp-010">Lori Broaddus</option>
-            <option value="emp-011">John Smith</option>
-            <option value="emp-012">Sarah Johnson</option>
+          <select
+            disabled={loading.emps}
+            className="w-full pl-3 pr-10 py-2 text-base border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">{loading.emps ? 'Loading...' : 'All Employees'}</option>
+            {employees.map(emp => (
+              <option key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName} ({emp.employeeId})</option>
+            ))}
           </select>
         </div>
       )}

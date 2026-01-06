@@ -1,22 +1,51 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronUp, ChevronDown, Search, Filter } from 'lucide-react';
+import { leaveReportsService } from '@/services/hr-services/leaveReports.service';
+import Pagination from '@/components/common/Pagination';
 
 const EmployeeLeaveTable = ({ filters }) => {
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    totalItems: 0,
+    totalPages: 1
+  });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Mock data - in real app, this would come from API based on filters
-  const employees = [
-    { id: 1, name: 'Sarah Johnson', department: 'Engineering', totalLeaves: 18, usedLeaves: 15, remainingLeaves: 3, utilization: '83%' },
-    { id: 2, name: 'Michael Chen', department: 'Sales', totalLeaves: 18, usedLeaves: 12, remainingLeaves: 6, utilization: '67%' },
-    { id: 3, name: 'Emily Rodriguez', department: 'Marketing', totalLeaves: 18, usedLeaves: 10, remainingLeaves: 8, utilization: '56%' },
-    { id: 4, name: 'David Kim', department: 'Engineering', totalLeaves: 18, usedLeaves: 16, remainingLeaves: 2, utilization: '89%' },
-    { id: 5, name: 'Lisa Wang', department: 'HR', totalLeaves: 18, usedLeaves: 8, remainingLeaves: 10, utilization: '44%' },
-    { id: 6, name: 'Robert Wilson', department: 'Finance', totalLeaves: 18, usedLeaves: 7, remainingLeaves: 11, utilization: '39%' },
-    { id: 7, name: 'Jennifer Lee', department: 'Operations', totalLeaves: 18, usedLeaves: 14, remainingLeaves: 4, utilization: '78%' },
-    { id: 8, name: 'Daniel Thomas', department: 'Engineering', totalLeaves: 18, usedLeaves: 13, remainingLeaves: 5, utilization: '72%' }
-  ];
+  useEffect(() => {
+    const fetchEmployeeSummary = async () => {
+      try {
+        setLoading(true);
+        const response = await leaveReportsService.getEmployeeLeaveSummary({
+          ...filters,
+          page: pagination.page,
+          limit: pagination.limit,
+          search: searchTerm,
+          sortKey: sortConfig.key,
+          sortDirection: sortConfig.direction
+        });
+        setEmployees(response.data || []);
+        setPagination(prev => ({
+          ...prev,
+          totalItems: response.pagination?.totalItems || 0,
+          totalPages: response.pagination?.totalPages || 1
+        }));
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching employee leave summary:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchEmployeeSummary();
+  }, [filters, pagination.page, pagination.limit, searchTerm, sortConfig]);
 
   const handleSort = (key) => {
     let direction = 'asc';
@@ -26,23 +55,6 @@ const EmployeeLeaveTable = ({ filters }) => {
     setSortConfig({ key, direction });
   };
 
-  const sortedEmployees = [...employees].sort((a, b) => {
-    if (sortConfig.key) {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
-      }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-    }
-    return 0;
-  });
-
-  const filteredEmployees = sortedEmployees.filter(employee =>
-    employee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    employee.department.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
       return <div className="ml-1 flex flex-col"><ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" /><ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" /></div>;
@@ -50,6 +62,14 @@ const EmployeeLeaveTable = ({ filters }) => {
     return sortConfig.direction === 'asc' ?
       <ChevronUp className="ml-1 w-4 h-4 text-blue-500" /> :
       <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />;
+  };
+
+  const handlePageChange = (newPage) => {
+    setPagination(prev => ({ ...prev, page: newPage }));
+  };
+
+  const handleItemsPerPageChange = (newLimit) => {
+    setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
   };
 
   return (
@@ -143,37 +163,69 @@ const EmployeeLeaveTable = ({ filters }) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredEmployees.map((employee) => (
-              <tr key={employee.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                  {employee.name}
+            {loading ? (
+              <tr>
+                <td colSpan="6" className="px-6 py-4 text-center">
+                  <div className="flex justify-center items-center py-4">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {employee.department}
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan="6" className="px-6 py-4 text-center text-red-600 dark:text-red-400">
+                  {error}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {employee.totalLeaves}
+              </tr>
+            ) : employees.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                  No data found
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {employee.usedLeaves}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
-                  {employee.remainingLeaves}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${parseFloat(employee.utilization) > 80
+              </tr>
+            ) : (
+              employees.map((employee) => (
+                <tr key={employee.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    {employee.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    {employee.department}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    {employee.totalLeaves}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    {employee.usedLeaves}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+                    {employee.remainingLeaves}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${parseFloat(employee.utilization) > 80
                       ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
                       : parseFloat(employee.utilization) > 60
                         ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
                         : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                    }`}>
-                    {employee.utilization}
-                  </span>
-                </td>
-              </tr>
-            ))}
+                      }`}>
+                      {employee.utilization}%
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
+      </div>
+
+      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+        <Pagination
+          currentPage={pagination.page}
+          totalItems={pagination.totalItems}
+          itemsPerPage={pagination.limit}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
       </div>
     </div>
   );

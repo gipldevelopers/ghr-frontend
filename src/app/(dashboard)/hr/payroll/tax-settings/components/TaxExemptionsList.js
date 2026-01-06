@@ -22,7 +22,8 @@ const TaxExemptionsList = ({ taxSettingId }) => {
       try {
         setLoading(true);
         const response = await payrollService.getTaxExemptions(taxSettingId);
-        setExemptions(response.data || []);
+        const data = response.data || response;
+        setExemptions(Array.isArray(data) ? data : []);
         setError(null);
       } catch (err) {
         setError(err.message);

@@ -21,7 +21,8 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
     const fetchSettings = async () => {
       try {
         const response = await payrollService.getTaxSettings();
-        setTaxSettingId(response.data.id);
+        const data = response.data || response;
+        setTaxSettingId(data?.id);
       } catch (err) {
         console.error('Error fetching tax settings:', err);
       }
