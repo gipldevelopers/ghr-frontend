@@ -1,11 +1,12 @@
 // src/app/(dashboard)/hr/payroll/reports/page.js
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Download, BarChart3, FileText, TrendingUp } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import ReportList from './components/ReportList';
 import ReportFilters from './components/ReportFilters';
 import ReportChart from './components/ReportChart';
+import { payrollService } from '../../../../../services/hr-services/payroll.service';
 
 export default function PayrollReports() {
   const [selectedReportType, setSelectedReportType] = useState('all');
@@ -13,20 +14,69 @@ export default function PayrollReports() {
     startDate: '',
     endDate: ''
   });
+  const [analytics, setAnalytics] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleGenerateReport = () => {
-    // This would generate the report based on filters
-    console.log('Generating report with:', {
-      reportType: selectedReportType,
-      dateRange
-    });
-    alert('Report generated successfully!');
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        const response = await payrollService.getPayrollAnalytics();
+        setAnalytics(response.data);
+      } catch (err) {
+        console.error('Error fetching analytics:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  const handleGenerateReport = async () => {
+    try {
+      let result;
+      const data = {
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate
+      };
+
+      if (selectedReportType === 'payroll-summary') {
+        result = await payrollService.generatePayrollSummary(data);
+      } else if (selectedReportType === 'tax-report') {
+        result = await payrollService.generateTaxReport(data);
+      } else if (selectedReportType === 'department-wise') {
+        result = await payrollService.generateDepartmentWiseReport(data);
+      } else if (selectedReportType === 'employee-wise') {
+        result = await payrollService.generateEmployeeWiseReport(data);
+      } else {
+        alert('Please select a report type');
+        return;
+      }
+
+      alert('Report generated successfully!');
+      // Refresh report list if needed
+      window.location.reload();
+    } catch (error) {
+      alert('Failed to generate report: ' + error.message);
+    }
   };
 
-  const handleDownloadReport = (report) => {
-    console.log('Downloading report:', report);
-    // In a real app, this would download the report
-    alert(`Downloading ${report.name} report...`);
+  const handleDownloadReport = async (report) => {
+    try {
+      const blob = await payrollService.downloadReport(report.id, report.format?.toLowerCase() || 'pdf');
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = report.name || `report-${report.id}`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error('Error downloading report:', err);
+      alert('Failed to download report');
+    }
   };
 
   return (
@@ -49,7 +99,9 @@ export default function PayrollReports() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total Reports</p>
-                  <p className="text-xl font-semibold text-gray-800 dark:text-white">24</p>
+                  <p className="text-xl font-semibold text-gray-800 dark:text-white">
+                    {analytics?.totalReports || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -61,7 +113,9 @@ export default function PayrollReports() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">This Month</p>
-                  <p className="text-xl font-semibold text-gray-800 dark:text-white">8</p>
+                  <p className="text-xl font-semibold text-gray-800 dark:text-white">
+                    {analytics?.reportsThisMonth || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -72,8 +126,10 @@ export default function PayrollReports() {
                   <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Generated</p>
-                  <p className="text-xl font-semibold text-gray-800 dark:text-white">12</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Distributed</p>
+                  <p className="text-xl font-semibold text-gray-800 dark:text-white">
+                    {analytics?.totalDistributed || 0}
+                  </p>
                 </div>
               </div>
             </div>
@@ -111,7 +167,7 @@ export default function PayrollReports() {
           <ReportChart
             title="Payroll Distribution"
             type="doughnut"
-            data={{
+            data={analytics?.distributionData || {
               labels: ['Basic Salary', 'Allowances', 'Deductions', 'Taxes', 'Bonuses'],
               datasets: [{
                 data: [45, 25, 15, 10, 5],
@@ -125,11 +181,11 @@ export default function PayrollReports() {
           <ReportChart
             title="Monthly Payroll Trend"
             type="line"
-            data={{
+            data={analytics?.trendData || {
               labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
               datasets: [{
-                label: 'Total Payroll ($)',
-                data: [120000, 125000, 130000, 128000, 132000, 135000, 140000, 138000, 142000, 145000, 148000, 150000],
+                label: 'Total Payroll',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 borderColor: '#3B82F6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 fill: true

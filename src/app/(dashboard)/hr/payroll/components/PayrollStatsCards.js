@@ -1,8 +1,8 @@
 // src/app/(dashboard)/hr/payroll/components/PayrollStatsCards.js
 "use client";
-
 import { IndianRupee, Users, CheckCircle, Clock, TrendingUp } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { payrollService } from '../../../../../services/hr-services/payroll.service';
 
 export default function PayrollStatsCards() {
   const [statsData, setStatsData] = useState({
@@ -12,25 +12,52 @@ export default function PayrollStatsCards() {
     averageSalary: 0,
     totalGrowth: 0
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Simulate API call
-    const timer = setTimeout(() => {
-      setStatsData({
-        totalPayroll: 125000,
-        employeesPaid: 854,
-        pendingPayments: 23,
-        averageSalary: 4500,
-        totalGrowth: 12.5
-      });
-    }, 500);
-    return () => clearTimeout(timer);
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        const response = await payrollService.getDashboardStats();
+        setStatsData(response.data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching payroll stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
   }, []);
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4 md:p-6 animate-pulse">
+            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-4"></div>
+            <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg mb-6">
+        <p className="text-red-600 dark:text-red-400">Error loading payroll stats: {error}</p>
+      </div>
+    );
+  }
 
   const cards = [
     {
       title: "Total Payroll",
-      value: `$${statsData.totalPayroll.toLocaleString()}`,
+      value: payrollService.formatCurrency(statsData.totalPayroll),
       icon: IndianRupee,
       iconBg: "bg-gradient-to-r from-green-500 to-green-400",
       iconColor: "text-white",
@@ -63,7 +90,7 @@ export default function PayrollStatsCards() {
     },
     {
       title: "Average Salary",
-      value: `$${statsData.averageSalary.toLocaleString()}`,
+      value: payrollService.formatCurrency(statsData.averageSalary),
       icon: CheckCircle,
       iconBg: "bg-gradient-to-r from-purple-500 to-purple-400",
       iconColor: "text-white",

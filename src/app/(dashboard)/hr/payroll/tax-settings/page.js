@@ -1,41 +1,53 @@
 // src/app/(dashboard)/hr/payroll/tax-settings/page.js
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Save, Download, Upload } from 'lucide-react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import TaxConfigForm from './components/TaxConfigForm';
 import TaxBracketsTable from './components/TaxBracketsTable';
 import TaxExemptionsList from './components/TaxExemptionsList';
+import { payrollService } from '../../../../../services/hr-services/payroll.service';
 
 export default function TaxSettings() {
   const [activeTab, setActiveTab] = useState('configuration');
-  const [taxConfig, setTaxConfig] = useState({
-    taxYear: '2024',
-    taxMethod: 'progressive',
-    defaultAllowance: 12500,
-    socialSecurityRate: 6.2,
-    medicareRate: 1.45,
-    additionalMedicareRate: 0.9,
-    additionalMedicareThreshold: 200000,
-    stateTaxRate: 5.0,
-    unemploymentInsuranceRate: 0.6
-  });
+  const [taxConfig, setTaxConfig] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const handleSaveSettings = () => {
-    console.log('Saving tax settings:', taxConfig);
-    // In a real app, this would save to the backend
-    alert('Tax settings saved successfully!');
+  useEffect(() => {
+    const fetchTaxSettings = async () => {
+      try {
+        setLoading(true);
+        const response = await payrollService.getTaxSettings();
+        setTaxConfig(response.data);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching tax settings:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTaxSettings();
+  }, []);
+
+  const handleSaveSettings = async () => {
+    try {
+      await payrollService.updateTaxSettings(taxConfig);
+      alert('Tax settings saved successfully!');
+    } catch (err) {
+      alert('Failed to save tax settings: ' + err.message);
+    }
   };
 
   const handleExportSettings = () => {
-    console.log('Exporting tax settings');
-    // In a real app, this would export the settings
+    // Implement export if needed
     alert('Tax settings exported successfully!');
   };
 
   const handleImportSettings = () => {
-    console.log('Importing tax settings');
-    // In a real app, this would import settings from a file
+    // Implement import if needed
     alert('Tax settings imported successfully!');
   };
 
@@ -44,6 +56,17 @@ export default function TaxSettings() {
     { id: 'brackets', name: 'Tax Brackets' },
     { id: 'exemptions', name: 'Exemptions' }
   ];
+
+  if (loading && !taxConfig) {
+    return (
+      <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
+        <div className="animate-pulse flex flex-col gap-6">
+          <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+          <div className="h-64 bg-white dark:bg-gray-800 rounded-lg shadow mt-6"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-4 sm:p-6">
@@ -77,6 +100,12 @@ export default function TaxSettings() {
         }
       />
 
+      {error && (
+        <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
+          Error: {error}
+        </div>
+      )}
+
       {/* Tabs */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow mt-6">
         <div className="border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
@@ -86,8 +115,8 @@ export default function TaxSettings() {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-6 text-sm font-medium border-b-2 whitespace-nowrap ${activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
                   }`}
               >
                 {tab.name}
@@ -98,7 +127,7 @@ export default function TaxSettings() {
 
         {/* Tab Content */}
         <div className="p-4 sm:p-6">
-          {activeTab === 'configuration' && (
+          {activeTab === 'configuration' && taxConfig && (
             <TaxConfigForm
               taxConfig={taxConfig}
               setTaxConfig={setTaxConfig}
@@ -106,11 +135,11 @@ export default function TaxSettings() {
           )}
 
           {activeTab === 'brackets' && (
-            <TaxBracketsTable />
+            <TaxBracketsTable taxSettingId={taxConfig?.id} />
           )}
 
           {activeTab === 'exemptions' && (
-            <TaxExemptionsList />
+            <TaxExemptionsList taxSettingId={taxConfig?.id} />
           )}
         </div>
       </div>

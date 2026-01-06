@@ -1,19 +1,39 @@
 // src/app/(dashboard)/hr/payroll/process/page.js
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import PayrollProcessForm from './components/PayrollProcessForm';
 import EmployeeSelectionTable from './components/EmployeeSelectionTable';
 import PayrollSummary from './components/PayrollSummary';
+import { payrollService } from '../../../../../services/hr-services/payroll.service';
 
 export default function ProcessPayroll() {
   const [selectedEmployees, setSelectedEmployees] = useState([]);
   const [payrollData, setPayrollData] = useState({
-    payrollPeriod: '',
+    period: '',
+    startDate: '',
+    endDate: '',
     paymentDate: '',
     notes: ''
   });
   const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Set default dates
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    const paymentDate = new Date(today.getFullYear(), today.getMonth() + 1, 5);
+
+    setPayrollData(prev => ({
+      ...prev,
+      startDate: firstDay.toISOString().split('T')[0],
+      endDate: lastDay.toISOString().split('T')[0],
+      paymentDate: paymentDate.toISOString().split('T')[0],
+      period: `${payrollService.getMonthName(today.getMonth() + 1)} ${today.getFullYear()}`
+    }));
+  }, []);
 
   const handleEmployeeSelection = (employees) => {
     setSelectedEmployees(employees);
@@ -31,13 +51,40 @@ export default function ProcessPayroll() {
     if (currentStep > 1) setCurrentStep(currentStep - 1);
   };
 
-  const handleProcessPayroll = () => {
-    // This would be where you process the payroll
-    console.log('Processing payroll with data:', {
-      payrollData,
-      selectedEmployees
-    });
-    alert('Payroll processed successfully!');
+  const handleProcessPayroll = async () => {
+    try {
+      setLoading(true);
+      
+      const payrollRunData = {
+        ...payrollData,
+        employeeIds: selectedEmployees.map(emp => emp.id),
+        processedBy: 1 // Get from auth context
+      };
+
+      const result = await payrollService.createPayrollRun(payrollRunData);
+      
+      // Process the payroll run
+      await payrollService.processPayrollRun(result.data.id);
+      
+      alert('Payroll processed successfully!');
+      
+      // Reset form or navigate to payroll runs page
+      setCurrentStep(1);
+      setSelectedEmployees([]);
+      setPayrollData({
+        period: '',
+        startDate: '',
+        endDate: '',
+        paymentDate: '',
+        notes: ''
+      });
+      
+    } catch (error) {
+      console.error('Error processing payroll:', error);
+      alert(`Failed to process payroll: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -109,6 +156,7 @@ export default function ProcessPayroll() {
             selectedEmployees={selectedEmployees}
             onProcess={handleProcessPayroll}
             onBack={prevStep}
+            loading={loading}
           />
         )}
       </div>

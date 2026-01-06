@@ -1,83 +1,167 @@
 // src/app/(dashboard)/hr/payroll/tax-settings/components/TaxExemptionsList.js
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
+import { payrollService } from '../../../../../../services/hr-services/payroll.service';
 
-const TaxExemptionsList = () => {
-  const [exemptions, setExemptions] = useState([
-    { id: 1, name: 'Health Insurance', amount: 300, description: 'Monthly health insurance premium' },
-    { id: 2, name: 'Retirement Contribution', amount: 500, description: '401k contribution' },
-    { id: 3, name: 'Education Allowance', amount: 200, description: 'Education and training expenses' },
-    { id: 4, name: 'Transportation', amount: 150, description: 'Monthly transportation costs' },
-  ]);
-
+const TaxExemptionsList = ({ taxSettingId }) => {
+  const [exemptions, setExemptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [newExemption, setNewExemption] = useState({
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
     name: '',
     amount: 0,
     description: ''
   });
 
-  const handleAddExemption = () => {
-    if (newExemption.name && newExemption.amount >= 0) {
-      setExemptions([...exemptions, { ...newExemption, id: Date.now() }]);
-      setNewExemption({ name: '', amount: 0, description: '' });
-      setIsAdding(false);
-    }
-  };
+  useEffect(() => {
+    const fetchExemptions = async () => {
+      try {
+        setLoading(true);
+        const response = await payrollService.getTaxExemptions(taxSettingId);
+        setExemptions(response.data || []);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error fetching tax exemptions:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleDeleteExemption = (id) => {
-    setExemptions(exemptions.filter(exemption => exemption.id !== id));
-  };
+    if (taxSettingId) {
+      fetchExemptions();
+    }
+  }, [taxSettingId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewExemption(prev => ({
+    setFormData(prev => ({
       ...prev,
-      [name]: name === 'amount' ? parseFloat(value) : value
+      [name]: name === 'amount' ? (value === '' ? '' : parseFloat(value)) : value
     }));
   };
 
+  const handleSaveExemption = async () => {
+    if (!formData.name || formData.amount < 0) {
+      alert('Please provide a valid name and amount');
+      return;
+    }
+
+    try {
+      if (isEditing) {
+        const response = await payrollService.updateTaxExemption(editingId, {
+          ...formData,
+          taxSettingId
+        });
+        setExemptions(exemptions.map(ex => ex.id === editingId ? response.data : ex));
+      } else {
+        const response = await payrollService.createTaxExemption({
+          ...formData,
+          taxSettingId
+        });
+        setExemptions([...exemptions, response.data]);
+      }
+      resetForm();
+    } catch (err) {
+      alert('Failed to save exemption: ' + err.message);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({ name: '', amount: 0, description: '' });
+    setIsAdding(false);
+    setIsEditing(false);
+    setEditingId(null);
+  };
+
+  const handleEditClick = (exemption) => {
+    setFormData({
+      name: exemption.name,
+      amount: exemption.amount,
+      description: exemption.description || ''
+    });
+    setEditingId(exemption.id);
+    setIsEditing(true);
+    setIsAdding(true);
+  };
+
+  const handleDeleteExemption = async (id) => {
+    if (confirm('Are you sure you want to delete this tax exemption?')) {
+      try {
+        await payrollService.deleteTaxExemption(id);
+        setExemptions(exemptions.filter(exemption => exemption.id !== id));
+      } catch (err) {
+        alert('Failed to delete exemption: ' + err.message);
+      }
+    }
+  };
+
+  if (loading && exemptions.length === 0) {
+    return (
+      <div className="space-y-4 animate-pulse">
+        <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
+        <div className="h-48 bg-gray-100 dark:bg-gray-800 rounded-lg"></div>
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="text-left">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold text-gray-800 dark:text-white">Tax Exemptions</h2>
-        <button
-          onClick={() => setIsAdding(!isAdding)}
-          className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition"
-        >
-          <Plus size={18} />
-          Add Exemption
-        </button>
+        {!isAdding && (
+          <button
+            onClick={() => setIsAdding(true)}
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 transition font-medium"
+          >
+            <Plus size={18} />
+            Add Exemption
+          </button>
+        )}
       </div>
 
-      {/* Add Exemption Form */}
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      {/* Exemption Form */}
       {isAdding && (
-        <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg mb-6">
-          <h3 className="text-md font-medium text-gray-800 dark:text-white mb-4">Add New Tax Exemption</h3>
+        <div className="bg-gray-50 dark:bg-gray-700/30 p-4 rounded-lg mb-6 border border-gray-100 dark:border-gray-700">
+          <h3 className="text-md font-medium text-gray-800 dark:text-white mb-4">
+            {isEditing ? 'Edit Tax Exemption' : 'Add New Tax Exemption'}
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Exemption Name
+                Exemption Name *
               </label>
               <input
                 type="text"
                 name="name"
-                value={newExemption.name}
+                value={formData.name}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                className="w-full px-3 py-2 text-sm border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white"
+                placeholder="e.g. Standard Deduction"
+                required
               />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Amount ($)
+                Amount *
               </label>
               <input
                 type="number"
                 name="amount"
-                value={newExemption.amount}
+                value={formData.amount}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                className="w-full px-3 py-2 text-sm border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white"
+                required
               />
             </div>
             <div>
@@ -87,24 +171,25 @@ const TaxExemptionsList = () => {
               <input
                 type="text"
                 name="description"
-                value={newExemption.description}
+                value={formData.description}
                 onChange={handleInputChange}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+                className="w-full px-3 py-2 text-sm border border-gray-100 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:text-white"
+                placeholder="Brief details about this exemption"
               />
             </div>
           </div>
           <div className="flex justify-end gap-3 mt-4">
             <button
-              onClick={() => setIsAdding(false)}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200"
+              onClick={resetForm}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 font-medium"
             >
               Cancel
             </button>
             <button
-              onClick={handleAddExemption}
-              className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
+              onClick={handleSaveExemption}
+              className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
             >
-              Add Exemption
+              {isEditing ? 'Update Exemption' : 'Save Exemption'}
             </button>
           </div>
         </div>
@@ -119,7 +204,7 @@ const TaxExemptionsList = () => {
                 Exemption Name
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-                Amount ($)
+                Amount
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
                 Description
@@ -130,32 +215,45 @@ const TaxExemptionsList = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {exemptions.map((exemption) => (
-              <tr key={exemption.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
-                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                  {exemption.name}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600 dark:text-green-400">
-                  ${exemption.amount.toLocaleString()}
-                </td>
-                <td className="px-4 py-4 text-sm text-gray-700 dark:text-gray-300">
-                  {exemption.description}
-                </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm">
-                  <div className="flex items-center gap-2">
-                    <button className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50">
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button 
-                      onClick={() => handleDeleteExemption(exemption.id)}
-                      className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+            {exemptions.length > 0 ? (
+              exemptions.map((exemption) => (
+                <tr key={exemption.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150">
+                  <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white text-left">
+                    {exemption.name}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-green-600 dark:text-green-400 text-left font-mono">
+                    {payrollService.formatCurrency(exemption.amount)}
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-700 dark:text-gray-300 text-left">
+                    {exemption.description || '-'}
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => handleEditClick(exemption)}
+                        className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50"
+                        title="Edit"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteExemption(exemption.id)}
+                        className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50"
+                        title="Delete"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="4" className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
+                  No tax exemptions found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>

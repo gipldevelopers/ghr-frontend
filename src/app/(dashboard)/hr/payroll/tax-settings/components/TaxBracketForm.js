@@ -3,17 +3,31 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, ArrowLeft, Percent } from 'lucide-react';
+import { payrollService } from '../../../../../../services/hr-services/payroll.service';
 
 export default function TaxBracketForm({ bracket = null, isEdit = false }) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [taxSettingId, setTaxSettingId] = useState(null);
   const [formData, setFormData] = useState({
     minIncome: 0,
     maxIncome: '',
     rate: 0,
     description: '',
-    status: 'Active',
+    status: 'ACTIVE',
   });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await payrollService.getTaxSettings();
+        setTaxSettingId(response.data.id);
+      } catch (err) {
+        console.error('Error fetching tax settings:', err);
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     if (bracket) {
@@ -22,7 +36,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
         maxIncome: bracket.maxIncome || '',
         rate: bracket.rate || 0,
         description: bracket.description || '',
-        status: bracket.status || 'Active',
+        status: bracket.status || 'ACTIVE',
       });
     }
   }, [bracket]);
@@ -31,29 +45,38 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'minIncome' || name === 'maxIncome' || name === 'rate' 
-        ? (value === '' ? '' : parseFloat(value)) 
+      [name]: name === 'minIncome' || name === 'maxIncome' || name === 'rate'
+        ? (value === '' ? '' : parseFloat(value))
         : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!taxSettingId) {
+      alert('Tax settings not loaded. Please try again.');
+      return;
+    }
+
     setIsSubmitting(true);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log(isEdit ? 'Updating tax bracket:' : 'Adding tax bracket:', {
+      const data = {
         ...formData,
+        taxSettingId,
         maxIncome: formData.maxIncome === '' ? null : formData.maxIncome
-      });
-      
-      // Redirect back to tax settings after successful submission
+      };
+
+      if (isEdit) {
+        await payrollService.updateTaxBracket(bracket.id, data);
+      } else {
+        await payrollService.createTaxBracket(data);
+      }
+
       router.push('/hr/payroll/tax-settings');
       router.refresh();
     } catch (error) {
+      alert('Error saving tax bracket: ' + error.message);
       console.error('Error saving tax bracket:', error);
     } finally {
       setIsSubmitting(false);
@@ -61,7 +84,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
   };
 
   return (
-    <div className="w-full p-4 sm:p-6">
+    <div className="w-full p-4 sm:p-6 text-left">
       {/* Header with title and back button */}
       <div className="flex items-center mb-6">
         <button
@@ -93,7 +116,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
             {/* Minimum Income */}
             <div className="col-span-2 md:col-span-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Minimum Income ($) *
+                Minimum Income *
               </label>
               <input
                 type="number"
@@ -102,7 +125,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
                 onChange={handleChange}
                 min="0"
                 step="1"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors"
+                className="w-full px-4 py-3 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-colors"
                 placeholder="Enter minimum income"
                 required
               />
@@ -111,7 +134,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
             {/* Maximum Income */}
             <div className="col-span-2 md:col-span-1">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Maximum Income ($)
+                Maximum Income
               </label>
               <input
                 type="number"
@@ -120,7 +143,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
                 onChange={handleChange}
                 min="0"
                 step="1"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors"
+                className="w-full px-4 py-3 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-colors"
                 placeholder="Leave empty for no limit"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -141,7 +164,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
                 min="0"
                 max="100"
                 step="0.1"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors"
+                className="w-full px-4 py-3 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700  dark:text-white dark:placeholder-gray-400 transition-colors"
                 placeholder="Enter tax rate percentage"
                 required
               />
@@ -157,7 +180,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
                 name="description"
                 value={formData.description}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors"
+                className="w-full px-4 py-3 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 transition-colors"
                 placeholder="e.g., First bracket, Second bracket, etc."
                 required
               />
@@ -173,11 +196,11 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white appearance-none transition-colors"
+                  className="w-full px-4 py-3 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white appearance-none transition-colors"
                   required
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700 dark:text-gray-300">
                   <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -192,8 +215,8 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
           <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
             <h3 className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-2">About Tax Brackets</h3>
             <p className="text-sm text-blue-700 dark:text-blue-400">
-              Tax brackets define the income ranges and corresponding tax rates. The minimum income is required, 
-              while maximum income can be left empty to indicate no upper limit. Tax rates should be expressed as 
+              Tax brackets define the income ranges and corresponding tax rates. The minimum income is required,
+              while maximum income can be left empty to indicate no upper limit. Tax rates should be expressed as
               percentages (e.g., 10 for 10%).
             </p>
           </div>
@@ -214,7 +237,7 @@ export default function TaxBracketForm({ bracket = null, isEdit = false }) {
               className="inline-flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               <Save size={18} />
-              {isSubmitting 
+              {isSubmitting
                 ? (isEdit ? 'Updating...' : 'Creating...')
                 : (isEdit ? 'Update Tax Bracket' : 'Create Tax Bracket')
               }
