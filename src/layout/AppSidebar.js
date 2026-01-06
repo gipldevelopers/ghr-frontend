@@ -1,3 +1,4 @@
+// src\layout\AppSidebar.js
 "use client";
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
@@ -48,7 +49,6 @@ const superAdminNavItems = [
     name: "User Management",
     subItems: [
       { name: "All Users", path: "/super-admin/users" },
-      { name: "Admin Users", path: "/super-admin/users/admins" },
     ],
   },
   {
@@ -147,23 +147,6 @@ const hrNavItems = [
       { name: "Asset Reports", path: "/hr/assets/reports" },
     ],
   },
-  // {
-  //   icon: <Settings size={20} />,
-  //   name: "System Settings",
-  //   subItems: [
-  //     { name: "Role Management", path: "/hr/settings/roles" },
-  //     { name: "Permission Management", path: "/hr/settings/permissions" },
-  //     { name: "User Access Control", path: "/hr/settings/user-access" },
-  //   ],
-  // },
-  // {
-  //   icon: <UserStar size={20} />,
-  //   name: "Roles & Permissions",
-  //   subItems: [
-  //     { name: "Role Management", path: "/super-admin/roles-permissions" },
-  //     { name: "Add New Role", path: "/super-admin/roles-permissions/add" },
-  //   ],
-  // },
 ];
 
 const employeeNavItems = [

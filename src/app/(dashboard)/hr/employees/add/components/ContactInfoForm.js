@@ -1,3 +1,4 @@
+// src\app\(dashboard)\hr\employees\add\components\ContactInfoForm.js
 "use client";
 import { Mail, Phone, MapPin, PhoneCall } from 'lucide-react';
 import InputField from '@/components/form/input/InputField';

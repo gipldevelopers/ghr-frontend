@@ -67,5 +67,14 @@ export const authService = {
     } catch (error) {
       throw new Error(error.response?.data?.message || error.message || 'Company verification failed');
     }
-  }
+  },
+
+  getUserPermissions: async () => {
+    try {
+      const response = await apiClient.get('/auth/me/permissions');
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message || 'Failed to fetch permissions');
+    }
+  },
 };

@@ -1,3 +1,4 @@
+// src\context\AuthContext.js
 "use client";
 import { createContext, useContext, useState, useEffect } from 'react';
 import { authService } from '@/services/auth-services/authService';
@@ -11,6 +12,45 @@ export function AuthProvider({ children }) {
 
  useEffect(() => {
     // Check if user is logged in on app load
+    // const checkAuth = async () => {
+    //   try {
+    //     const savedToken = localStorage.getItem('token');
+    //     const savedUser = localStorage.getItem('hrms_user');
+    //     const savedCompanyId = localStorage.getItem('company_id');
+
+    //     if (savedToken && savedUser && savedCompanyId) {
+    //       setToken(savedToken);
+    //       setUser(JSON.parse(savedUser));
+          
+    //       // Verify token is still valid by fetching current user
+    //       const response = await authService.getCurrentUser();
+    //       if (response.success) {
+    //         // Update user data with fresh data from server
+    //         setUser(response.data);
+    //         localStorage.setItem('hrms_user', JSON.stringify(response.data));
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error('Auth check failed:', error);
+        
+    //     // Don't logout here - just clear invalid data
+    //     // localStorage.removeItem('token');
+    //     // localStorage.removeItem('hrms_user');
+    //     // setUser(null);
+    //     // setToken(null);
+
+    //      // Clear all auth data
+    //     localStorage.removeItem('token');
+    //     localStorage.removeItem('hrms_user');
+    //     localStorage.removeItem('company_id');
+    //     localStorage.removeItem('company_subdomain');
+    //     setUser(null);
+    //     setToken(null);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+
     const checkAuth = async () => {
       try {
         const savedToken = localStorage.getItem('token');
@@ -24,21 +64,28 @@ export function AuthProvider({ children }) {
           // Verify token is still valid by fetching current user
           const response = await authService.getCurrentUser();
           if (response.success) {
+            const userData = response.data;
+            
+            // Fetch permissions separately
+            try {
+              const permissionsResponse = await authService.getUserPermissions();
+              if (permissionsResponse.success) {
+                userData.permissions = permissionsResponse.data;
+              }
+            } catch (permError) {
+              console.warn('Could not fetch permissions:', permError);
+              userData.permissions = {};
+            }
+            
             // Update user data with fresh data from server
-            setUser(response.data);
-            localStorage.setItem('hrms_user', JSON.stringify(response.data));
+            setUser(userData);
+            localStorage.setItem('hrms_user', JSON.stringify(userData));
           }
         }
       } catch (error) {
         console.error('Auth check failed:', error);
         
-        // Don't logout here - just clear invalid data
-        // localStorage.removeItem('token');
-        // localStorage.removeItem('hrms_user');
-        // setUser(null);
-        // setToken(null);
-
-         // Clear all auth data
+        // Clear all auth data
         localStorage.removeItem('token');
         localStorage.removeItem('hrms_user');
         localStorage.removeItem('company_id');

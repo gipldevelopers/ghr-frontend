@@ -1,3 +1,4 @@
+// src\app\(dashboard)\hr\employees\add\components\ProgressIndicator.js
 "use client";
 import { Check } from 'lucide-react';
 import { useState, useEffect } from 'react';

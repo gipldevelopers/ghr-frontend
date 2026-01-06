@@ -1,9 +1,9 @@
-// src\app\(dashboard)\super-admin\roles-permissions\add\page.js
+// src/app/(dashboard)/super-admin/users/add/page.js
 "use client";
 import Breadcrumb from '@/components/common/Breadcrumb';
-import RoleForm from '../components/RoleForm';
+import UserForm from '../components/UserForm';
 
-export default function AddRolePage() {
+export default function AddUserPage() {
   return (
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
       {/* Breadcrumb */}
@@ -11,14 +11,14 @@ export default function AddRolePage() {
         items={[
           { label: 'Dashboard', href: '/dashboard' },
           { label: 'Super Admin', href: '/super-admin' },
-          { label: 'Roles & Permissions', href: '/super-admin/roles-permissions' },
-          { label: 'Add Role', href: '#' }
+          { label: 'User Management', href: '/super-admin/users' },
+          { label: 'Add User', href: '#' }
         ]}
         rightContent={null} 
       />
       
       <div className="bg-white rounded-lg shadow dark:bg-gray-800 mt-4">
-        <RoleForm />
+        <UserForm />
       </div>
     </div>
   );

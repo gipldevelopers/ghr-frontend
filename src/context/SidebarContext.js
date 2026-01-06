@@ -1,3 +1,4 @@
+// src\context\SidebarContext.js
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
 

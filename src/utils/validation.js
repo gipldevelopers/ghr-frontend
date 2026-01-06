@@ -35,6 +35,7 @@
 //   return errors;
 // };
 
+// src\utils\validation.js
 export const validateEmployeeForm = (formData, currentStep) => {
   const errors = {};
 

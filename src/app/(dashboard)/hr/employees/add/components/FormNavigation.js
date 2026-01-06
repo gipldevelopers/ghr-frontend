@@ -1,3 +1,4 @@
+// src\app\(dashboard)\hr\employees\add\components\FormNavigation.js
 "use client";
 import { ChevronLeft, ChevronRight, Save } from 'lucide-react';
 

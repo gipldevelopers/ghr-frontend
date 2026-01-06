@@ -1,3 +1,4 @@
+// src\app\(dashboard)\hr\employees\add\components\DocumentsForm.js
 "use client";
 import { Upload, FileText, X, Eye, CheckCircle, User, FileCheck } from 'lucide-react';
 import { useState } from 'react';
