@@ -60,10 +60,10 @@ const AppHeader = () => {
   }, [isSearchVisible]);
 
   return (
-    <header className="sticky top-0 flex w-full bg-white border-gray-200 dark:border-gray-800 dark:bg-gray-900 lg:border-b z-40">
-      <div className="flex flex-col items-center justify-between w-full lg:flex-row lg:px-6">
+    <header className="sticky top-0 flex w-full bg-white border-gray-200 dark:border-gray-800 dark:bg-gray-900 lg:border-b border-dashed z-40 h-16">
+      <div className="flex flex-col items-center justify-between w-full lg:flex-row h-full">
         {/* Top Row - Logo, Menu Button, User Info */}
-        <div className="flex items-center justify-between w-full gap-2 px-4 py-3 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-0 lg:py-4">
+        <div className="flex items-center justify-between w-full h-full gap-2 px-4 border-b border-gray-200 dark:border-gray-800 sm:gap-4 lg:justify-normal lg:border-b-0 lg:px-6">
           {/* Menu Toggle Button */}
           <button
             className="flex items-center justify-center w-10 h-10 text-gray-500 rounded-lg dark:text-gray-400 lg:w-11 lg:h-11 lg:border lg:border-gray-200 lg:dark:border-gray-800 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -258,9 +258,8 @@ const AppHeader = () => {
 
         {/* Bottom Row - Action Buttons (Mobile/Tablet) */}
         <div
-          className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
-          } lg:flex items-center justify-between w-full gap-4 px-5 py-4 border-t border-gray-200 dark:border-gray-800 lg:border-t-0 lg:justify-end lg:px-0 lg:py-0`}
+          className={`${isApplicationMenuOpen ? "flex" : "hidden"
+            } lg:flex items-center justify-between w-full gap-4 px-5 py-4 border-t border-gray-200 dark:border-gray-800 lg:border-t-0 lg:justify-end lg:px-0 lg:py-0`}
         >
           {/* User Welcome Message for Mobile */}
           <div className="md:hidden">

@@ -37,6 +37,11 @@ const superAdminNavItems = [
     path: "/super-admin/dashboard",
   },
   {
+    icon: <Building size={20} />,
+    name: "Company & Organization",
+    path: "/super-admin/company-orgranization",
+  },
+  {
     icon: <Shield size={20} />,
     name: "Roles & Permissions",
     subItems: [
@@ -51,14 +56,14 @@ const superAdminNavItems = [
       { name: "All Users", path: "/super-admin/users" },
     ],
   },
-  {
-    icon: <Settings size={20} />,
-    name: "System Settings",
-    subItems: [
-      { name: "General Settings", path: "/super-admin/settings/general" },
-      { name: "Audit Logs", path: "/super-admin/settings/audit" },
-    ],
-  },
+  // {
+  //   icon: <Settings size={20} />,
+  //   name: "System Settings",
+  //   subItems: [
+  //     { name: "General Settings", path: "/super-admin/settings/general" },
+  //     { name: "Audit Logs", path: "/super-admin/settings/audit" },
+  //   ],
+  // },
 ];
 
 const hrNavItems = [
@@ -423,13 +428,13 @@ const AppSidebar = () => {
 
   return (
     <>
-      {/* Mobile header toggle button */}
-      <button
+      {/* Mobile header toggle button - Removed as AppHeader provides one */
+      /* <button
         onClick={toggleMobileSidebar}
         className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white dark:bg-gray-800 rounded-lg shadow-md"
       >
         {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
-      </button>
+      </button> */}
 
       <aside
         className={`fixed flex flex-col top-0 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
@@ -457,7 +462,7 @@ const AppSidebar = () => {
         </div>
 
         <div
-          className={`py-4 px-4 flex border-b border-transparent ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-center"
+          className={`h-16 flex items-center px-6 border-b border-gray-200 dark:border-gray-800 border-dashed ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
             }`}
         >
           <Link href="/" onClick={() => {
@@ -489,16 +494,16 @@ const AppSidebar = () => {
               <Image
                 src="/images/logo/GHR-COLLAPSED.PNG"
                 alt="Logo"
-                width={50}
-                height={50}
+                width={32}
+                height={32}
                 style={{ width: 'auto', height: 'auto' }}
               />
             )}
           </Link>
         </div>
-        <div className="h-[1px] w-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500 mb-4"></div>
+        {/* <div className="h-[1px] w-full bg-gradient-to-r from-blue-500 via-violet-500 to-cyan-500 mb-4"></div> */}
 
-        <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar flex-1 px-4">
+        <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar flex-1 px-4 mt-4">
           <nav className="mb-6">
             <div className="flex flex-col gap-4">
               <div>

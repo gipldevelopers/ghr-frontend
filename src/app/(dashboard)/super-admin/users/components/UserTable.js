@@ -10,10 +10,11 @@ import {
   getPaginationRowModel,
   flexRender,
 } from '@tanstack/react-table';
-import { ChevronUp, ChevronDown, Edit, Trash2, User, Mail, Shield, Loader2, Key, Eye, UserCheck, UserX } from 'lucide-react';
+import { ChevronUp, ChevronDown, Edit, Trash2, User, Mail, Shield, Loader2, Key, Eye, UserCheck, UserX, UserCog } from 'lucide-react';
 import Pagination from '@/components/common/Pagination';
 import UserFilters from './UserFilters';
 import { userManagementService } from '@/services/userManagementService';
+import { roleService } from '@/services/super-admin-services/user-roleService';
 import { toast } from 'sonner';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 
@@ -28,6 +29,10 @@ export default function UserTable() {
   const [userToDelete, setUserToDelete] = useState(null);
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [userToDeactivate, setUserToDeactivate] = useState(null);
+  const [assignRoleDialogOpen, setAssignRoleDialogOpen] = useState(false);
+  const [userToAssignRole, setUserToAssignRole] = useState(null);
+  const [selectedRoleForAssign, setSelectedRoleForAssign] = useState('');
+
   const [pagination, setPagination] = useState({
     pageIndex: 0,
     pageSize: 10,
@@ -37,142 +42,72 @@ export default function UserTable() {
   const [systemRoles, setSystemRoles] = useState([]);
 
   // Fetch users and roles
-//   const fetchData = async () => {
-//     try {
-//       setLoading(true);
-      
-//       // Fetch users with filters
-//       const params = {
-//         page: pagination.pageIndex + 1,
-//         limit: pagination.pageSize,
-//         search: globalFilter,
-//         status: statusFilter !== 'all' ? statusFilter.toUpperCase() : '',
-//         role: roleFilter !== 'all' ? roleFilter : ''
-//       };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-//       const [usersResponse, rolesResponse, sysRolesResponse] = await Promise.all([
-//         userManagementService.getAllUsers(params),
-//         userManagementService.getAvailableRoles(),
-//         userManagementService.getSystemRoles()
-//       ]);
+      // Fetch users with filters
+      const params = {
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+        search: globalFilter,
+        status: statusFilter !== 'all' ? statusFilter.toUpperCase() : '',
+        role: roleFilter !== 'all' ? roleFilter : ''
+      };
 
-//       if (usersResponse.success) {
-//         const transformedData = usersResponse.data.map(user => ({
-//           id: user.id,
-//           publicId: user.publicId,
-//           name: user.employee 
-//             ? `${user.employee.firstName} ${user.employee.lastName}`
-//             : user.email.split('@')[0],
-//           email: user.email,
-//           employeeId: user.employee?.employeeId || 'N/A',
-//           systemRole: user.systemRole,
-//           companyRole: user.companyRole?.displayName || 'No role assigned',
-//           status: user.isActive ? 'Active' : 'Inactive',
-//           lastLogin: user.lastLogin 
-//             ? new Date(user.lastLogin).toLocaleDateString('en-GB', {
-//                 day: '2-digit',
-//                 month: 'short',
-//                 year: 'numeric'
-//               })
-//             : 'Never',
-//           createdAt: new Date(user.createdAt).toLocaleDateString('en-GB', {
-//             day: '2-digit',
-//             month: 'short',
-//             year: 'numeric'
-//           }),
-//           isActive: user.isActive,
-//           hasEmployee: !!user.employee,
-//           employee: user.employee,
-//           companyRoleId: user.companyRoleId
-//         }));
-        
-//         setData(transformedData);
-//         setTotalItems(usersResponse.pagination?.totalItems || transformedData.length);
-//       }
+      const [usersResponse, rolesResponse] = await Promise.all([
+        userManagementService.getAllUsers(params),
+        roleService.getAllRoles() // Use roleService to get roles
+      ]);
 
-//       if (rolesResponse.success) {
-//         setAvailableRoles(rolesResponse.data || []);
-//       }
-
-//       if (sysRolesResponse.success) {
-//         setSystemRoles(sysRolesResponse.data || []);
-//       }
-
-//     } catch (error) {
-//       console.error('Error fetching data:', error);
-//       toast.error(error.message || 'Failed to fetch data');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-const fetchData = async () => {
-  try {
-    setLoading(true);
-    
-    // Fetch users with filters
-    const params = {
-      page: pagination.pageIndex + 1,
-      limit: pagination.pageSize,
-      search: globalFilter,
-      status: statusFilter !== 'all' ? statusFilter.toUpperCase() : '',
-      role: roleFilter !== 'all' ? roleFilter : ''
-    };
-
-    const [usersResponse, rolesResponse, sysRolesResponse] = await Promise.all([
-      userManagementService.getAllUsers(params),
-      userManagementService.getAvailableRoles(),
-      userManagementService.getSystemRoles()
-    ]);
-
-    if (usersResponse.success) {
-      const transformedData = usersResponse.data.map(user => ({
-        id: user.id,
-        publicId: user.publicId,
-        name: user.employee 
-          ? `${user.employee.firstName} ${user.employee.lastName}`
-          : user.email.split('@')[0],
-        email: user.email,
-        employeeId: user.employee?.employeeId || 'N/A',
-        systemRole: user.systemRole,
-        companyRole: user.companyRole?.displayName || 'No role assigned',
-        status: user.isActive ? 'Active' : 'Inactive',
-        lastLogin: user.lastLogin 
-          ? new Date(user.lastLogin).toLocaleDateString('en-GB', {
+      if (usersResponse.success) {
+        const transformedData = usersResponse.data.map(user => ({
+          id: user.id,
+          publicId: user.publicId,
+          name: user.employee
+            ? `${user.employee.firstName} ${user.employee.lastName}`
+            : user.email.split('@')[0],
+          email: user.email,
+          employeeId: user.employee?.employeeId || 'N/A',
+          systemRole: user.systemRole,
+          companyRole: user.companyRole?.displayName || 'No role assigned',
+          status: user.isActive ? 'Active' : 'Inactive',
+          lastLogin: user.lastLogin
+            ? new Date(user.lastLogin).toLocaleDateString('en-GB', {
               day: '2-digit',
               month: 'short',
               year: 'numeric'
             })
-          : 'Never',
-        createdAt: new Date(user.createdAt).toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: 'numeric'
-        }),
-        isActive: user.isActive,
-        hasEmployee: !!user.employee,
-        employee: user.employee,
-        companyRoleId: user.companyRoleId
-      }));
-      
-      setData(transformedData);
-      setTotalItems(usersResponse.pagination?.totalItems || transformedData.length);
-    }
+            : 'Never',
+          createdAt: new Date(user.createdAt).toLocaleDateString('en-GB', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+          }),
+          isActive: user.isActive,
+          hasEmployee: !!user.employee,
+          employee: user.employee,
+          companyRoleId: user.companyRoleId
+        }));
 
-    if (rolesResponse.success) {
-      setAvailableRoles(rolesResponse.data || []);
-    }
+        setData(transformedData);
+        setTotalItems(usersResponse.pagination?.totalItems || transformedData.length);
+      }
 
-    if (sysRolesResponse.success) {
-      setSystemRoles(sysRolesResponse.data || []);
-    }
+      if (rolesResponse.status || rolesResponse.success) {
+        setAvailableRoles(rolesResponse.data?.roles || []);
+      }
 
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    toast.error(error.message || 'Failed to fetch data');
-  } finally {
-    setLoading(false);
-  }
-};
+      // System roles often come from a different logic or are part of available roles
+      // For now we assume availableRoles has everything we need for the dropdown
+
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      toast.error(error.message || 'Failed to fetch data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     fetchData();
@@ -182,25 +117,18 @@ const fetchData = async () => {
   const roleOptions = useMemo(() => {
     const roles = ['all'];
     const roleMap = {};
-    
-    // Add company roles
+
+    // Add roles from availableRoles
     availableRoles.forEach(role => {
-      if (role.displayName && !roleMap[role.displayName]) {
-        roleMap[role.displayName] = true;
-        roles.push(role.displayName);
+      const displayName = role.displayName || role.name;
+      if (displayName && !roleMap[displayName]) {
+        roleMap[displayName] = true;
+        roles.push(displayName);
       }
     });
-    
-    // Add system roles
-    systemRoles.forEach(role => {
-      if (role.displayName && !roleMap[role.displayName]) {
-        roleMap[role.displayName] = true;
-        roles.push(role.displayName);
-      }
-    });
-    
+
     return roles;
-  }, [availableRoles, systemRoles]);
+  }, [availableRoles]);
 
   // Handle delete click
   const handleDeleteClick = (user) => {
@@ -212,6 +140,12 @@ const fetchData = async () => {
   const handleStatusClick = (user) => {
     setUserToDeactivate(user);
     setDeactivateDialogOpen(true);
+  };
+
+  const handleAssignRoleClick = (user) => {
+    setUserToAssignRole(user);
+    setSelectedRoleForAssign(user.companyRoleId || '');
+    setAssignRoleDialogOpen(true);
   };
 
   // Handle delete confirmation
@@ -249,12 +183,36 @@ const fetchData = async () => {
     }
   };
 
+  // Handle validation and submission for Assign Role
+  const handleAssignRoleSubmit = async () => {
+    if (!userToAssignRole || !selectedRoleForAssign) {
+      toast.error("Please select a role");
+      return;
+    }
+    try {
+      await roleService.assignRoleToUser({
+        userId: userToAssignRole.id,
+        roleId: selectedRoleForAssign
+      });
+      toast.success("Role assigned successfully");
+      fetchData();
+    } catch (error) {
+      console.error("Error assigning role:", error);
+      toast.error(error.message || "Failed to assign role");
+    } finally {
+      setAssignRoleDialogOpen(false);
+      setUserToAssignRole(null);
+      setSelectedRoleForAssign('');
+    }
+  };
+
+
   // Handle reset password
   const handleResetPassword = async (user) => {
     try {
       const confirmReset = window.confirm(`Reset password for ${user.email}? A temporary password will be generated.`);
       if (!confirmReset) return;
-      
+
       const response = await userManagementService.resetUserPassword(user.id);
       if (response.success) {
         toast.success('Password reset successful. Temporary password sent to user.');
@@ -278,7 +236,7 @@ const fetchData = async () => {
               </div>
             </div>
             <div className="ml-3">
-              <Link 
+              <Link
                 href={`/super-admin/users/${info.row.original.publicId || info.row.original.id}`}
                 className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 block"
               >
@@ -336,11 +294,10 @@ const fetchData = async () => {
           const status = info.getValue();
           const isActive = info.row.original.isActive;
           return (
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              isActive 
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' 
-                : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-            }`}>
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isActive
+              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+              : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+              }`}>
               {isActive ? <UserCheck size={12} className="mr-1" /> : <UserX size={12} className="mr-1" />}
               {status}
             </span>
@@ -359,11 +316,21 @@ const fetchData = async () => {
         header: 'Actions',
         cell: info => {
           const user = info.row.original;
-          const isCurrentUser = false; // Add logic to check if this is the current logged-in user
-          
+          const isCurrentUser = false;
+
           return (
             <div className="flex items-center gap-2">
-              {/* View */}
+              <button
+                onClick={() => handleAssignRoleClick(user)}
+                className="p-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 transition-all duration-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-900/50 group relative"
+                title="Assign Role"
+              >
+                <UserCog className="w-4 h-4" />
+                <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
+                  Assign Role
+                </span>
+              </button>
+
               <Link
                 href={`/super-admin/users/${user.publicId || user.id}`}
                 className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 group relative"
@@ -374,8 +341,7 @@ const fetchData = async () => {
                   View
                 </span>
               </Link>
-              
-              {/* Edit */}
+
               <Link
                 href={`/super-admin/users/edit/${user.publicId || user.id}`}
                 className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 group relative"
@@ -386,8 +352,7 @@ const fetchData = async () => {
                   Edit
                 </span>
               </Link>
-              
-              {/* Reset Password */}
+
               <button
                 onClick={() => handleResetPassword(user)}
                 className="p-1.5 rounded-lg bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition-all duration-200 dark:bg-yellow-900/30 dark:text-yellow-400 dark:hover:bg-yellow-900/50 group relative"
@@ -398,15 +363,13 @@ const fetchData = async () => {
                   Reset Password
                 </span>
               </button>
-              
-              {/* Deactivate/Activate */}
+
               <button
                 onClick={() => handleStatusClick(user)}
-                className={`p-1.5 rounded-lg transition-all duration-200 group relative ${
-                  user.isActive
-                    ? 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'
-                    : 'bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50'
-                }`}
+                className={`p-1.5 rounded-lg transition-all duration-200 group relative ${user.isActive
+                  ? 'bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'
+                  : 'bg-green-50 text-green-600 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50'
+                  }`}
                 title={user.isActive ? 'Deactivate User' : 'Activate User'}
                 disabled={isCurrentUser}
               >
@@ -415,8 +378,7 @@ const fetchData = async () => {
                   {user.isActive ? 'Deactivate' : 'Activate'}
                 </span>
               </button>
-              
-              {/* Delete (only for non-current users) */}
+
               {!isCurrentUser && !user.hasEmployee && (
                 <button
                   onClick={() => handleDeleteClick(user)}
@@ -519,11 +481,11 @@ const fetchData = async () => {
                               asc: <ChevronUp className="ml-1 w-4 h-4 text-blue-500" />,
                               desc: <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />,
                             }[header.column.getIsSorted()] ?? (
-                              <div className="ml-1 flex flex-col">
-                                <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
-                                <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
-                              </div>
-                            )}
+                                <div className="ml-1 flex flex-col">
+                                  <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
+                                  <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
+                                </div>
+                              )}
                           </>
                         )}
                       </div>
@@ -535,8 +497,8 @@ const fetchData = async () => {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map(row => (
-                  <tr 
-                    key={row.id} 
+                  <tr
+                    key={row.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
                   >
                     {row.getVisibleCells().map(cell => (
@@ -580,6 +542,50 @@ const fetchData = async () => {
         }}
         className="mt-6"
       />
+
+      {/* Assign Role Dialog */}
+      {assignRoleDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              Assign Role to {userToAssignRole?.name}
+            </h3>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Select Role
+              </label>
+              <select
+                value={selectedRoleForAssign}
+                onChange={(e) => setSelectedRoleForAssign(e.target.value)}
+                className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+              >
+                <option value="">Select a role...</option>
+                {availableRoles.map(role => (
+                  <option key={role.id} value={role.id}>
+                    {role.displayName || role.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setAssignRoleDialogOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAssignRoleSubmit}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors"
+              >
+                Assign Role
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Confirmation Dialogs */}
       <ConfirmationDialog

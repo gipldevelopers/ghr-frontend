@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Breadcrumb from '@/components/common/Breadcrumb';
 import RoleForm from '../../components/RoleForm';
-import roleService from '@/services/roleService';
+import roleService from '@/services/super-admin-services/user-roleService';
 import { toast } from 'sonner';
 
 export default function EditRolePage() {
@@ -19,7 +19,7 @@ export default function EditRolePage() {
       try {
         const response = await roleService.getRoleById(params.roleId);
         console.log(response);
-        if(response.success) {
+        if (response.status || response.success) {
           setRole(response.data);
         } else {
           toast.error('Failed to fetch role details');
@@ -52,13 +52,13 @@ export default function EditRolePage() {
 
   return (
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
-      <Breadcrumb 
+      <Breadcrumb
         items={[
           { label: "Roles & Permissions", href: "/super-admin/roles-permissions" },
           { label: role?.displayName || role?.name || "Edit Role" }
         ]}
       />
-      
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800">
         <RoleForm role={role} isEdit={true} />
       </div>

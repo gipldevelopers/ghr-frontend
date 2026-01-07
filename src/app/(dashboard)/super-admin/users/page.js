@@ -7,7 +7,7 @@ import Link from 'next/link';
 
 export default function UsersPage() {
   return (
-    <div className="bg-gray-50 min-h-screen dark:bg-gray-900 p-3 sm:p-6">
+    <div className="">
       {/* Breadcrumb with Add User button */}
       <Breadcrumb
         rightContent={
@@ -19,7 +19,7 @@ export default function UsersPage() {
           </Link>
         }
       />
-      
+
       <div className="bg-white rounded-lg shadow dark:bg-gray-800 mt-4">
         <UserTable />
       </div>

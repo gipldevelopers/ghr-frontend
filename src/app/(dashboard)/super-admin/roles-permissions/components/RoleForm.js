@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Save, ArrowLeft, Shield, Loader2 } from 'lucide-react';
-import { roleService } from '@/services/roleService';
+import { roleService } from '@/services/super-admin-services/user-roleService';
 import { toast } from 'sonner';
 
 export default function RoleForm({ role = null, isEdit = false }) {
@@ -34,182 +34,100 @@ export default function RoleForm({ role = null, isEdit = false }) {
       ...prev,
       [name]: value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
   };
 
-  // const validateForm = () => {
-  //   const newErrors = {};
 
-  //   // if (!formData.name.trim()) {
-  //   //   newErrors.name = "Role name is required";
-  //   // } else if (formData.name.trim().length < 2) {
-  //   //   newErrors.name = "Role name must be at least 2 characters";
-  //   // }
-  //   if (!formData.displayName?.trim()) {
-  //     newErrors.displayName = "Role name is required";
-  //   } else if (formData.displayName.trim().length < 2) {
-  //     newErrors.displayName = "Role name must be at least 2 characters";
-  //   } else {
-  //      // Validate that the auto-generated name will be valid
-  //     const generatedName = formData.displayName.trim()
-  //       .toUpperCase()
-  //       .replace(/\s+/g, '_')
-  //       .replace(/[^A-Z0-9_]/g, '');
-      
-  //     if (generatedName.length < 2) {
-  //       newErrors.displayName = "Role name contains invalid characters";
-  //     }
-  //   }
-
-  //   if (!formData.description.trim()) {
-  //     newErrors.description = "Description is required";
-  //   } else if (formData.description.trim().length < 10) {
-  //     newErrors.description = "Description must be at least 10 characters";
-  //   }
-
-  //   setErrors(newErrors);
-  //   return Object.keys(newErrors).length === 0;
-  // };
   const validateForm = () => {
-  const newErrors = {};
+    const newErrors = {};
 
-  if (!formData.displayName?.trim()) {
-    newErrors.displayName = "Role name is required";
-  } else if (formData.displayName.trim().length < 2) {
-    newErrors.displayName = "Role name must be at least 2 characters";
-  } else {
-    // Validate that the auto-generated name will be valid
-    const generatedName = formData.displayName.trim()
-      .toUpperCase()
-      .replace(/\s+/g, '_')
-      .replace(/[^A-Z0-9_]/g, '');
-    
-    if (generatedName.length < 2) {
-      newErrors.displayName = "Role name contains invalid characters";
-    } else if (generatedName.length > 50) {
-      newErrors.displayName = "Role name is too long (max 50 characters after conversion)";
+    if (!formData.displayName?.trim()) {
+      newErrors.displayName = "Role name is required";
+    } else if (formData.displayName.trim().length < 2) {
+      newErrors.displayName = "Role name must be at least 2 characters";
+    } else {
+      // Validate that the auto-generated name will be valid
+      const generatedName = formData.displayName.trim()
+        .toUpperCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^A-Z0-9_]/g, '');
+
+      if (generatedName.length < 2) {
+        newErrors.displayName = "Role name contains invalid characters";
+      } else if (generatedName.length > 50) {
+        newErrors.displayName = "Role name is too long (max 50 characters after conversion)";
+      }
     }
-  }
 
-  if (!formData.description.trim()) {
-    newErrors.description = "Description is required";
-  } else if (formData.description.trim().length < 10) {
-    newErrors.description = "Description must be at least 10 characters";
-  }
+    if (!formData.description.trim()) {
+      newErrors.description = "Description is required";
+    } else if (formData.description.trim().length < 10) {
+      newErrors.description = "Description must be at least 10 characters";
+    }
 
-  setErrors(newErrors);
-  return Object.keys(newErrors).length === 0;
-};
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-    
-  //   if (!validateForm()) return;
-    
-  //   setIsSubmitting(true);
-    
-  //   try {
-
-  //     // Prepare data for API (convert status to uppercase)
-  //     const apiData = {
-  //       displayName: formData.displayName.trim(), // Keep the user-friendly name
-  //       description: formData.description.trim(),
-  //       isDefault: false,
-  //       status: formData.status.toUpperCase() // Convert to ACTIVE/INACTIVE
-  //     };
-
-  //     console.log('Submitting:', apiData);
-
-  //     let response;
-      
-  //     if (isEdit) {
-  //       response = await roleService.updateRole(role.id, apiData);
-  //       toast.success('Role updated successfully');
-  //       // router.push(`/super-admin/roles-permissions/${role.id}`);
-  //        router.push('/super-admin/roles-permissions');
-  //     } else {
-  //       response = await roleService.createRole(apiData);
-  //       toast.success('Role created successfully');
-  //       // Redirect to permissions page with the new role ID
-  //       router.push(`/super-admin/roles-permissions/${response.data.id}/permissions`);
-  //     }
-      
-  //     router.refresh();
-  //   } catch (error) {
-  //     console.error('Error saving role:', error);
-      
-  //     // Handle specific error cases
-  //     if (error.message.includes('already exists')) {
-  //       toast.error('Role name already exists');
-  //       setErrors(prev => ({ ...prev, displayName: 'This role name is already taken' }));
-  //     } else if (error.message.includes('System roles')) {
-  //       toast.error('Cannot modify system roles');
-  //     } else {
-  //       toast.error(error.message || 'Failed to save role');
-  //     }
-  //   } finally {
-  //     setIsSubmitting(false);
-  //   }
-  // };
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!validateForm()) return;
-  
-  setIsSubmitting(true);
-  
-  try {
-    // Generate the internal name from displayName
-    const name = formData.displayName.trim()
-      .toUpperCase()
-      .replace(/\s+/g, '_')
-      .replace(/[^A-Z0-9_]/g, '');
+    e.preventDefault();
 
-    // Prepare data for API (convert status to uppercase)
-    const apiData = {
-      name: name, // ADD THIS - the internal name for validation
-      displayName: formData.displayName.trim(), // Keep the user-friendly name
-      description: formData.description.trim(),
-      isDefault: false,
-      status: formData.status.toUpperCase() // Convert to ACTIVE/INACTIVE
-    };
+    if (!validateForm()) return;
 
-    console.log('Submitting:', apiData);
+    setIsSubmitting(true);
 
-    let response;
-    
-    if (isEdit) {
-      response = await roleService.updateRole(role.id, apiData);
-      toast.success('Role updated successfully');
-      router.push('/super-admin/roles-permissions');
-    } else {
-      response = await roleService.createRole(apiData);
-      toast.success('Role created successfully');
-      // Redirect to permissions page with the new role ID
-      router.push(`/super-admin/roles-permissions/${response.data.id}/permissions`);
+    try {
+      // Generate the internal name from displayName
+      const name = formData.displayName.trim()
+        .toUpperCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^A-Z0-9_]/g, '');
+
+      // Prepare data for API (convert status to uppercase)
+      // Prepare data for API 
+      const apiData = {
+        name: name,
+        displayName: formData.displayName.trim(),
+        description: formData.description.trim(),
+        isActive: formData.status === 'Active' // Convert to boolean
+      };
+
+      console.log('Submitting:', apiData);
+
+      let response;
+
+      if (isEdit) {
+        response = await roleService.updateRole(role.id, apiData);
+        toast.success('Role updated successfully');
+        router.push('/super-admin/roles-permissions');
+      } else {
+        response = await roleService.createRole(apiData);
+        toast.success('Role created successfully');
+        // Redirect to permissions page with the new role ID
+        router.push(`/super-admin/roles-permissions/${response.data.id}/permissions`);
+      }
+
+      router.refresh();
+    } catch (error) {
+      console.error('Error saving role:', error);
+
+      // Handle specific error cases
+      if (error.message.includes('already exists')) {
+        toast.error('Role name already exists');
+        setErrors(prev => ({ ...prev, displayName: 'This role name is already taken' }));
+      } else if (error.message.includes('System roles')) {
+        toast.error('Cannot modify system roles');
+      } else {
+        toast.error(error.message || 'Failed to save role');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    router.refresh();
-  } catch (error) {
-    console.error('Error saving role:', error);
-    
-    // Handle specific error cases
-    if (error.message.includes('already exists')) {
-      toast.error('Role name already exists');
-      setErrors(prev => ({ ...prev, displayName: 'This role name is already taken' }));
-    } else if (error.message.includes('System roles')) {
-      toast.error('Cannot modify system roles');
-    } else {
-      toast.error(error.message || 'Failed to save role');
-    }
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <div className="w-full p-4 sm:p-6">
@@ -257,9 +175,8 @@ export default function RoleForm({ role = null, isEdit = false }) {
                   name="displayName"
                   value={formData.displayName}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${
-                    errors.displayName ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${errors.displayName ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
+                    }`}
                   placeholder="Enter role name (e.g., HR Manager)"
                   disabled={isSubmitting}
                 />
@@ -267,7 +184,7 @@ export default function RoleForm({ role = null, isEdit = false }) {
                   <p className="text-red-500 text-sm mt-1">{errors.displayName}</p>
                 )}
                 {/* <p className="text-xs text-gray-500 mt-1">Minimum 2 characters</p> */}
-                
+
                 {/* Show auto-generated name preview */}
                 {formData.displayName && (
                   <p className="text-xs text-blue-500 mt-1">
@@ -285,9 +202,8 @@ export default function RoleForm({ role = null, isEdit = false }) {
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={3}
-                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${
-                    errors.description ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${errors.description ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
+                    }`}
                   placeholder="Describe the role's purpose, responsibilities, and permissions..."
                   disabled={isSubmitting}
                 />

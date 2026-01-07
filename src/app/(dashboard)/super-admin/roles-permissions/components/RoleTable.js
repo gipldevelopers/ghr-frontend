@@ -13,7 +13,7 @@ import {
 import { ChevronUp, ChevronDown, Edit, Trash2, Shield, Loader2, Settings } from 'lucide-react';
 import Pagination from '@/components/common/Pagination';
 import RoleFilters from './RoleFilter';
-import { roleService } from '@/services/roleService';
+import { roleService } from '@/services/super-admin-services/user-roleService';
 import { toast } from 'sonner';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 
@@ -40,28 +40,18 @@ export default function RoleTable() {
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
         search: globalFilter,
+        roleType: 'all', // matches API requirement
         status: statusFilter !== 'all' ? statusFilter.toUpperCase() : ''
       };
 
       const response = await roleService.getAllRoles(params);
-      
-      if (response.success) {
-        // Transform API data to match frontend format
-        // const transformedData = response.data.map(role => ({
-        //   id: role.id,
-        //   name: role.name,
-        //   displayName: role.displayName || role.name.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        //   createdDate: new Date(role.createdAt).toLocaleDateString('en-GB', {
-        //     day: '2-digit',
-        //     month: 'short',
-        //     year: 'numeric'
-        //   }),
-        //   status: role.status.charAt(0) + role.status.slice(1).toLowerCase(),
-        //   userCount: role._count?.users || 0,
-        //   description: role.description || '',
-        //   isSystem: role.isSystem || false
-        // }));
-        const transformedData = response.data.map(role => ({
+
+      // Handle response structure: { status: true, data: { roles: [], pagination: {} } }
+      if (response.status || response.success) {
+        const rolesData = response.data?.roles || [];
+        const paginationData = response.data?.pagination || {};
+
+        const transformedData = rolesData.map(role => ({
           id: role.id,
           name: role.name,
           displayName: role.displayName || role.name.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()),
@@ -71,16 +61,16 @@ export default function RoleTable() {
             year: 'numeric'
           }),
           // FIX: Handle both system and company roles
-          status: role.isSystem ? 
-            (role.isEditable === false ? 'System' : 'Active') : 
+          status: role.isSystem ?
+            (role.isEditable === false ? 'System' : 'Active') :
             (role.isActive ? 'Active' : 'Inactive'),
           userCount: role._count?.users || 0,
           description: role.description || '',
           isSystem: role.isSystem || false
         }));
-        
+
         setData(transformedData);
-        setTotalItems(response.pagination?.totalItems || transformedData.length);
+        setTotalItems(paginationData.total || rolesData.length);
       }
     } catch (error) {
       console.error('Error fetching roles:', error);
@@ -131,7 +121,7 @@ export default function RoleTable() {
         cell: info => (
           <div>
             <div className="flex items-center">
-              <Link 
+              <Link
                 href={`/super-admin/roles-permissions/${info.row.original.id}`}
                 className="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 block"
               >
@@ -159,7 +149,7 @@ export default function RoleTable() {
         header: 'Status',
         cell: info => {
           const status = info.getValue();
-          const statusClass = status === 'Active' 
+          const statusClass = status === 'Active'
             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
             : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
           return (
@@ -184,7 +174,7 @@ export default function RoleTable() {
         cell: info => {
           const role = info.row.original;
           const isSystemRole = role.isSystem;
-          
+
           return (
             <div className="flex items-center gap-3">
               {/* PERMISSIONS - Always visible */}
@@ -198,7 +188,7 @@ export default function RoleTable() {
                   Permissions
                 </span>
               </Link>
-              
+
               {/* EDIT - Only for non-system roles */}
               {!isSystemRole && (
                 <Link
@@ -212,7 +202,7 @@ export default function RoleTable() {
                   </span>
                 </Link>
               )}
-              
+
               {/* DELETE - Only for non-system roles with no users */}
               {!isSystemRole && role.userCount === 0 && (
                 <button
@@ -327,11 +317,11 @@ export default function RoleTable() {
                               asc: <ChevronUp className="ml-1 w-4 h-4 text-blue-500" />,
                               desc: <ChevronDown className="ml-1 w-4 h-4 text-blue-500" />,
                             }[header.column.getIsSorted()] ?? (
-                              <div className="ml-1 flex flex-col">
-                                <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
-                                <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
-                              </div>
-                            )}
+                                <div className="ml-1 flex flex-col">
+                                  <ChevronUp className="w-3 h-3 -mb-0.5 text-gray-400" />
+                                  <ChevronDown className="w-3 h-3 -mt-0.5 text-gray-400" />
+                                </div>
+                              )}
                           </>
                         )}
                       </div>
@@ -343,8 +333,8 @@ export default function RoleTable() {
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {table.getRowModel().rows.length > 0 ? (
                 table.getRowModel().rows.map(row => (
-                  <tr 
-                    key={row.id} 
+                  <tr
+                    key={row.id}
                     className="hover:bg-gray-50 dark:hover:bg-gray-700/30 transition-colors duration-150"
                     onMouseEnter={() => setHoveredRow(row.id)}
                     onMouseLeave={() => setHoveredRow(null)}
