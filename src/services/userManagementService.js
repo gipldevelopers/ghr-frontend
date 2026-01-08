@@ -5,7 +5,7 @@ export const userManagementService = {
   // Get all users with pagination and filters
   getAllUsers: async (params = {}) => {
     try {
-      const response = await apiClient.get('/users', { params });
+      const response = await apiClient.get('/users/get-all-users', { params });
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch users';
@@ -16,7 +16,7 @@ export const userManagementService = {
   // Get user by ID
   getUserById: async (id) => {
     try {
-      const response = await apiClient.get(`/users/${id}`);
+      const response = await apiClient.get(`/users/get-user-by-id/${id}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch user';
@@ -27,7 +27,7 @@ export const userManagementService = {
   // Create new user
   createUser: async (userData) => {
     try {
-      const response = await apiClient.post('/users', userData);
+      const response = await apiClient.post('/users/create-user', userData);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to create user';
@@ -38,7 +38,7 @@ export const userManagementService = {
   // Update user
   updateUser: async (id, userData) => {
     try {
-      const response = await apiClient.put(`/users/${id}`, userData);
+      const response = await apiClient.put(`/users/update-user/${id}`, userData);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to update user';
@@ -49,7 +49,7 @@ export const userManagementService = {
   // Delete user
   deleteUser: async (id) => {
     try {
-      const response = await apiClient.delete(`/users/${id}`);
+      const response = await apiClient.delete(`/users/delete-user/${id}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to delete user';
@@ -57,21 +57,10 @@ export const userManagementService = {
     }
   },
 
-  // Get available roles for assignment
-//   getAvailableRoles: async () => {
-//     try {
-//       const response = await apiClient.get('/rbac/roles');
-//       return response.data;
-//     } catch (error) {
-//       const errorMessage = error.response?.data?.message || 'Failed to fetch roles';
-//       throw new Error(errorMessage);
-//     }
-//   },
- // Get available roles for assignment - Updated endpoint
   getAvailableRoles: async () => {
     try {
-      const response = await apiClient.get('/rbac/roles', { 
-        params: { limit: 100, type: 'custom' } 
+      const response = await apiClient.get('/rbac/roles', {
+        params: { limit: 100, type: 'custom' }
       });
       return response.data;
     } catch (error) {
@@ -80,20 +69,9 @@ export const userManagementService = {
     }
   },
 
-  // Get system roles
-//   getSystemRoles: async () => {
-//     try {
-//       const response = await apiClient.get('/rbac/system-roles');
-//       return response.data;
-//     } catch (error) {
-//       const errorMessage = error.response?.data?.message || 'Failed to fetch system roles';
-//       throw new Error(errorMessage);
-//     }
-//   },
-// Get system roles - Updated endpoint
   getSystemRoles: async () => {
     try {
-      const response = await apiClient.get('/rbac/roles/system');
+      const response = await apiClient.get('/users/roles/system');
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch system roles';
@@ -101,7 +79,6 @@ export const userManagementService = {
     }
   },
 
-    // Get company roles - New endpoint
   getCompanyRoles: async () => {
     try {
       const response = await apiClient.get('/users/roles/company');
@@ -112,10 +89,9 @@ export const userManagementService = {
     }
   },
 
-  // Assign role to user
   assignRoleToUser: async (userId, roleData) => {
     try {
-      const response = await apiClient.post(`/users/${userId}/assign-role`, roleData);
+      const response = await apiClient.post(`/users/assign-role/${userId}`, roleData);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to assign role';
@@ -123,10 +99,9 @@ export const userManagementService = {
     }
   },
 
-  // Remove role from user
   removeRoleFromUser: async (userId) => {
     try {
-      const response = await apiClient.delete(`/users/${userId}/role`);
+      const response = await apiClient.delete(`/users/remove-role/${userId}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to remove role';
@@ -137,7 +112,7 @@ export const userManagementService = {
   // Change user status (activate/deactivate)
   changeUserStatus: async (userId, status) => {
     try {
-      const response = await apiClient.patch(`/users/${userId}/status`, { status });
+      const response = await apiClient.patch(`/users/change-user-status/${userId}`, { status });
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to change user status';
@@ -148,7 +123,7 @@ export const userManagementService = {
   // Reset user password
   resetUserPassword: async (userId) => {
     try {
-      const response = await apiClient.post(`/users/${userId}/reset-password`);
+      const response = await apiClient.post(`/users/reset-password/${userId}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to reset password';
@@ -159,7 +134,7 @@ export const userManagementService = {
   // Get user activity/logs
   getUserActivity: async (userId) => {
     try {
-      const response = await apiClient.get(`/users/${userId}/activity`);
+      const response = await apiClient.get(`/users/get-user-activity/${userId}`);
       return response.data;
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Failed to fetch user activity';

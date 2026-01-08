@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Breadcrumb from '@/components/common/Breadcrumb';
-import { 
-  User, Mail, Shield, Calendar, Clock, Building, Briefcase, 
+import {
+  User, Mail, Shield, Calendar, Clock, Building, Briefcase,
   ArrowLeft, Edit, Key, UserCheck, UserX, Activity
 } from 'lucide-react';
 import { userManagementService } from '@/services/userManagementService';
@@ -23,12 +23,12 @@ export default function UserDetailsPage() {
     const fetchUserData = async () => {
       try {
         setLoading(true);
-        
+
         // Fetch user details
         const userResponse = await userManagementService.getUserById(params.id);
         if (userResponse.success) {
           setUser(userResponse.data);
-          
+
           // Fetch user activity logs
           const activityResponse = await userManagementService.getUserActivity(params.id);
           if (activityResponse.success) {
@@ -50,7 +50,7 @@ export default function UserDetailsPage() {
     try {
       const confirmReset = window.confirm(`Reset password for ${user.email}?`);
       if (!confirmReset) return;
-      
+
       const response = await userManagementService.resetUserPassword(user.id);
       if (response.success) {
         toast.success('Password reset successful. Temporary password sent to user.');
@@ -102,7 +102,7 @@ export default function UserDetailsPage() {
 
   return (
     <div className="bg-gray-50 min-h-screen dark:bg-gray-900">
-      <Breadcrumb 
+      <Breadcrumb
         items={[
           { label: 'Dashboard', href: '/dashboard' },
           { label: 'Super Admin', href: '/super-admin' },
@@ -119,20 +119,13 @@ export default function UserDetailsPage() {
             </button>
             <button
               onClick={() => setShowDeactivateDialog(true)}
-              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition ${
-                user.isActive 
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition ${user.isActive
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-green-600 text-white hover:bg-green-700'
-              }`}
+                }`}
             >
               {user.isActive ? <UserX size={16} /> : <UserCheck size={16} />}
               {user.isActive ? 'Deactivate' : 'Activate'}
-            </button>
-            <button
-              onClick={() => router.push(`/super-admin/users/edit/${user.id}`)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              <Edit size={16} /> Edit User
             </button>
           </div>
         }
@@ -150,18 +143,17 @@ export default function UserDetailsPage() {
                 </div>
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                    {user.employee 
+                    {user.employee
                       ? `${user.employee.firstName} ${user.employee.lastName}`
                       : user.email.split('@')[0]
                     }
                   </h2>
                   <p className="text-gray-600 dark:text-gray-400">{user.email}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      user.isActive 
+                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${user.isActive
                         ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                         : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                    }`}>
+                      }`}>
                       {user.isActive ? 'Active' : 'Inactive'}
                     </span>
                     <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium dark:bg-blue-900/30 dark:text-blue-400">
@@ -235,14 +227,14 @@ export default function UserDetailsPage() {
               </div>
             </div>
 
-            {/* Activity Logs */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
-                <Activity className="w-5 h-5 mr-2" /> Recent Activity
-              </h3>
-              <div className="space-y-4">
-                {activityLogs.length > 0 ? (
-                  activityLogs.map((log, index) => (
+            {/* Activity Logs (if any) */}
+            {activityLogs.length > 0 && (
+              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+                  <Activity className="w-5 h-5 mr-2" /> Recent Activity
+                </h3>
+                <div className="space-y-4">
+                  {activityLogs.map((log, index) => (
                     <div key={index} className="flex items-start border-b border-gray-100 dark:border-gray-700 pb-4 last:border-0">
                       <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-900/20 mr-3">
                         <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -254,14 +246,11 @@ export default function UserDetailsPage() {
                         </p>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <p className="text-gray-500 dark:text-gray-400 text-center py-4">
-                    No activity logs found
-                  </p>
-                )}
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
+
           </div>
 
           {/* Sidebar - Account Information */}
@@ -283,45 +272,15 @@ export default function UserDetailsPage() {
                 <div>
                   <p className="text-sm text-gray-500 dark:text-gray-400">Last Login</p>
                   <p className="text-gray-900 dark:text-white">
-                    {user.lastLogin 
+                    {user.lastLogin
                       ? new Date(user.lastLogin).toLocaleString()
                       : 'Never'
                     }
                   </p>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">First Login</p>
-                  <p className="text-gray-900 dark:text-white">
-                    {user.isFirstLogin ? 'Pending' : 'Completed'}
-                  </p>
-                </div>
               </div>
             </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <button
-                  onClick={() => router.push(`/super-admin/users/edit/${user.id}`)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-                >
-                  <Edit size={16} /> Edit User
-                </button>
-                <button
-                  onClick={handleResetPassword}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
-                >
-                  <Key size={16} /> Reset Password
-                </button>
-                <button
-                  onClick={() => router.push(`/super-admin/users/${user.id}/role-assignment`)}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
-                >
-                  <Shield size={16} /> Manage Roles
-                </button>
-              </div>
-            </div>
+            {/* Quick Actions removed */}
           </div>
         </div>
       </div>
@@ -332,11 +291,10 @@ export default function UserDetailsPage() {
         onClose={() => setShowDeactivateDialog(false)}
         onConfirm={handleToggleStatus}
         title={user.isActive ? 'Deactivate User' : 'Activate User'}
-        message={`Are you sure you want to ${user.isActive ? 'deactivate' : 'activate'} this user? ${
-          user.isActive 
+        message={`Are you sure you want to ${user.isActive ? 'deactivate' : 'activate'} this user? ${user.isActive
             ? 'They will no longer be able to log in until reactivated.'
             : 'They will regain access to the system.'
-        }`}
+          }`}
         confirmText={user.isActive ? 'Deactivate User' : 'Activate User'}
         cancelText="Cancel"
         isDestructive={user.isActive}

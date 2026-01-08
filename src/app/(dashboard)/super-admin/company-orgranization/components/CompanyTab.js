@@ -21,7 +21,9 @@ export default function CompanyTab({ companies = [], onRefresh }) {
         country: '',
         plan: 'STANDARD',
         address: '',
-        website: ''
+        website: '',
+        maxUsers: '',
+        maxEmployees: ''
     });
 
     const resetForm = () => {
@@ -36,7 +38,9 @@ export default function CompanyTab({ companies = [], onRefresh }) {
             country: '',
             plan: 'STANDARD',
             address: '',
-            website: ''
+            website: '',
+            maxUsers: '',
+            maxEmployees: ''
         });
         setEditingCompany(null);
         setIsFormOpen(false);
@@ -55,7 +59,9 @@ export default function CompanyTab({ companies = [], onRefresh }) {
             country: company.country || '',
             plan: company.plan || 'STANDARD',
             address: company.address || '',
-            website: company.website || ''
+            website: company.website || '',
+            maxUsers: company.maxUsers || '',
+            maxEmployees: company.maxEmployees || ''
         });
         setIsFormOpen(true);
     };
@@ -120,9 +126,10 @@ export default function CompanyTab({ companies = [], onRefresh }) {
                         <input
                             type="text"
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={formData.companyCode}
                             onChange={(e) => setFormData({ ...formData, companyCode: e.target.value })}
+                            disabled={!!editingCompany}
+                            className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all ${editingCompany ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                         />
                     </div>
 
@@ -131,9 +138,10 @@ export default function CompanyTab({ companies = [], onRefresh }) {
                         <input
                             type="text"
                             required
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={formData.subdomain}
                             onChange={(e) => setFormData({ ...formData, subdomain: e.target.value })}
+                            disabled={!!editingCompany}
+                            className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all ${editingCompany ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : ''}`}
                         />
                     </div>
 
@@ -206,6 +214,26 @@ export default function CompanyTab({ companies = [], onRefresh }) {
                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
                             value={formData.website}
                             onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Max Users</label>
+                        <input
+                            type="number"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            value={formData.maxUsers}
+                            onChange={(e) => setFormData({ ...formData, maxUsers: e.target.value })}
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">Max Employees</label>
+                        <input
+                            type="number"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                            value={formData.maxEmployees}
+                            onChange={(e) => setFormData({ ...formData, maxEmployees: e.target.value })}
                         />
                     </div>
 

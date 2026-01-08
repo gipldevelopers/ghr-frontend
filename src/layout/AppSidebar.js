@@ -13,7 +13,6 @@ import {
   Calendar,
   Clock,
   FileText,
-  PieChart,
   Settings,
   UserCircle,
   ChevronDown,
@@ -23,10 +22,10 @@ import {
   CreditCard,
   Package,
   Shield,
-  UserStar,
   CalendarDays,
-  Menu,
-  X
+  X,
+  GitBranch,
+  Network,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -40,6 +39,30 @@ const superAdminNavItems = [
     icon: <Building size={20} />,
     name: "Company & Organization",
     path: "/super-admin/company-orgranization",
+  },
+  {
+    icon: <GitBranch size={20} />,
+    name: "Workflow Management",
+    subItems: [
+      { name: "Workflow List", path: "/super-admin/workflow-management" },
+      { name: "Add Workflow", path: "/super-admin/workflow-management/add" },
+    ],
+  },
+  {
+    icon: <Network size={20} />,
+    name: "Integration Center",
+    subItems: [
+      { name: "All Integrations", path: "/super-admin/integration-management" },
+      { name: "Add Integration", path: "/super-admin/integration-management/add" },
+    ],
+  },
+  {
+    icon: <CalendarDays size={20} />,
+    name: "Policy & Rule",
+    subItems: [
+      { name: "Policy List", path: "/super-admin/policy-rule" },
+      { name: "Add Policy", path: "/super-admin/policy-rule/add" },
+    ],
   },
   {
     icon: <Shield size={20} />,
@@ -56,14 +79,6 @@ const superAdminNavItems = [
       { name: "All Users", path: "/super-admin/users" },
     ],
   },
-  // {
-  //   icon: <Settings size={20} />,
-  //   name: "System Settings",
-  //   subItems: [
-  //     { name: "General Settings", path: "/super-admin/settings/general" },
-  //     { name: "Audit Logs", path: "/super-admin/settings/audit" },
-  //   ],
-  // },
 ];
 
 const hrNavItems = [
@@ -105,16 +120,6 @@ const hrNavItems = [
       { name: "Dashboard", path: "/hr/attendance" },
     ],
   },
-  // {
-  //   icon: <PieChart size={20} />,
-  //   name: "Reports & Analytics",
-  //   subItems: [
-  //     { name: "Attendance Reports", path: "/hr/attendance/reports" },
-  //     { name: "Employee Reports", path: "/hr/reports/employees" },
-  //     { name: "Leave Reports", path: "/hr/reports/leave" },
-  //     { name: "Department Reports", path: "/hr/reports/departments" },
-  //   ],
-  // },
   {
     icon: <Calendar size={20} />,
     name: "Leave Management",

@@ -46,7 +46,7 @@ export default function LocationTab({ companies }) {
         setIsLoading(true);
         try {
             const data = await companyOrganizationService.getLocations(companyId);
-            setLocations(data.locations || data); // Adjust based on actual API response structure
+            setLocations(data.data || data.locations || data);
         } catch (error) {
             console.error('Failed to fetch locations', error);
             toast.error('Failed to fetch locations');

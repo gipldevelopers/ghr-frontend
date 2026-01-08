@@ -14,7 +14,6 @@ import { ChevronUp, ChevronDown, Edit, Trash2, User, Mail, Shield, Loader2, Key,
 import Pagination from '@/components/common/Pagination';
 import UserFilters from './UserFilters';
 import { userManagementService } from '@/services/userManagementService';
-import { roleService } from '@/services/super-admin-services/user-roleService';
 import { toast } from 'sonner';
 import ConfirmationDialog from '@/components/common/ConfirmationDialog';
 
@@ -55,9 +54,10 @@ export default function UserTable() {
         role: roleFilter !== 'all' ? roleFilter : ''
       };
 
-      const [usersResponse, rolesResponse] = await Promise.all([
+      const [usersResponse, companyRolesResponse, systemRolesResponse] = await Promise.all([
         userManagementService.getAllUsers(params),
-        roleService.getAllRoles() // Use roleService to get roles
+        userManagementService.getCompanyRoles(),
+        userManagementService.getSystemRoles()
       ]);
 
       if (usersResponse.success) {
@@ -72,13 +72,6 @@ export default function UserTable() {
           systemRole: user.systemRole,
           companyRole: user.companyRole?.displayName || 'No role assigned',
           status: user.isActive ? 'Active' : 'Inactive',
-          lastLogin: user.lastLogin
-            ? new Date(user.lastLogin).toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric'
-            })
-            : 'Never',
           createdAt: new Date(user.createdAt).toLocaleDateString('en-GB', {
             day: '2-digit',
             month: 'short',
@@ -94,12 +87,13 @@ export default function UserTable() {
         setTotalItems(usersResponse.pagination?.totalItems || transformedData.length);
       }
 
-      if (rolesResponse.status || rolesResponse.success) {
-        setAvailableRoles(rolesResponse.data?.roles || []);
+      if (companyRolesResponse.status || companyRolesResponse.success) {
+        setAvailableRoles(companyRolesResponse.data?.roles || companyRolesResponse.data || []);
       }
 
-      // System roles often come from a different logic or are part of available roles
-      // For now we assume availableRoles has everything we need for the dropdown
+      if (systemRolesResponse.status || systemRolesResponse.success) {
+        setSystemRoles(systemRolesResponse.data || []);
+      }
 
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -118,7 +112,16 @@ export default function UserTable() {
     const roles = ['all'];
     const roleMap = {};
 
-    // Add roles from availableRoles
+    // Add system roles
+    systemRoles.forEach(role => {
+      const displayName = role.displayName || role.name;
+      if (displayName && !roleMap[displayName]) {
+        roleMap[displayName] = true;
+        roles.push(displayName);
+      }
+    });
+
+    // Add company roles
     availableRoles.forEach(role => {
       const displayName = role.displayName || role.name;
       if (displayName && !roleMap[displayName]) {
@@ -128,7 +131,7 @@ export default function UserTable() {
     });
 
     return roles;
-  }, [availableRoles]);
+  }, [availableRoles, systemRoles]);
 
   // Handle delete click
   const handleDeleteClick = (user) => {
@@ -144,7 +147,15 @@ export default function UserTable() {
 
   const handleAssignRoleClick = (user) => {
     setUserToAssignRole(user);
-    setSelectedRoleForAssign(user.companyRoleId || '');
+    // Determine initial selected value
+    // Priority: Company Role -> System Role -> empty
+    if (user.companyRoleId) {
+      setSelectedRoleForAssign(`company:${user.companyRoleId}`);
+    } else if (user.systemRole) {
+      setSelectedRoleForAssign(`system:${user.systemRole}`);
+    } else {
+      setSelectedRoleForAssign('');
+    }
     setAssignRoleDialogOpen(true);
   };
 
@@ -189,11 +200,28 @@ export default function UserTable() {
       toast.error("Please select a role");
       return;
     }
+
     try {
-      await roleService.assignRoleToUser({
-        userId: userToAssignRole.id,
-        roleId: selectedRoleForAssign
-      });
+      const [type, roleValue] = selectedRoleForAssign.split(':');
+
+      if (type === 'system') {
+        // For system roles, update the user object
+        const payload = {
+          email: userToAssignRole.email,
+          systemRole: roleValue,
+          companyRoleId: userToAssignRole.companyRoleId || null,
+          employeeId: userToAssignRole.employee?.id || null, // Ensure ID is extracted
+          isActive: userToAssignRole.isActive
+        };
+
+        await userManagementService.updateUser(userToAssignRole.id, payload);
+      } else {
+        // For company roles, use Assign Role
+        await userManagementService.assignRoleToUser(userToAssignRole.id, {
+          companyRoleId: roleValue
+        });
+      }
+
       toast.success("Role assigned successfully");
       fetchData();
     } catch (error) {
@@ -205,7 +233,6 @@ export default function UserTable() {
       setSelectedRoleForAssign('');
     }
   };
-
 
   // Handle reset password
   const handleResetPassword = async (user) => {
@@ -237,7 +264,7 @@ export default function UserTable() {
             </div>
             <div className="ml-3">
               <Link
-                href={`/super-admin/users/${info.row.original.publicId || info.row.original.id}`}
+                href={`/super-admin/users/${info.row.original.id}`}
                 className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 block"
               >
                 {info.getValue()}
@@ -261,28 +288,36 @@ export default function UserTable() {
           </div>
         ),
       },
-      {
-        accessorKey: 'systemRole',
-        header: 'System Role',
-        cell: info => (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400">
-            <Shield size={12} className="mr-1" />
-            {info.getValue()}
-          </span>
-        ),
-      },
+
       {
         accessorKey: 'companyRole',
         header: 'Assigned Role',
         cell: info => {
-          const role = info.getValue();
-          return role !== 'No role assigned' ? (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-              {role}
+          const companyRole = info.row.original.companyRole;
+          const systemRole = info.row.original.systemRole;
+
+          let roleDisplay = 'No role assigned';
+          let isCompanyRole = false;
+
+          // Check for company role first (as it's more specific)
+          if (companyRole && companyRole !== 'No role assigned') {
+            roleDisplay = companyRole;
+            isCompanyRole = true;
+          } else if (systemRole) {
+            // Fallback to system role
+            roleDisplay = systemRole;
+          }
+
+          return roleDisplay !== 'No role assigned' ? (
+            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${isCompanyRole
+                ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                : "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400"
+              }`}>
+              {roleDisplay}
             </span>
           ) : (
             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
-              {role}
+              {roleDisplay}
             </span>
           );
         },
@@ -304,13 +339,7 @@ export default function UserTable() {
           );
         },
       },
-      {
-        accessorKey: 'lastLogin',
-        header: 'Last Login',
-        cell: info => (
-          <span className="text-sm text-gray-600 dark:text-gray-400">{info.getValue()}</span>
-        ),
-      },
+
       {
         id: 'actions',
         header: 'Actions',
@@ -332,24 +361,13 @@ export default function UserTable() {
               </button>
 
               <Link
-                href={`/super-admin/users/${user.publicId || user.id}`}
+                href={`/super-admin/users/${user.id}`}
                 className="p-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 group relative"
                 title="View Details"
               >
                 <Eye className="w-4 h-4" />
                 <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
                   View
-                </span>
-              </Link>
-
-              <Link
-                href={`/super-admin/users/edit/${user.publicId || user.id}`}
-                className="p-1.5 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 group relative"
-                title="Edit User"
-              >
-                <Edit className="w-4 h-4" />
-                <span className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap">
-                  Edit
                 </span>
               </Link>
 
@@ -379,7 +397,7 @@ export default function UserTable() {
                 </span>
               </button>
 
-              {!isCurrentUser && !user.hasEmployee && (
+              {!isCurrentUser && (
                 <button
                   onClick={() => handleDeleteClick(user)}
                   className="p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50 group relative"
@@ -545,7 +563,7 @@ export default function UserTable() {
 
       {/* Assign Role Dialog */}
       {assignRoleDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
               Assign Role to {userToAssignRole?.name}
@@ -561,11 +579,20 @@ export default function UserTable() {
                 className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
               >
                 <option value="">Select a role...</option>
-                {availableRoles.map(role => (
-                  <option key={role.id} value={role.id}>
-                    {role.displayName || role.name}
-                  </option>
-                ))}
+                <optgroup label="System Roles">
+                  {systemRoles.map(role => (
+                    <option key={`system-${role.name}`} value={`system:${role.name}`}>
+                      {role.displayName || role.name}
+                    </option>
+                  ))}
+                </optgroup>
+                <optgroup label="Company Roles">
+                  {availableRoles.map(role => (
+                    <option key={`company-${role.id}`} value={`company:${role.id}`}>
+                      {role.displayName || role.name}
+                    </option>
+                  ))}
+                </optgroup>
               </select>
             </div>
 

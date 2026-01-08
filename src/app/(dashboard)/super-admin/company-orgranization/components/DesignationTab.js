@@ -21,7 +21,10 @@ export default function DesignationTab({ companies }) {
         name: '',
         code: '',
         level: '',
-        grade: ''
+        grade: '',
+        reportingLevel: '',
+        minExperience: '',
+        maxExperience: ''
     });
 
     useEffect(() => {
@@ -45,7 +48,7 @@ export default function DesignationTab({ companies }) {
         setIsLoading(true);
         try {
             const data = await companyOrganizationService.getDesignations(companyId);
-            setDesignations(data.designations || data);
+            setDesignations(data.data || data.designations || data);
         } catch (error) {
             console.error('Failed to fetch designations', error);
             toast.error('Failed to fetch designations');
@@ -57,7 +60,7 @@ export default function DesignationTab({ companies }) {
     const fetchDepartments = async (companyId) => {
         try {
             const data = await companyOrganizationService.getDepartments(companyId);
-            setDepartments(data.departments || data);
+            setDepartments(data.data || data.departments || data);
         } catch (error) {
             console.error("Failed to fetch departments", error);
         }
@@ -70,7 +73,10 @@ export default function DesignationTab({ companies }) {
             name: '',
             code: '',
             level: '',
-            grade: ''
+            grade: '',
+            reportingLevel: '',
+            minExperience: '',
+            maxExperience: ''
         });
         setEditingDesignation(null);
         setIsFormOpen(false);
@@ -84,7 +90,10 @@ export default function DesignationTab({ companies }) {
             name: desig.name || '',
             code: desig.code || '',
             level: desig.level || '',
-            grade: desig.grade || ''
+            grade: desig.grade || '',
+            reportingLevel: desig.reportingLevel || '',
+            minExperience: desig.minExperience || '',
+            maxExperience: desig.maxExperience || ''
         });
         setIsFormOpen(true);
     };
@@ -109,11 +118,20 @@ export default function DesignationTab({ companies }) {
         }
 
         try {
+            const payload = {
+                ...formData,
+                companyId: parseInt(formData.companyId),
+                departmentId: parseInt(formData.departmentId),
+                reportingLevel: formData.reportingLevel ? parseInt(formData.reportingLevel) : null,
+                minExperience: formData.minExperience ? parseInt(formData.minExperience) : null,
+                maxExperience: formData.maxExperience ? parseInt(formData.maxExperience) : null
+            };
+
             if (editingDesignation) {
-                await companyOrganizationService.updateDesignation(editingDesignation.id, formData);
+                await companyOrganizationService.updateDesignation(editingDesignation.id, payload);
                 toast.success('Designation updated successfully');
             } else {
-                await companyOrganizationService.createDesignation(formData);
+                await companyOrganizationService.createDesignation(payload);
                 toast.success('Designation created successfully');
             }
             resetForm();
@@ -195,6 +213,22 @@ export default function DesignationTab({ companies }) {
                         <div className="space-y-2">
                             <label className="text-sm font-medium text-gray-700">Grade</label>
                             <input type="text" value={formData.grade} onChange={e => setFormData({ ...formData, grade: e.target.value })} className="form-input w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. A" />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-gray-700">Reporting Level</label>
+                            <input type="number" value={formData.reportingLevel} onChange={e => setFormData({ ...formData, reportingLevel: e.target.value })} className="form-input w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. 2" />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Min Exp (Yrs)</label>
+                                <input type="number" value={formData.minExperience} onChange={e => setFormData({ ...formData, minExperience: e.target.value })} className="form-input w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="0" />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Max Exp (Yrs)</label>
+                                <input type="number" value={formData.maxExperience} onChange={e => setFormData({ ...formData, maxExperience: e.target.value })} className="form-input w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="10" />
+                            </div>
                         </div>
 
 

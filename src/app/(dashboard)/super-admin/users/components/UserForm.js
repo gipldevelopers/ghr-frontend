@@ -14,7 +14,7 @@ export default function UserForm({ user = null, isEdit = false }) {
   const [systemRoles, setSystemRoles] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
-  
+
   const [formData, setFormData] = useState({
     email: "",
     systemRole: "",
@@ -28,16 +28,16 @@ export default function UserForm({ user = null, isEdit = false }) {
     const loadData = async () => {
       try {
         setLoadingData(true);
-        
+
         // Fetch roles and employees in parallel
         const [rolesResponse, sysRolesResponse, employeesResponse] = await Promise.all([
-          userManagementService.getAvailableRoles(),
+          userManagementService.getCompanyRoles(),
           userManagementService.getSystemRoles(),
           fetch('/api/employees?limit=100').then(res => res.json()) // You'll need to create this endpoint
         ]);
 
         if (rolesResponse.success) {
-          setAvailableRoles(rolesResponse.data || []);
+          setAvailableRoles(rolesResponse.data?.roles || rolesResponse.data || []);
         }
 
         if (sysRolesResponse.success) {
@@ -80,7 +80,7 @@ export default function UserForm({ user = null, isEdit = false }) {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
+
     // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
@@ -108,11 +108,11 @@ export default function UserForm({ user = null, isEdit = false }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       // Prepare data for API
       const apiData = {
@@ -124,7 +124,7 @@ export default function UserForm({ user = null, isEdit = false }) {
       };
 
       let response;
-      
+
       if (isEdit) {
         response = await userManagementService.updateUser(user.id, apiData);
         toast.success('User updated successfully');
@@ -135,11 +135,11 @@ export default function UserForm({ user = null, isEdit = false }) {
         // Optionally redirect to user details or send password reset
         router.push('/super-admin/users');
       }
-      
+
       router.refresh();
     } catch (error) {
       console.error('Error saving user:', error);
-      
+
       // Handle specific error cases
       if (error.message.includes('already exists')) {
         toast.error('Email already exists');
@@ -210,9 +210,8 @@ export default function UserForm({ user = null, isEdit = false }) {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${
-                    errors.email ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 transition-colors ${errors.email ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
+                    }`}
                   placeholder="Enter email address"
                   disabled={isSubmitting || isEdit}
                 />
@@ -235,9 +234,8 @@ export default function UserForm({ user = null, isEdit = false }) {
                   name="systemRole"
                   value={formData.systemRole}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white ${
-                    errors.systemRole ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.systemRole ? "border-red-500 ring-1 ring-red-500" : "border-gray-300"
+                    }`}
                   disabled={isSubmitting}
                 >
                   <option value="">Select System Role</option>
@@ -330,7 +328,7 @@ export default function UserForm({ user = null, isEdit = false }) {
                     Password Information
                   </h4>
                   <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-                    A temporary password will be automatically generated and sent to the user's email address. 
+                    A temporary password will be automatically generated and sent to the user's email address.
                     They will be required to change it on first login.
                   </p>
                 </div>
