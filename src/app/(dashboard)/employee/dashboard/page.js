@@ -1,60 +1,95 @@
-import React from "react";
-import EmployeeProfile from "./components/EmployeeProfile";
-import LeaveSummary from "./components/LeaveSummary";
-import Payroll from "./components/Payroll";
-import LeaveTypes from "./components/LeaveTypes";
-import UpcomingBirthdays from "./components/UpcomingBirthdays";
-import UpcomingEvents from "./components/UpcomingEvents";
-import UpcomingWorkAnniversaries from "./components/UpcomingWorkAnniversaries";
-import EmployeeAttendance from "./components/EmployeeAttendance";
+"use client";
 
-export const metadata = {
-  title: "Employee Dashboard | GHR Portal",
-  description: "Employee dashboard with profile, leave, payroll, and events",
-};
+import React, { useState, useEffect } from "react";
+import { employeeDashboardService } from "@/services/employee/dashboard.service";
+import AttendanceWidget from "./components/widgets/AttendanceWidget";
+import LeaveWidget from "./components/widgets/LeaveWidget";
+import PayrollWidget from "./components/widgets/PayrollWidget";
+import PendingRequestsWidget from "./components/widgets/PendingRequestsWidget";
+import NotificationsWidget from "./components/widgets/NotificationsWidget";
 
 export default function EmployeeDashboard() {
-  return (
-    <div className="space-y-5 bg-gray-50 dark:bg-gray-900 min-h-screen">
-      {/* Row 1: Profile + Leave Summary - Fixed height container */}
-      <div className="flex flex-col md:flex-row w-full gap-4 items-stretch">
-        {/* Right Column - 30% */}
-        <div className="w-full md:w-3/10 min-w-[280px] flex">
-          <EmployeeAttendance />
-        </div>
-        {/* Left Column - 70% */}
-        <div className="w-full md:w-7/10 min-w-[280px] flex">
-          <LeaveSummary />
-        </div>
-      </div>
+    const [dashboardData, setDashboardData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
 
-      {/* Row 2: Payroll (Full Width) */}
-      {/* <div className="w-full">
-        <LeaveSummary />
-      </div> */}
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const data = await employeeDashboardService.getDashboardStats();
+                setDashboardData(data);
+            } catch (error) {
+                console.error("Failed to fetch dashboard data", error);
+                setError(error.message);
+            } finally {
+                setIsLoading(false);
+            }
+        };
 
-      {/* Row 2: Payroll (Full Width) */}
-      <div className="w-full">
-        <Payroll />
-      </div>
+        fetchData();
+    }, []);
 
-      {/* Row 3: Leave Types (Full Width) */}
-      <div className="w-full">
-        <LeaveTypes />
-      </div>
+    if (isLoading) {
+        return (
+            <div className="p-8 space-y-4">
+                <div className="h-8 bg-gray-200 rounded w-1/4 animate-pulse"></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="h-48 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-48 bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-48 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+            </div>
+        );
+    }
 
-      {/* Row 4: Upcoming Events + Upcoming Birthdays (Side by Side) */}
-      <div className="flex flex-col md:flex-row gap-5">
-        <div className="flex-1 min-w-[300px]">
-          <UpcomingEvents />
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] p-4 text-center">
+                <div className="bg-red-50 text-red-600 p-4 rounded-full mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>
+                </div>
+                <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-2">Dashboard Unavailable</h2>
+                <p className="text-gray-600 dark:text-gray-400 max-w-md">
+                    {error || "We couldn't load your dashboard information."}
+                </p>
+                {error.includes("Employee record not found") && (
+                    <p className="mt-4 text-sm text-gray-500 bg-gray-100 p-2 rounded">
+                        It looks like you are logged in, but your user account is not linked to an active Employee profile. Please contact your HR administrator.
+                    </p>
+                )}
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen p-4">
+            <div>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
+                <p className="text-gray-500">Welcome back! Here's your daily overview.</p>
+            </div>
+
+            {/* Row 1: 3 Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="h-full">
+                    <AttendanceWidget data={dashboardData?.attendance} />
+                </div>
+                <div className="h-full">
+                    <LeaveWidget data={dashboardData?.leaves} />
+                </div>
+                <div className="h-full">
+                    <PayrollWidget data={dashboardData?.payroll} />
+                </div>
+            </div>
+
+            {/* Row 2: 2 Columns */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="h-full">
+                    <PendingRequestsWidget data={dashboardData?.requests} />
+                </div>
+                <div className="h-full">
+                    <NotificationsWidget data={dashboardData?.notifications} />
+                </div>
+            </div>
         </div>
-        <div className="flex-1 min-w-[300px]">
-          <UpcomingBirthdays />
-        </div>
-        <div className="flex-1 min-w-[300px]">
-          <UpcomingWorkAnniversaries />
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
